@@ -1,0 +1,873 @@
+/**
+ * AI Section Builder - Visual Editor Styles
+ * Dark theme professional editor interface
+ * 
+ * @package AISB
+ * @since 2.0.0
+ */
+
+/* =========================================
+   Imports
+   ========================================= */
+@import url('../shared/_variables.css');
+
+/* =========================================
+   Editor Base Styles
+   ========================================= */
+.aisb-editor-wrapper {
+    position: fixed;
+    top: 32px; /* WordPress admin bar */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--aisb-editor-bg-base);
+    color: var(--aisb-editor-text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+/* Hide WordPress admin elements */
+body.aisb-editor-active #adminmenumain,
+body.aisb-editor-active #adminmenuback,
+body.aisb-editor-active #wpadminbar {
+    display: none !important;
+}
+
+body.aisb-editor-active .aisb-editor-wrapper {
+    top: 0;
+}
+
+/* =========================================
+   Editor Toolbar
+   ========================================= */
+.aisb-editor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--aisb-editor-toolbar-height);
+    background: var(--aisb-editor-bg-surface);
+    border-bottom: 1px solid var(--aisb-editor-border);
+    padding: 0 var(--aisb-editor-space-lg);
+    position: relative;
+    z-index: 100;
+}
+
+.aisb-editor-toolbar__left,
+.aisb-editor-toolbar__right {
+    display: flex;
+    align-items: center;
+    gap: var(--aisb-editor-space-md);
+}
+
+.aisb-editor-toolbar__center {
+    flex: 1;
+    text-align: center;
+}
+
+.aisb-editor-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--aisb-editor-text-primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =========================================
+   Editor Layout (Three-Panel)
+   ========================================= */
+.aisb-editor-layout {
+    display: flex;
+    height: calc(100% - var(--aisb-editor-toolbar-height));
+    position: relative;
+}
+
+/* =========================================
+   Editor Panels
+   ========================================= */
+.aisb-editor-panel {
+    background: var(--aisb-editor-bg-panel);
+    border-right: 1px solid var(--aisb-editor-border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.aisb-editor-panel--left {
+    width: var(--aisb-editor-panel-left-width);
+}
+
+.aisb-editor-panel--right {
+    width: var(--aisb-editor-panel-right-width);
+    border-right: none;
+    border-left: 1px solid var(--aisb-editor-border);
+}
+
+.aisb-editor-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--aisb-editor-space-lg);
+    border-bottom: 1px solid var(--aisb-editor-divider);
+}
+
+.aisb-editor-panel__header h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--aisb-editor-text-primary);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.aisb-editor-panel__content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--aisb-editor-space-lg);
+}
+
+/* Custom scrollbar for dark theme */
+.aisb-editor-panel__content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.aisb-editor-panel__content::-webkit-scrollbar-track {
+    background: var(--aisb-editor-bg-surface);
+}
+
+.aisb-editor-panel__content::-webkit-scrollbar-thumb {
+    background: var(--aisb-editor-border);
+    border-radius: 4px;
+}
+
+.aisb-editor-panel__content::-webkit-scrollbar-thumb:hover {
+    background: var(--aisb-editor-border-strong);
+}
+
+/* Close panel button */
+.aisb-editor-close-panel {
+    background: transparent;
+    border: none;
+    color: var(--aisb-editor-text-muted);
+    cursor: pointer;
+    padding: var(--aisb-editor-space-xs);
+    transition: color var(--aisb-transition-fast);
+}
+
+.aisb-editor-close-panel:hover {
+    color: var(--aisb-editor-text-primary);
+}
+
+/* =========================================
+   Editor Canvas
+   ========================================= */
+.aisb-editor-canvas {
+    flex: 1;
+    background: #F5F5F5; /* Light gray wrapper for contrast */
+    overflow-y: auto;
+    position: relative;
+}
+
+.aisb-editor-canvas__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0; /* Zero padding for edge-to-edge sections */
+    min-height: 100vh;
+    background: #FFFFFF; /* White canvas background */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Empty state */
+.aisb-editor-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+    padding: 40px;
+    color: #6B7280;
+}
+
+.aisb-editor-empty-state .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: var(--aisb-editor-space-lg);
+    opacity: 0.3;
+    color: #9CA3AF;
+}
+
+.aisb-editor-empty-state h2 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #374151;
+    margin: 0 0 var(--aisb-editor-space-md) 0;
+}
+
+.aisb-editor-empty-state p {
+    margin: 0;
+    color: #6B7280;
+}
+
+/* =========================================
+   Editor Buttons
+   ========================================= */
+.aisb-editor-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--aisb-editor-space-sm);
+    height: 32px;
+    padding: 0 var(--aisb-editor-space-lg);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--aisb-transition-fast);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.aisb-editor-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--aisb-editor-accent-bg);
+}
+
+.aisb-editor-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Button variants */
+.aisb-editor-btn-primary {
+    background: var(--aisb-editor-accent);
+    color: white;
+}
+
+.aisb-editor-btn-primary:hover:not(:disabled) {
+    background: var(--aisb-editor-accent-hover);
+}
+
+.aisb-editor-btn-ghost {
+    background: transparent;
+    border-color: var(--aisb-editor-border);
+    color: var(--aisb-editor-text-primary);
+}
+
+.aisb-editor-btn-ghost:hover:not(:disabled) {
+    background: var(--aisb-editor-bg-hover);
+    border-color: var(--aisb-editor-border-strong);
+}
+
+/* Icon buttons */
+.aisb-editor-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+}
+
+/* Save status indicator */
+.aisb-save-status {
+    margin-left: var(--aisb-editor-space-md);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--aisb-editor-text-muted);
+    opacity: 0;
+    transition: opacity var(--aisb-transition-fast);
+}
+
+.aisb-save-status.saving,
+.aisb-save-status.saved,
+.aisb-save-status.error,
+.aisb-save-status.unsaved {
+    opacity: 1;
+}
+
+.aisb-save-status.saving {
+    color: var(--aisb-editor-text-secondary);
+}
+
+.aisb-save-status.saved {
+    color: var(--aisb-editor-success);
+}
+
+.aisb-save-status.error {
+    color: var(--aisb-editor-danger);
+}
+
+.aisb-save-status.unsaved {
+    color: var(--aisb-editor-warning, #f39c12);
+}
+
+/* Visual indicator on save button when there are unsaved changes */
+.aisb-editor-button.has-changes {
+    background-color: var(--aisb-editor-warning, #f39c12);
+    border-color: var(--aisb-editor-warning, #f39c12);
+}
+
+.aisb-editor-button.has-changes:hover {
+    background-color: #e67e22;
+    border-color: #e67e22;
+}
+
+/* =========================================
+   Section Type Selector
+   ========================================= */
+.aisb-section-type {
+    display: block;
+    width: 100%;
+    padding: var(--aisb-editor-space-lg);
+    background: var(--aisb-editor-bg-surface);
+    border: 1px solid var(--aisb-editor-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--aisb-transition-fast);
+    text-align: left;
+    margin-bottom: var(--aisb-editor-space-md);
+}
+
+.aisb-section-type:hover {
+    background: var(--aisb-editor-bg-hover);
+    border-color: var(--aisb-editor-accent);
+    transform: translateY(-1px);
+}
+
+.aisb-section-type__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--aisb-editor-accent-bg);
+    border-radius: 8px;
+    margin-bottom: var(--aisb-editor-space-md);
+}
+
+.aisb-section-type__icon .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: var(--aisb-editor-accent);
+}
+
+.aisb-section-type__label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--aisb-editor-text-primary);
+    margin-bottom: var(--aisb-editor-space-xs);
+}
+
+.aisb-section-type__description {
+    font-size: 12px;
+    color: var(--aisb-editor-text-muted);
+    line-height: 1.4;
+}
+
+/* =========================================
+   Accessibility & Screen Reader Support
+   ========================================= */
+.screen-reader-text {
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+}
+
+.screen-reader-text:focus {
+    background-color: #f1f1f1;
+    border-radius: 3px;
+    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
+    clip: auto !important;
+    color: #21759b;
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    height: auto;
+    left: 5px;
+    line-height: normal;
+    padding: 15px 23px 14px;
+    text-decoration: none;
+    top: 5px;
+    width: auto;
+    z-index: 100000;
+}
+
+/* Focus indicators - WCAG 2.1 AA compliant */
+.aisb-section-item:focus,
+.aisb-section-item__action:focus,
+.aisb-section-item__drag:focus {
+    outline: 2px solid var(--aisb-editor-accent);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .aisb-section-item:focus,
+    .aisb-section-item__action:focus,
+    .aisb-section-item__drag:focus {
+        outline: 3px solid;
+        outline-offset: 1px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .aisb-section-item,
+    .aisb-section-item__actions,
+    .aisb-editor-btn {
+        transition: none;
+    }
+}
+
+/* =========================================
+   Panel Modes & Structure Panel
+   ========================================= */
+.aisb-panel-mode {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Back to Library button */
+#aisb-back-to-library {
+    justify-content: flex-start;
+    gap: var(--aisb-editor-space-sm);
+}
+
+#aisb-back-to-library .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+/* Structure Panel Empty State */
+.aisb-structure-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--aisb-editor-space-2xl);
+    text-align: center;
+    color: var(--aisb-editor-text-muted);
+}
+
+.aisb-structure-empty .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    margin-bottom: var(--aisb-editor-space-md);
+    opacity: 0.5;
+}
+
+.aisb-structure-empty p {
+    margin: 0;
+    font-size: 13px;
+}
+
+/* Ensure section list is visible when it has content */
+#aisb-section-list:not(:empty) {
+    display: block !important;
+}
+
+/* Section List Items */
+.aisb-section-item {
+    display: flex;
+    align-items: center;
+    padding: var(--aisb-editor-space-md);
+    background: var(--aisb-editor-bg-surface);
+    border: 1px solid var(--aisb-editor-border);
+    border-radius: 6px;
+    margin-bottom: var(--aisb-editor-space-sm);
+    cursor: pointer;
+    transition: all var(--aisb-transition-fast);
+    position: relative;
+}
+
+.aisb-section-item:hover {
+    background: var(--aisb-editor-bg-hover);
+    border-color: var(--aisb-editor-border-strong);
+}
+
+.aisb-section-item.active {
+    border-color: var(--aisb-editor-accent);
+    background: var(--aisb-editor-accent-bg);
+}
+
+/* Reorder mode styling */
+.aisb-section-item.reorder-mode {
+    border-color: var(--aisb-editor-accent);
+    background: var(--aisb-editor-accent-bg);
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.aisb-section-item.reorder-mode::before {
+    content: 'REORDER MODE: Use ↑↓ arrow keys to move';
+    position: absolute;
+    top: -24px;
+    left: 0;
+    background: var(--aisb-editor-accent);
+    color: white;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+/* Moving animation */
+.aisb-section-item.moving {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Drop indicator */
+.aisb-section-item.drop-indicator {
+    border-top: 3px solid var(--aisb-editor-accent);
+    margin-top: 3px;
+}
+
+.aisb-section-item__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--aisb-editor-accent-bg);
+    border-radius: 4px;
+    margin-right: var(--aisb-editor-space-md);
+}
+
+.aisb-section-item__icon .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--aisb-editor-accent);
+}
+
+.aisb-section-item__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.aisb-section-item__title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--aisb-editor-text-primary);
+    margin: 0 0 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.aisb-section-item__type {
+    font-size: 11px;
+    color: var(--aisb-editor-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.aisb-section-item__actions {
+    display: flex;
+    gap: var(--aisb-editor-space-xs);
+    opacity: 0;
+    transition: opacity var(--aisb-transition-fast);
+}
+
+.aisb-section-item:hover .aisb-section-item__actions {
+    opacity: 1;
+}
+
+.aisb-section-item__action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--aisb-editor-text-muted);
+    cursor: pointer;
+    transition: all var(--aisb-transition-fast);
+}
+
+.aisb-section-item__action:hover {
+    background: var(--aisb-editor-bg-hover);
+    color: var(--aisb-editor-text-primary);
+}
+
+.aisb-section-item__action.delete:hover {
+    background: var(--aisb-editor-danger);
+    color: white;
+}
+
+.aisb-section-item__action .dashicons {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+}
+
+/* Drag handle */
+.aisb-section-item__drag {
+    margin-right: var(--aisb-editor-space-sm);
+    cursor: grab;
+    color: var(--aisb-editor-text-muted);
+    transition: all var(--aisb-transition-fast);
+}
+
+.aisb-section-item__drag:hover {
+    color: var(--aisb-editor-text-primary);
+    transform: scale(1.1);
+}
+
+.aisb-section-item__drag:active {
+    cursor: grabbing;
+}
+
+/* Sortable.js visual feedback */
+.aisb-sortable-ghost {
+    opacity: 0.3;
+    background: var(--aisb-editor-accent-bg) !important;
+    border: 2px dashed var(--aisb-editor-accent) !important;
+}
+
+.aisb-sortable-chosen {
+    transform: rotate(2deg);
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+.aisb-sortable-drag {
+    transform: rotate(5deg);
+    opacity: 0.8;
+}
+
+.aisb-sortable-fallback {
+    cursor: grabbing !important;
+}
+
+/* Body state during drag */
+.aisb-dragging {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.aisb-dragging * {
+    cursor: grabbing !important;
+}
+
+/* Improve drag handle visibility on touch devices */
+@media (pointer: coarse) {
+    .aisb-section-item__drag {
+        padding: var(--aisb-editor-space-sm);
+        margin: calc(-1 * var(--aisb-editor-space-sm));
+        min-width: 44px; /* Accessibility minimum touch target */
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* =========================================
+   Form Controls
+   ========================================= */
+.aisb-editor-form-group {
+    margin-bottom: var(--aisb-editor-space-xl);
+}
+
+.aisb-editor-form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--aisb-editor-text-secondary);
+    margin-bottom: var(--aisb-editor-space-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.aisb-editor-input,
+.aisb-editor-textarea {
+    width: 100%;
+    background: var(--aisb-editor-bg-surface);
+    border: 1px solid var(--aisb-editor-border);
+    color: var(--aisb-editor-text-primary);
+    padding: var(--aisb-editor-space-md) var(--aisb-editor-space-lg);
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+    transition: all var(--aisb-transition-fast);
+}
+
+.aisb-editor-input {
+    height: 36px;
+}
+
+.aisb-editor-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.aisb-editor-input:focus,
+.aisb-editor-textarea:focus {
+    outline: none;
+    border-color: var(--aisb-editor-accent);
+    box-shadow: 0 0 0 3px var(--aisb-editor-accent-bg);
+}
+
+.aisb-editor-input::placeholder,
+.aisb-editor-textarea::placeholder {
+    color: var(--aisb-editor-text-muted);
+}
+
+/* Color picker */
+.aisb-editor-color-picker {
+    display: flex;
+    gap: var(--aisb-editor-space-md);
+}
+
+.aisb-editor-color-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: 2px solid var(--aisb-editor-border);
+    cursor: pointer;
+    position: relative;
+}
+
+.aisb-editor-color-swatch.active {
+    border-color: var(--aisb-editor-accent);
+}
+
+.aisb-editor-color-swatch.active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+}
+
+/* =========================================
+   Responsive Preview Controls
+   ========================================= */
+.aisb-preview-toggle {
+    position: relative;
+}
+
+.aisb-preview-toggle[data-view="desktop"] .dashicons-desktop,
+.aisb-preview-toggle[data-view="tablet"] .dashicons-tablet,
+.aisb-preview-toggle[data-view="mobile"] .dashicons-smartphone {
+    color: var(--aisb-editor-accent);
+}
+
+/* =========================================
+   Responsive Design
+   ========================================= */
+@media (max-width: 1280px) {
+    .aisb-editor-panel--left {
+        width: 240px;
+    }
+    
+    .aisb-editor-panel--right {
+        width: 280px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .aisb-editor-panel--left {
+        position: absolute;
+        left: -240px;
+        height: 100%;
+        z-index: 10;
+        transition: left var(--aisb-transition-base);
+    }
+    
+    .aisb-editor-panel--left.open {
+        left: 0;
+    }
+    
+    .aisb-editor-panel--right {
+        position: absolute;
+        right: -280px;
+        height: 100%;
+        z-index: 10;
+        transition: right var(--aisb-transition-base);
+    }
+    
+    .aisb-editor-panel--right.open {
+        right: 0;
+    }
+}
+
+/* =========================================
+   Preview Section Styles
+   ========================================= */
+.aisb-section {
+    padding: 80px 20px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: all var(--aisb-transition-fast);
+}
+
+.aisb-section:hover {
+    box-shadow: inset 0 0 0 2px var(--aisb-editor-accent);
+}
+
+/* Hero section default gradient */
+.aisb-section-hero {
+    background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+}
+
+.aisb-section__inner {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.aisb-section-hero .aisb-hero-headline {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 16px 0;
+    color: #ffffff;
+}
+
+.aisb-section-hero .aisb-hero-subheadline {
+    font-size: 18px;
+    line-height: 1.5;
+    margin: 0 0 24px 0;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.aisb-section-hero .aisb-hero-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #ffffff;
+    color: var(--aisb-editor-accent);
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all var(--aisb-transition-fast);
+}
+
+.aisb-section-hero .aisb-hero-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

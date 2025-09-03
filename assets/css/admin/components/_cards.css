@@ -1,0 +1,242 @@
+/**
+ * Status Cards Component Styles
+ * Cards for displaying status messages and information
+ * 
+ * @package AISB
+ * @since 2.0.0
+ */
+
+/* =========================================
+   Base Card Styles
+   ========================================= */
+.aisb-card {
+    background-color: #ffffff;
+    border: 1px solid var(--aisb-gray-200);
+    border-radius: var(--aisb-radius-md);
+    padding: var(--aisb-space-lg);
+    margin-bottom: var(--aisb-space-lg);
+    box-shadow: var(--aisb-shadow-sm);
+}
+
+/* Status Card - with left border accent */
+.aisb-status-card {
+    position: relative;
+    padding: var(--aisb-space-md);
+    padding-left: var(--aisb-space-lg);
+    border-left: 3px solid;
+    border-radius: var(--aisb-radius-md);
+    margin-bottom: var(--aisb-space-lg);
+    background-color: #ffffff;
+    box-shadow: var(--aisb-shadow-xs);
+}
+
+/* Status card header with icon */
+.aisb-status-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--aisb-space-sm);
+    font-size: var(--aisb-font-md);
+    font-weight: var(--aisb-font-semibold);
+    color: var(--aisb-gray-900);
+    margin-bottom: var(--aisb-space-xs);
+}
+
+.aisb-status-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+.aisb-status-card__icon .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
+}
+
+/* Status card content */
+.aisb-status-card__content {
+    color: var(--aisb-gray-600);
+    font-size: var(--aisb-font-sm);
+    line-height: var(--aisb-line-relaxed);
+}
+
+.aisb-status-card__content p {
+    margin: var(--aisb-space-xs) 0 0 0;
+}
+
+.aisb-status-card__content p:first-child {
+    margin-top: 0;
+}
+
+/* Status card list */
+.aisb-status-card__list {
+    margin: var(--aisb-space-sm) 0 0 var(--aisb-space-lg);
+    padding: 0;
+    list-style: disc;
+    color: var(--aisb-gray-700);
+}
+
+.aisb-status-card__list li {
+    margin-bottom: var(--aisb-space-xs);
+}
+
+/* =========================================
+   Status Card Variants
+   ========================================= */
+
+/* Ready/Info Status */
+.aisb-status-ready {
+    background-color: #f0f6fc;
+    border-left-color: var(--aisb-wp-info);
+}
+
+.aisb-status-ready .aisb-status-card__icon {
+    color: var(--aisb-wp-info);
+}
+
+/* Active/Success Status */
+.aisb-status-active {
+    background-color: #f0fdf4;
+    border-left-color: var(--aisb-wp-success);
+}
+
+.aisb-status-active .aisb-status-card__icon {
+    color: var(--aisb-wp-success);
+}
+
+/* Warning Status */
+.aisb-status-warning {
+    background-color: #fffbeb;
+    border-left-color: var(--aisb-wp-warning);
+}
+
+.aisb-status-warning .aisb-status-card__icon {
+    color: var(--aisb-wp-warning);
+}
+
+.aisb-status-warning .aisb-status-card__list {
+    color: var(--aisb-wp-warning);
+}
+
+/* Error/Danger Status */
+.aisb-status-error {
+    background-color: #fef2f2;
+    border-left-color: var(--aisb-wp-danger);
+}
+
+.aisb-status-error .aisb-status-card__icon {
+    color: var(--aisb-wp-danger);
+}
+
+.aisb-status-error .aisb-status-card__list {
+    color: var(--aisb-wp-danger);
+}
+
+/* Neutral Status */
+.aisb-status-neutral {
+    background-color: var(--aisb-gray-50);
+    border-left-color: var(--aisb-gray-400);
+}
+
+.aisb-status-neutral .aisb-status-card__icon {
+    color: var(--aisb-gray-600);
+}
+
+/* =========================================
+   Section Cards (for admin pages)
+   ========================================= */
+.aisb-section-card {
+    background-color: #ffffff;
+    border: 1px solid var(--aisb-gray-200);
+    border-radius: var(--aisb-radius-lg);
+    padding: var(--aisb-space-xl);
+    margin-bottom: var(--aisb-space-xl);
+    box-shadow: var(--aisb-shadow-sm);
+}
+
+.aisb-section-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--aisb-space-md);
+    margin-bottom: var(--aisb-space-lg);
+    padding-bottom: var(--aisb-space-lg);
+    border-bottom: 1px solid var(--aisb-gray-200);
+}
+
+.aisb-section-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: var(--aisb-gray-100);
+    border-radius: var(--aisb-radius-md);
+    color: var(--aisb-wp-primary);
+}
+
+.aisb-section-card__icon .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.aisb-section-card__title {
+    font-size: var(--aisb-font-xl);
+    font-weight: var(--aisb-font-semibold);
+    color: var(--aisb-gray-900);
+    margin: 0;
+}
+
+.aisb-section-card__content {
+    color: var(--aisb-gray-700);
+    line-height: var(--aisb-line-relaxed);
+}
+
+/* =========================================
+   Progress Cards
+   ========================================= */
+.aisb-progress-card {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--aisb-space-lg);
+    margin-bottom: var(--aisb-space-xl);
+}
+
+.aisb-progress-card__item {
+    background-color: #ffffff;
+    border: 1px solid var(--aisb-gray-200);
+    border-radius: var(--aisb-radius-md);
+    padding: var(--aisb-space-lg);
+}
+
+.aisb-progress-card__item h4 {
+    display: flex;
+    align-items: center;
+    gap: var(--aisb-space-sm);
+    font-size: var(--aisb-font-md);
+    font-weight: var(--aisb-font-semibold);
+    margin: 0 0 var(--aisb-space-md) 0;
+}
+
+.aisb-progress-card__item--completed h4 {
+    color: var(--aisb-wp-success);
+}
+
+.aisb-progress-card__item--in-progress h4 {
+    color: var(--aisb-wp-warning);
+}
+
+.aisb-progress-card__item--planned h4 {
+    color: var(--aisb-gray-500);
+}
+
+.aisb-progress-card__item ul {
+    margin: 0;
+    padding-left: var(--aisb-space-lg);
+    color: var(--aisb-gray-600);
+    font-size: var(--aisb-font-sm);
+    line-height: var(--aisb-line-relaxed);
+}

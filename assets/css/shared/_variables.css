@@ -1,0 +1,172 @@
+/**
+ * AISB Design System - Core Variables
+ * Shared design tokens for all contexts (admin, editor, sections)
+ * 
+ * @package AISB
+ * @since 2.0.0
+ */
+
+:root {
+    /* =========================================
+       Mathematical Foundation - Golden Ratio
+       ========================================= */
+    --aisb-ratio: 1.618;
+    --aisb-ratio-inverse: 0.618;
+    
+    /* Base unit for spacing calculations */
+    --aisb-base-unit: 8px;
+    
+    /* Fibonacci-based spacing scale */
+    --aisb-space-xs: 5px;     /* 8 / 1.618 */
+    --aisb-space-sm: 8px;     /* base */
+    --aisb-space-md: 13px;    /* 8 * 1.618 */
+    --aisb-space-lg: 21px;    /* 13 * 1.618 */
+    --aisb-space-xl: 34px;    /* 21 * 1.618 */
+    --aisb-space-2xl: 55px;   /* 34 * 1.618 */
+    --aisb-space-3xl: 89px;   /* 55 * 1.618 */
+    
+    /* =========================================
+       Typography Scale
+       ========================================= */
+    --aisb-font-base: 13px;   /* WordPress admin standard */
+    
+    /* Golden ratio type scale */
+    --aisb-font-xs: 11px;     /* 13 / 1.18 */
+    --aisb-font-sm: 13px;     /* base */
+    --aisb-font-md: 14px;     /* practical increment */
+    --aisb-font-lg: 16px;     /* 13 * 1.23 */
+    --aisb-font-xl: 21px;     /* 13 * 1.618 */
+    --aisb-font-2xl: 26px;    /* 16 * 1.618 */
+    --aisb-font-3xl: 34px;    /* 21 * 1.618 */
+    --aisb-font-4xl: 42px;    /* 26 * 1.618 */
+    
+    /* Font weights */
+    --aisb-font-light: 300;
+    --aisb-font-regular: 400;
+    --aisb-font-medium: 500;
+    --aisb-font-semibold: 600;
+    --aisb-font-bold: 700;
+    
+    /* Line heights based on golden ratio */
+    --aisb-line-tight: 1.2;
+    --aisb-line-base: 1.5;
+    --aisb-line-relaxed: 1.618;
+    --aisb-line-loose: 2;
+    
+    /* =========================================
+       Color System - Semantic
+       ========================================= */
+    
+    /* Brand colors */
+    --aisb-brand-primary: #667eea;
+    --aisb-brand-secondary: #764ba2;
+    --aisb-brand-gradient: linear-gradient(135deg, var(--aisb-brand-primary) 0%, var(--aisb-brand-secondary) 100%);
+    
+    /* WordPress Admin Colors (for admin context) */
+    --aisb-wp-primary: #2271b1;
+    --aisb-wp-primary-hover: #135e96;
+    --aisb-wp-success: #00a32a;
+    --aisb-wp-warning: #dba617;
+    --aisb-wp-danger: #d63638;
+    --aisb-wp-info: #72aee6;
+    
+    /* Editor Dark Theme Colors (Professional Dark UI) */
+    /* Background elevation layers */
+    --aisb-editor-bg-base: #09111A;        /* Deep blue-black base */
+    --aisb-editor-bg-surface: #0F1823;     /* Elevated surface */
+    --aisb-editor-bg-panel: #141F2E;       /* Panel background */
+    --aisb-editor-bg-elevated: #1A2738;    /* Highest elevation */
+    --aisb-editor-bg-hover: #1E2B3D;       /* Hover state */
+    
+    /* Editor borders and dividers */
+    --aisb-editor-border: #2A3747;         /* Subtle borders */
+    --aisb-editor-border-strong: #3A4757;  /* Emphasized borders */
+    --aisb-editor-divider: #1A2738;        /* Section dividers */
+    
+    /* Editor text hierarchy (WCAG AAA compliant) */
+    --aisb-editor-text-primary: #E8EAED;   /* Main text - 15.8:1 ratio */
+    --aisb-editor-text-secondary: #9CA3AF; /* Secondary text - 7.2:1 ratio */
+    --aisb-editor-text-muted: #6B7280;     /* Disabled/hints - 4.5:1 ratio */
+    --aisb-editor-text-inverse: #09111A;   /* For light surfaces */
+    
+    /* Editor brand colors (desaturated for dark mode) */
+    --aisb-editor-accent: #667EEA;         /* Primary brand */
+    --aisb-editor-accent-muted: #4A5FC7;   /* Desaturated */
+    --aisb-editor-accent-hover: #7B8FF5;   /* Hover state */
+    --aisb-editor-accent-bg: rgba(102, 126, 234, 0.1); /* Subtle backgrounds */
+    
+    /* Editor semantic colors (desaturated 20%) */
+    --aisb-editor-success: #34D399;
+    --aisb-editor-warning: #FBBF24;
+    --aisb-editor-danger: #F87171;
+    --aisb-editor-info: #60A5FA;
+    
+    /* Neutral scale */
+    --aisb-gray-50: #f9fafb;
+    --aisb-gray-100: #f3f4f6;
+    --aisb-gray-200: #e5e7eb;
+    --aisb-gray-300: #d1d5db;
+    --aisb-gray-400: #9ca3af;
+    --aisb-gray-500: #6b7280;
+    --aisb-gray-600: #4b5563;
+    --aisb-gray-700: #374151;
+    --aisb-gray-800: #1f2937;
+    --aisb-gray-900: #111827;
+    
+    /* =========================================
+       Editor-Specific Spacing (Tighter for UI density)
+       ========================================= */
+    --aisb-editor-space-xs: 3px;
+    --aisb-editor-space-sm: 5px;
+    --aisb-editor-space-md: 8px;
+    --aisb-editor-space-lg: 13px;
+    --aisb-editor-space-xl: 21px;
+    --aisb-editor-space-2xl: 34px;
+    --aisb-editor-space-3xl: 55px;
+    
+    /* Editor layout dimensions */
+    --aisb-editor-toolbar-height: 48px;
+    --aisb-editor-panel-left-width: 280px;
+    --aisb-editor-panel-right-width: 320px;
+    
+    /* =========================================
+       Component Tokens
+       ========================================= */
+    
+    /* Border radius */
+    --aisb-radius-sm: 2px;
+    --aisb-radius-md: 4px;
+    --aisb-radius-lg: 8px;
+    --aisb-radius-xl: 12px;
+    --aisb-radius-full: 9999px;
+    
+    /* Shadows */
+    --aisb-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --aisb-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --aisb-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --aisb-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --aisb-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Transitions */
+    --aisb-transition-fast: 150ms ease;
+    --aisb-transition-base: 200ms ease;
+    --aisb-transition-slow: 300ms ease;
+    
+    /* Z-index scale */
+    --aisb-z-base: 0;
+    --aisb-z-dropdown: 1000;
+    --aisb-z-sticky: 1100;
+    --aisb-z-modal: 1200;
+    --aisb-z-popover: 1300;
+    --aisb-z-tooltip: 1400;
+    --aisb-z-toast: 1500;
+    
+    /* =========================================
+       Breakpoints (for reference in CSS)
+       ========================================= */
+    --aisb-screen-sm: 640px;
+    --aisb-screen-md: 768px;
+    --aisb-screen-lg: 1024px;
+    --aisb-screen-xl: 1280px;
+    --aisb-screen-2xl: 1536px;
+}

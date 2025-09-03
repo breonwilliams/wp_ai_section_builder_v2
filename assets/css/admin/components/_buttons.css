@@ -1,0 +1,232 @@
+/**
+ * Button Component Styles
+ * Consistent button styling across admin interface
+ * 
+ * @package AISB
+ * @since 2.0.0
+ */
+
+/* =========================================
+   Base Button Styles
+   ========================================= */
+.aisb-btn {
+    /* Layout */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--aisb-space-xs);
+    
+    /* Sizing - Fixed height for consistency */
+    height: 34px;
+    min-width: 80px;
+    padding: 0 var(--aisb-space-lg);
+    
+    /* Typography */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: var(--aisb-font-sm);
+    font-weight: var(--aisb-font-regular);
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    
+    /* Appearance */
+    border: 1px solid;
+    border-radius: var(--aisb-radius-sm);
+    cursor: pointer;
+    
+    /* Transitions */
+    transition: all var(--aisb-transition-base);
+    
+    /* Prevent text selection */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Focus styles for accessibility */
+.aisb-btn:focus {
+    outline: 2px solid var(--aisb-wp-primary);
+    outline-offset: 2px;
+}
+
+/* Disabled state */
+.aisb-btn:disabled,
+.aisb-btn.aisb-btn-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Loading state */
+.aisb-btn.aisb-btn-loading {
+    color: transparent;
+    position: relative;
+    pointer-events: none;
+}
+
+.aisb-btn.aisb-btn-loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: aisb-spin 0.6s linear infinite;
+}
+
+/* =========================================
+   Button Variants
+   ========================================= */
+
+/* Primary Button */
+.aisb-btn-primary {
+    background-color: var(--aisb-wp-primary);
+    border-color: var(--aisb-wp-primary);
+    color: #ffffff;
+}
+
+.aisb-btn-primary:hover:not(:disabled) {
+    background-color: var(--aisb-wp-primary-hover);
+    border-color: var(--aisb-wp-primary-hover);
+    color: #ffffff;
+}
+
+.aisb-btn-primary:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+/* Secondary Button */
+.aisb-btn-secondary {
+    background-color: #ffffff;
+    border-color: var(--aisb-gray-300);
+    color: var(--aisb-gray-700);
+}
+
+.aisb-btn-secondary:hover:not(:disabled) {
+    background-color: var(--aisb-gray-50);
+    border-color: var(--aisb-gray-400);
+    color: var(--aisb-gray-900);
+}
+
+/* Success Button */
+.aisb-btn-success {
+    background-color: var(--aisb-wp-success);
+    border-color: var(--aisb-wp-success);
+    color: #ffffff;
+}
+
+.aisb-btn-success:hover:not(:disabled) {
+    background-color: #00801f;
+    border-color: #00801f;
+    color: #ffffff;
+}
+
+/* Danger Button */
+.aisb-btn-danger {
+    background-color: #ffffff;
+    border-color: var(--aisb-wp-danger);
+    color: var(--aisb-wp-danger);
+}
+
+.aisb-btn-danger:hover:not(:disabled) {
+    background-color: var(--aisb-wp-danger);
+    border-color: var(--aisb-wp-danger);
+    color: #ffffff;
+}
+
+/* Ghost Button */
+.aisb-btn-ghost {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--aisb-wp-primary);
+}
+
+.aisb-btn-ghost:hover:not(:disabled) {
+    background-color: var(--aisb-gray-50);
+    color: var(--aisb-wp-primary-hover);
+}
+
+/* =========================================
+   Button Sizes
+   ========================================= */
+
+/* Small */
+.aisb-btn-sm {
+    height: 28px;
+    padding: 0 var(--aisb-space-md);
+    font-size: var(--aisb-font-xs);
+}
+
+/* Large */
+.aisb-btn-lg {
+    height: 42px;
+    padding: 0 var(--aisb-space-xl);
+    font-size: var(--aisb-font-md);
+}
+
+/* =========================================
+   Button Groups
+   ========================================= */
+.aisb-btn-group {
+    display: inline-flex;
+    gap: var(--aisb-space-sm);
+    align-items: center;
+}
+
+.aisb-btn-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: var(--aisb-space-sm);
+    align-items: stretch;
+}
+
+/* =========================================
+   Icon Support
+   ========================================= */
+.aisb-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.aisb-btn-sm .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.aisb-btn-lg .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Icon-only buttons */
+.aisb-btn-icon {
+    min-width: auto;
+    width: 34px;
+    padding: 0;
+}
+
+.aisb-btn-icon.aisb-btn-sm {
+    width: 28px;
+}
+
+.aisb-btn-icon.aisb-btn-lg {
+    width: 42px;
+}
+
+/* =========================================
+   Animation
+   ========================================= */
+@keyframes aisb-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

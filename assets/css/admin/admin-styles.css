@@ -1,0 +1,230 @@
+/**
+ * AI Section Builder - Admin Styles
+ * Main admin stylesheet that imports all components
+ * 
+ * @package AISB
+ * @since 2.0.0
+ */
+
+/* =========================================
+   Imports - Order matters!
+   ========================================= */
+
+/* 1. Variables and base setup */
+@import url('../shared/_variables.css');
+
+/* 2. Component styles */
+@import url('components/_buttons.css');
+@import url('components/_cards.css');
+
+/* =========================================
+   Admin Base Styles
+   ========================================= */
+
+/* Meta Box Container */
+.aisb-meta-box {
+    padding: 0;
+    margin: -6px -12px -12px;
+}
+
+.aisb-meta-box__inner {
+    padding: var(--aisb-space-lg);
+}
+
+/* Meta Box Actions */
+.aisb-meta-box__actions {
+    display: flex;
+    gap: var(--aisb-space-md);
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: var(--aisb-space-lg);
+}
+
+.aisb-meta-box__description {
+    margin: var(--aisb-space-sm) 0 0 0;
+    color: var(--aisb-gray-600);
+    font-size: var(--aisb-font-sm);
+    line-height: var(--aisb-line-relaxed);
+}
+
+/* =========================================
+   Admin Page Styles
+   ========================================= */
+.aisb-admin-wrap {
+    margin: var(--aisb-space-lg) var(--aisb-space-lg) 0 var(--aisb-space-xs);
+    max-width: 1200px;
+}
+
+.aisb-admin-header {
+    margin-bottom: var(--aisb-space-xl);
+}
+
+.aisb-admin-header__title {
+    font-size: var(--aisb-font-3xl);
+    font-weight: var(--aisb-font-light);
+    line-height: 1.2;
+    margin: 0 0 var(--aisb-space-sm) 0;
+    color: var(--aisb-gray-900);
+}
+
+.aisb-admin-header__subtitle {
+    font-size: var(--aisb-font-md);
+    color: var(--aisb-gray-600);
+    margin: 0;
+}
+
+/* =========================================
+   Form Styles
+   ========================================= */
+.aisb-form-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.aisb-form-table th {
+    text-align: left;
+    padding: var(--aisb-space-md) var(--aisb-space-md) var(--aisb-space-md) 0;
+    width: 200px;
+    font-weight: var(--aisb-font-semibold);
+    vertical-align: top;
+    color: var(--aisb-gray-900);
+}
+
+.aisb-form-table td {
+    padding: var(--aisb-space-md) 0;
+}
+
+.aisb-form-table input[type="text"],
+.aisb-form-table input[type="number"],
+.aisb-form-table input[type="url"],
+.aisb-form-table input[type="email"],
+.aisb-form-table select,
+.aisb-form-table textarea {
+    width: 100%;
+    max-width: 400px;
+    padding: var(--aisb-space-sm) var(--aisb-space-md);
+    border: 1px solid var(--aisb-gray-300);
+    border-radius: var(--aisb-radius-sm);
+    font-size: var(--aisb-font-sm);
+    line-height: var(--aisb-line-base);
+    background-color: #ffffff;
+    transition: border-color var(--aisb-transition-base);
+}
+
+.aisb-form-table input:focus,
+.aisb-form-table select:focus,
+.aisb-form-table textarea:focus {
+    border-color: var(--aisb-wp-primary);
+    outline: none;
+    box-shadow: 0 0 0 1px var(--aisb-wp-primary);
+}
+
+.aisb-form-description {
+    margin-top: var(--aisb-space-xs);
+    color: var(--aisb-gray-600);
+    font-size: var(--aisb-font-xs);
+    font-style: italic;
+}
+
+/* =========================================
+   Notice Styles
+   ========================================= */
+.aisb-notice {
+    padding: var(--aisb-space-md) var(--aisb-space-lg);
+    border-left: 4px solid;
+    border-radius: var(--aisb-radius-sm);
+    margin: var(--aisb-space-lg) 0;
+    background-color: #ffffff;
+}
+
+.aisb-notice p {
+    margin: 0;
+    font-size: var(--aisb-font-sm);
+    line-height: var(--aisb-line-relaxed);
+}
+
+.aisb-notice-success {
+    border-left-color: var(--aisb-wp-success);
+    background-color: #f0fdf4;
+}
+
+.aisb-notice-warning {
+    border-left-color: var(--aisb-wp-warning);
+    background-color: #fffbeb;
+}
+
+.aisb-notice-error {
+    border-left-color: var(--aisb-wp-danger);
+    background-color: #fef2f2;
+}
+
+.aisb-notice-info {
+    border-left-color: var(--aisb-wp-info);
+    background-color: #f0f6fc;
+}
+
+/* =========================================
+   Utility Classes
+   ========================================= */
+
+/* Spacing */
+.aisb-mt-sm { margin-top: var(--aisb-space-sm); }
+.aisb-mt-md { margin-top: var(--aisb-space-md); }
+.aisb-mt-lg { margin-top: var(--aisb-space-lg); }
+.aisb-mt-xl { margin-top: var(--aisb-space-xl); }
+
+.aisb-mb-sm { margin-bottom: var(--aisb-space-sm); }
+.aisb-mb-md { margin-bottom: var(--aisb-space-md); }
+.aisb-mb-lg { margin-bottom: var(--aisb-space-lg); }
+.aisb-mb-xl { margin-bottom: var(--aisb-space-xl); }
+
+/* Text */
+.aisb-text-muted { color: var(--aisb-gray-600); }
+.aisb-text-danger { color: var(--aisb-wp-danger); }
+.aisb-text-success { color: var(--aisb-wp-success); }
+.aisb-text-warning { color: var(--aisb-wp-warning); }
+
+/* Display */
+.aisb-hidden { display: none !important; }
+.aisb-block { display: block !important; }
+.aisb-inline-block { display: inline-block !important; }
+.aisb-flex { display: flex !important; }
+
+/* Alignment */
+.aisb-text-left { text-align: left; }
+.aisb-text-center { text-align: center; }
+.aisb-text-right { text-align: right; }
+
+/* =========================================
+   Responsive Design
+   ========================================= */
+@media (max-width: 782px) {
+    .aisb-admin-wrap {
+        margin: var(--aisb-space-md) var(--aisb-space-sm);
+    }
+    
+    .aisb-meta-box__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .aisb-meta-box__actions .aisb-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .aisb-form-table th {
+        width: auto;
+        display: block;
+        padding-bottom: var(--aisb-space-xs);
+    }
+    
+    .aisb-form-table td {
+        padding-top: 0;
+    }
+    
+    .aisb-progress-card {
+        grid-template-columns: 1fr;
+    }
+}
+
