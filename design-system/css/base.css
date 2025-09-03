@@ -1,0 +1,257 @@
+/* =========================================
+   AI Section Builder - Base Styles
+   Research-backed typography and spacing
+   ========================================= */
+
+/* Reset and Box Model
+   ========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px; /* Base for rem calculations */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6; /* Research: 1.6x optimal for body text */
+    color: var(--aisb-text-primary, #1a1a1a);
+    background: var(--aisb-bg-primary, #ffffff);
+}
+
+/* Typography Scale
+   Based on research: 1.25 modular scale (Major Third)
+   Mobile sizes in comments
+   ========================================= */
+
+/* Eyebrow Text */
+.aisb-eyebrow {
+    font-size: 0.875rem; /* 14px / 12px mobile */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+    color: var(--aisb-text-secondary);
+}
+
+/* Headings - Research-backed sizes */
+h1, .aisb-h1 {
+    font-size: 3.5rem; /* 56px / 32px mobile */
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+}
+
+h2, .aisb-h2 {
+    font-size: 2.8125rem; /* 45px / 28px mobile */
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.25rem;
+}
+
+h3, .aisb-h3 {
+    font-size: 2.25rem; /* 36px / 24px mobile */
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+}
+
+h4, .aisb-h4 {
+    font-size: 1.8125rem; /* 29px / 20px mobile */
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+}
+
+h5, .aisb-h5 {
+    font-size: 1.4375rem; /* 23px / 18px mobile */
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 0.875rem;
+}
+
+h6, .aisb-h6 {
+    font-size: 1.125rem; /* 18px / 16px mobile */
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+}
+
+/* Body Text */
+p, .aisb-body {
+    font-size: 1.125rem; /* 18px / 16px mobile */
+    line-height: 1.6; /* Research: Optimal for reading */
+    margin-bottom: 1.5rem;
+    max-width: 75ch; /* Research: 65-75ch optimal for readability */
+}
+
+.aisb-body-large {
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.6;
+}
+
+.aisb-body-small {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.5;
+}
+
+/* Links */
+a {
+    color: var(--aisb-color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--aisb-color-primary-dark);
+    text-decoration-thickness: 2px;
+}
+
+/* Spacing System
+   8px base grid (Research-backed for consistency)
+   ========================================= */
+:root {
+    --aisb-space-xs: 8px;
+    --aisb-space-sm: 16px;
+    --aisb-space-md: 24px;
+    --aisb-space-lg: 32px;
+    --aisb-space-xl: 48px;
+    --aisb-space-2xl: 64px;
+    --aisb-space-3xl: 96px;
+    --aisb-space-4xl: 128px;
+}
+
+/* Section Spacing */
+.aisb-section {
+    padding: var(--aisb-space-3xl) 0; /* 96px desktop */
+}
+
+@media (max-width: 768px) {
+    .aisb-section {
+        padding: var(--aisb-space-2xl) 0; /* 64px mobile */
+    }
+}
+
+/* Container */
+.aisb-container {
+    width: 100%;
+    max-width: 1200px; /* Research: Optimal for readability */
+    margin: 0 auto;
+    padding: 0 var(--aisb-space-md);
+}
+
+@media (max-width: 768px) {
+    .aisb-container {
+        padding: 0 var(--aisb-space-sm);
+    }
+}
+
+/* Utility Classes
+   ========================================= */
+
+/* Text Alignment */
+.aisb-text-left { text-align: left; }
+.aisb-text-center { text-align: center; }
+.aisb-text-right { text-align: right; }
+
+/* Spacing Utilities */
+.aisb-mt-0 { margin-top: 0; }
+.aisb-mt-1 { margin-top: var(--aisb-space-xs); }
+.aisb-mt-2 { margin-top: var(--aisb-space-sm); }
+.aisb-mt-3 { margin-top: var(--aisb-space-md); }
+.aisb-mt-4 { margin-top: var(--aisb-space-lg); }
+.aisb-mt-5 { margin-top: var(--aisb-space-xl); }
+
+.aisb-mb-0 { margin-bottom: 0; }
+.aisb-mb-1 { margin-bottom: var(--aisb-space-xs); }
+.aisb-mb-2 { margin-bottom: var(--aisb-space-sm); }
+.aisb-mb-3 { margin-bottom: var(--aisb-space-md); }
+.aisb-mb-4 { margin-bottom: var(--aisb-space-lg); }
+.aisb-mb-5 { margin-bottom: var(--aisb-space-xl); }
+
+/* Display Utilities */
+.aisb-flex { display: flex; }
+.aisb-inline-flex { display: inline-flex; }
+.aisb-grid { display: grid; }
+.aisb-block { display: block; }
+.aisb-inline-block { display: inline-block; }
+.aisb-none { display: none; }
+
+/* Flexbox Utilities */
+.aisb-flex-row { flex-direction: row; }
+.aisb-flex-column { flex-direction: column; }
+.aisb-justify-start { justify-content: flex-start; }
+.aisb-justify-center { justify-content: center; }
+.aisb-justify-end { justify-content: flex-end; }
+.aisb-justify-between { justify-content: space-between; }
+.aisb-align-start { align-items: flex-start; }
+.aisb-align-center { align-items: center; }
+.aisb-align-end { align-items: flex-end; }
+.aisb-flex-wrap { flex-wrap: wrap; }
+
+/* Grid Utilities */
+.aisb-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.aisb-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.aisb-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.aisb-gap-1 { gap: var(--aisb-space-xs); }
+.aisb-gap-2 { gap: var(--aisb-space-sm); }
+.aisb-gap-3 { gap: var(--aisb-space-md); }
+.aisb-gap-4 { gap: var(--aisb-space-lg); }
+.aisb-gap-5 { gap: var(--aisb-space-xl); }
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+    h1, .aisb-h1 { font-size: 2rem; } /* 32px */
+    h2, .aisb-h2 { font-size: 1.75rem; } /* 28px */
+    h3, .aisb-h3 { font-size: 1.5rem; } /* 24px */
+    h4, .aisb-h4 { font-size: 1.25rem; } /* 20px */
+    h5, .aisb-h5 { font-size: 1.125rem; } /* 18px */
+    
+    .aisb-eyebrow { font-size: 0.75rem; } /* 12px */
+    
+    p, .aisb-body { font-size: 1rem; } /* 16px */
+}
+
+/* Screen Reader Only */
+.aisb-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Focus Visible (Accessibility) */
+:focus-visible {
+    outline: 2px solid var(--aisb-color-primary);
+    outline-offset: 2px;
+}
+
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
