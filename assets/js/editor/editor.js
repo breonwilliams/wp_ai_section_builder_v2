@@ -373,6 +373,16 @@
         
         // Bind form events
         bindFormEvents();
+        
+        // Initialize button repeater if it's a hero section
+        if (sectionType === 'hero') {
+            // Use sectionContent if editing, otherwise use defaults
+            var content = sectionContent || heroDefaults;
+            // Small delay to ensure DOM is ready
+            setTimeout(function() {
+                initButtonRepeater(content);
+            }, 50);
+        }
     }
     
     /**
@@ -397,8 +407,24 @@
         eyebrow: 'Welcome to the Future',
         headline: 'Your Headline Here',
         subheadline: 'Add your compelling message that engages visitors',
-        button_text: 'Get Started',
-        button_url: '#'
+        // New button array structure
+        buttons: [
+            {
+                id: 'btn_default_1',
+                text: 'Get Started',
+                url: '#',
+                style: 'primary'
+            },
+            {
+                id: 'btn_default_2',
+                text: 'Learn More',
+                url: '#about',
+                style: 'secondary'
+            }
+        ],
+        // Keep old fields for backward compatibility (will be migrated)
+        button_text: '',
+        button_url: ''
     };
     
     /**
@@ -445,29 +471,117 @@
                 </div>
                 
                 <div class="aisb-editor-form-group">
-                    <label class="aisb-editor-form-label" for="hero-button-text">
-                        Button Text
+                    <label class="aisb-editor-form-label">
+                        Buttons
                     </label>
-                    <input type="text" 
-                           id="hero-button-text" 
-                           name="button_text" 
-                           class="aisb-editor-input" 
-                           value="${escapeHtml(content.button_text || '')}" 
-                           placeholder="Get Started">
-                </div>
-                
-                <div class="aisb-editor-form-group">
-                    <label class="aisb-editor-form-label" for="hero-button-url">
-                        Button URL
-                    </label>
-                    <input type="url" 
-                           id="hero-button-url" 
-                           name="button_url" 
-                           class="aisb-editor-input" 
-                           value="${escapeHtml(content.button_url || '')}" 
-                           placeholder="https://">
+                    <div id="hero-buttons-repeater" class="aisb-repeater-container">
+                        <!-- Button repeater will be initialized here -->
+                    </div>
                 </div>
             </form>
+        `;
+    }
+    
+    /**
+     * Initialize button repeater
+     */
+    function initButtonRepeater(content) {
+        // Ensure container exists before initialization
+        var $container = $('#hero-buttons-repeater');
+        if (!$container.length) {
+            console.error('AISB: Button repeater container not found');
+            return;
+        }
+        
+        // Migrate old button data if needed
+        var buttons = content.buttons || [];
+        if (!buttons.length && content.button_text) {
+            buttons = [{
+                id: 'btn_migrated_1',
+                text: content.button_text,
+                url: content.button_url || '#',
+                style: 'primary'
+            }];
+        }
+        
+        // Initialize repeater field
+        var buttonRepeater = $container.aisbRepeaterField({
+            fieldName: 'buttons',
+            items: buttons,
+            defaultItem: {
+                text: 'Button Text',
+                url: '#',
+                style: 'primary'
+            },
+            maxItems: 5,
+            minItems: 0,
+            itemLabel: 'Button',
+            addButtonText: 'Add Button',
+            template: function(item, index) {
+                return buttonRepeaterTemplate(item, index);
+            },
+            onUpdate: function(items) {
+                // Update the section content with button data
+                if (editorState.currentSection !== null && editorState.sections[editorState.currentSection]) {
+                    // Preserve existing content and update buttons
+                    editorState.sections[editorState.currentSection].content.buttons = items;
+                    editorState.isDirty = true;
+                    
+                    // Re-render the preview section without triggering full form update
+                    var section = editorState.sections[editorState.currentSection];
+                    var sectionHtml = renderSection(section, editorState.currentSection);
+                    $('.aisb-section[data-index="' + editorState.currentSection + '"]').replaceWith(sectionHtml);
+                    
+                    // Update save status
+                    updateSaveStatus('unsaved');
+                }
+            }
+        });
+        
+        return buttonRepeater;
+    }
+    
+    /**
+     * Button repeater item template
+     */
+    function buttonRepeaterTemplate(button, index) {
+        var styles = [
+            { value: 'primary', label: 'Primary' },
+            { value: 'secondary', label: 'Secondary' }
+        ];
+        
+        var styleOptions = styles.map(function(style) {
+            return '<option value="' + style.value + '"' + 
+                   (button.style === style.value ? ' selected' : '') + '>' + 
+                   style.label + '</option>';
+        }).join('');
+        
+        return `
+            <div class="aisb-repeater-fields">
+                <div class="aisb-repeater-field-group">
+                    <label>Button Text</label>
+                    <input type="text" 
+                           class="aisb-editor-input aisb-repeater-field" 
+                           data-field="text" 
+                           value="${escapeHtml(button.text || '')}" 
+                           placeholder="Button text">
+                </div>
+                <div class="aisb-repeater-field-group">
+                    <label>Button URL</label>
+                    <input type="text" 
+                           class="aisb-editor-input aisb-repeater-field" 
+                           data-field="url" 
+                           value="${escapeHtml(button.url || '')}" 
+                           placeholder="#">
+                </div>
+                <div class="aisb-repeater-field-group">
+                    <label>Button Style</label>
+                    <select class="aisb-editor-input aisb-repeater-field" 
+                            data-field="style">
+                        ${styleOptions}
+                    </select>
+                </div>
+            </div>
         `;
     }
     
@@ -615,6 +729,12 @@
             content[field.name] = field.value;
         });
         
+        // IMPORTANT: Preserve button data managed by repeater
+        var currentSection = editorState.sections[editorState.currentSection];
+        if (currentSection && currentSection.content && currentSection.content.buttons) {
+            content.buttons = currentSection.content.buttons;
+        }
+        
         // Update section in state
         if (editorState.sections[editorState.currentSection]) {
             editorState.sections[editorState.currentSection].content = content;
@@ -625,8 +745,8 @@
             var sectionHtml = renderSection(section, editorState.currentSection);
             $('.aisb-section[data-index="' + editorState.currentSection + '"]').replaceWith(sectionHtml);
             
-            // Update section list to show new title
-            updateSectionList();
+            // Update section list to show new title (without reinitializing sortable)
+            updateSectionList(true); // Pass flag to skip sortable reinit
             
             // Update save button to indicate unsaved changes
             updateSaveStatus('unsaved');
@@ -728,6 +848,38 @@
     }
     
     /**
+     * Render hero buttons
+     */
+    function renderHeroButtons(content) {
+        var buttons = content.buttons || [];
+        
+        // Backward compatibility: convert old single button to array
+        if (!buttons.length && content.button_text) {
+            buttons = [{
+                text: content.button_text,
+                url: content.button_url || '#',
+                style: 'primary'
+            }];
+        }
+        
+        // Return empty if no buttons
+        if (!buttons.length) {
+            return '';
+        }
+        
+        // Generate button HTML
+        var buttonHtml = buttons.map(function(button) {
+            if (!button.text) return ''; // Skip empty buttons
+            
+            var styleClass = 'aisb-btn-' + (button.style || 'primary');
+            return `<button class="aisb-btn ${styleClass}">${escapeHtml(button.text)}</button>`;
+        }).join('');
+        
+        // Wrap in buttons container
+        return buttonHtml ? `<div class="aisb-hero__buttons">${buttonHtml}</div>` : '';
+    }
+    
+    /**
      * Render Hero section
      */
     function renderHeroSection(section, index) {
@@ -742,11 +894,7 @@
                                 ${content.eyebrow ? `<div class="aisb-hero__eyebrow">${escapeHtml(content.eyebrow)}</div>` : ''}
                                 <h1 class="aisb-hero__heading">${escapeHtml(content.headline || 'Your Headline Here')}</h1>
                                 <p class="aisb-hero__body">${escapeHtml(content.subheadline || 'Your compelling message goes here')}</p>
-                                ${content.button_text ? `
-                                    <div class="aisb-hero__buttons">
-                                        <button class="aisb-btn aisb-btn-primary">${escapeHtml(content.button_text)}</button>
-                                    </div>
-                                ` : ''}
+                                ${renderHeroButtons(content)}
                             </div>
                             <div class="aisb-hero__media">
                                 <div class="placeholder-media" style="aspect-ratio: 16/9; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666;">
@@ -777,12 +925,18 @@
         $statusIndicator.removeClass('saving saved error unsaved');
         $saveBtn.removeClass('has-changes');
         
+        // Ensure button is enabled for states that allow saving
+        if (status !== 'saving') {
+            $saveBtn.prop('disabled', false);
+        }
+        
         switch (status) {
             case 'unsaved':
                 $saveBtn.addClass('has-changes');
                 $statusIndicator.addClass('unsaved').text('Unsaved changes');
                 break;
             case 'saving':
+                $saveBtn.prop('disabled', true);
                 $statusIndicator.addClass('saving').text('Saving...');
                 break;
             case 'saved':
@@ -793,6 +947,8 @@
                 break;
             case 'error':
                 $statusIndicator.addClass('error').text('Save failed');
+                // Keep button enabled so user can retry
+                $saveBtn.prop('disabled', false);
                 break;
             default:
                 $statusIndicator.text('');
@@ -827,7 +983,8 @@
         var postId = $('#aisb-post-id').val();
         var nonce = $('#aisb_editor_nonce').val();
         
-        // Disable button
+        // Disable button and store original text
+        var originalText = $button.text();
         $button.prop('disabled', true).text('Saving...');
         
         // Return a Promise for consistent error handling
@@ -843,6 +1000,9 @@
                 },
                 timeout: 30000, // 30 second timeout
                 success: function(response) {
+                    // Always re-enable button
+                    $button.prop('disabled', false).text(originalText);
+                    
                     if (response.success) {
                         resolve(response);
                     } else {
@@ -850,6 +1010,9 @@
                     }
                 },
                 error: function(xhr, status, error) {
+                    // Always re-enable button on error
+                    $button.prop('disabled', false).text(originalText);
+                    
                     var message = 'Network error';
                     if (status === 'timeout') {
                         message = 'Request timed out. Please check your connection.';
@@ -862,6 +1025,11 @@
                         }
                     }
                     reject(new Error(message));
+                },
+                complete: function() {
+                    // Failsafe: ensure button is always re-enabled
+                    // This runs regardless of success or error
+                    $button.prop('disabled', false).text(originalText);
                 }
             });
         });
@@ -891,7 +1059,7 @@
     /**
      * Update section list in right panel
      */
-    function updateSectionList() {
+    function updateSectionList(skipSortableReinit) {
         var $list = $('#aisb-section-list');
         var $empty = $('.aisb-structure-empty');
         
@@ -947,8 +1115,10 @@
             $list.append(itemHtml);
         });
         
-        // Reinitialize Sortable.js after DOM changes
-        reinitializeSortable();
+        // Only reinitialize Sortable.js if not skipping
+        if (!skipSortableReinit) {
+            reinitializeSortable();
+        }
     }
     
     /**

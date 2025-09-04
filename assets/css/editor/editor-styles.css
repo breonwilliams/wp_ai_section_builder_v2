@@ -745,16 +745,26 @@ body.aisb-editor-active .aisb-editor-wrapper {
 }
 
 .aisb-editor-input,
-.aisb-editor-textarea {
+.aisb-editor-textarea,
+.aisb-editor-wrapper input[type="text"],
+.aisb-editor-wrapper input[type="number"],
+.aisb-editor-wrapper input[type="email"],
+.aisb-editor-wrapper input[type="url"],
+.aisb-editor-wrapper textarea {
     width: 100%;
     background: var(--aisb-editor-bg-surface);
+    background-color: var(--aisb-editor-bg-surface);
     border: 1px solid var(--aisb-editor-border);
     color: var(--aisb-editor-text-primary);
     padding: var(--aisb-editor-space-md) var(--aisb-editor-space-lg);
     border-radius: 6px;
     font-size: 13px;
     line-height: 1.5;
+    font-family: inherit;
     transition: all var(--aisb-transition-fast);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 .aisb-editor-input {
@@ -767,15 +777,25 @@ body.aisb-editor-active .aisb-editor-wrapper {
 }
 
 .aisb-editor-input:focus,
-.aisb-editor-textarea:focus {
+.aisb-editor-textarea:focus,
+.aisb-editor-wrapper input[type="text"]:focus,
+.aisb-editor-wrapper input[type="number"]:focus,
+.aisb-editor-wrapper input[type="email"]:focus,
+.aisb-editor-wrapper input[type="url"]:focus,
+.aisb-editor-wrapper textarea:focus {
     outline: none;
     border-color: var(--aisb-editor-accent);
     box-shadow: 0 0 0 3px var(--aisb-editor-accent-bg);
+    background: var(--aisb-editor-bg-surface);
+    background-color: var(--aisb-editor-bg-surface);
 }
 
 .aisb-editor-input::placeholder,
-.aisb-editor-textarea::placeholder {
+.aisb-editor-textarea::placeholder,
+.aisb-editor-wrapper input::placeholder,
+.aisb-editor-wrapper textarea::placeholder {
     color: var(--aisb-editor-text-muted);
+    opacity: 1;
 }
 
 /* Color picker */
@@ -894,7 +914,7 @@ body.aisb-editor-active .aisb-editor-wrapper {
     --space-lg: 32px;
     --space-3xl: 48px;
     --font-size-eyebrow: 14px;
-    --font-size-h1: 48px;
+    --font-size-h1: 56px;
     --font-size-body: 18px;
     --font-weight-bold: 700;
     --font-weight-semibold: 600;
@@ -944,7 +964,7 @@ body.aisb-editor-active .aisb-editor-wrapper {
 
 /* Hero Heading (exact from approved design) */
 .aisb-hero__heading {
-    font-size: var(--font-size-h1);
+    font-size: 56px;
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-tight);
     color: var(--color-text);
@@ -963,7 +983,7 @@ body.aisb-editor-active .aisb-editor-wrapper {
 /* Hero Buttons (exact from approved design) */
 .aisb-hero__buttons {
     display: flex;
-    gap: var(--space-md);
+    gap: 24px;
     flex-wrap: wrap;
 }
 
@@ -985,22 +1005,202 @@ body.aisb-editor-active .aisb-editor-wrapper {
     box-sizing: border-box;
 }
 
-/* Primary Button */
-.aisb-btn-primary {
+/* Button base styling for preview - increased specificity for button elements */
+.aisb-editor-sections .aisb-btn,
+.aisb-editor-sections button.aisb-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.2;
+    border-radius: 6px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: transparent;
+    text-decoration: none;
+    transition: all 200ms ease;
+    cursor: pointer;
+    background: transparent;
+    font-family: inherit;
+}
+
+/* Primary Button - increased specificity */
+.aisb-btn-primary,
+.aisb-editor-sections button.aisb-btn-primary {
     background-color: var(--color-primary);
     color: #ffffff;
     border-color: var(--color-primary);
 }
 
-.aisb-btn-primary:hover {
+.aisb-btn-primary:hover,
+.aisb-editor-sections button.aisb-btn-primary:hover {
     background-color: #1d4ed8;
     border-color: #1d4ed8;
     color: #ffffff;
 }
 
+/* Secondary Button - increased specificity */
+.aisb-btn-secondary,
+.aisb-editor-sections button.aisb-btn-secondary {
+    background-color: transparent;
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.aisb-btn-secondary:hover,
+.aisb-editor-sections button.aisb-btn-secondary:hover {
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+
+
 /* Media Column */
 .aisb-hero__media {
     position: relative;
+}
+
+/* =========================================
+   Repeater Field Styles
+   ========================================= */
+.aisb-repeater-container {
+    margin-top: 8px;
+}
+
+.aisb-repeater-item {
+    background: var(--aisb-editor-bg-surface);
+    border: 1px solid var(--aisb-editor-border);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.aisb-repeater-item__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--aisb-editor-bg-panel);
+    border-bottom: 1px solid var(--aisb-editor-border);
+}
+
+.aisb-repeater-item__handle {
+    cursor: move;
+    color: var(--aisb-editor-text-secondary);
+    margin-right: 8px;
+}
+
+.aisb-repeater-item__title {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--aisb-editor-text-primary);
+}
+
+.aisb-repeater-item__remove {
+    background: none;
+    border: none;
+    color: var(--aisb-editor-text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+.aisb-repeater-item__remove:hover {
+    background: var(--aisb-editor-danger-bg);
+    color: var(--aisb-editor-danger);
+}
+
+.aisb-repeater-item__content {
+    padding: 12px;
+}
+
+.aisb-repeater-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.aisb-repeater-field-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+
+.aisb-repeater-field-group:last-child {
+    margin-bottom: 0;
+}
+
+.aisb-repeater-field-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--aisb-editor-text-secondary);
+    margin-bottom: 6px;
+}
+
+.aisb-repeater-add {
+    width: 100%;
+    padding: 10px;
+    background: var(--aisb-editor-bg-surface);
+    border: 2px dashed var(--aisb-editor-border);
+    border-radius: 4px;
+    color: var(--aisb-editor-text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.aisb-repeater-add:hover {
+    border-color: var(--aisb-editor-accent);
+    color: var(--aisb-editor-accent);
+    background: var(--aisb-editor-bg-hover);
+}
+
+/* Sortable Ghost and Drag States */
+.aisb-repeater-item--ghost {
+    opacity: 0.4;
+}
+
+.aisb-repeater-item--drag {
+    opacity: 0.9;
+}
+
+/* Select dropdown styling */
+.aisb-editor-select,
+.aisb-editor-wrapper select {
+    width: 100%;
+    padding: var(--aisb-editor-space-md) var(--aisb-editor-space-lg);
+    background: var(--aisb-editor-bg-surface);
+    background-color: var(--aisb-editor-bg-surface);
+    border: 1px solid var(--aisb-editor-border);
+    border-radius: 6px;
+    color: var(--aisb-editor-text-primary);
+    font-size: 13px;
+    line-height: 1.5;
+    cursor: pointer;
+    height: 36px;
+    font-family: inherit;
+    transition: all var(--aisb-transition-fast);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239CA3AF' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+.aisb-editor-select:focus,
+.aisb-editor-wrapper select:focus {
+    outline: none;
+    border-color: var(--aisb-editor-accent);
+    box-shadow: 0 0 0 3px var(--aisb-editor-accent-bg);
+    background: var(--aisb-editor-bg-surface);
+    background-color: var(--aisb-editor-bg-surface);
 }
 
 /* Responsive (from approved design) */

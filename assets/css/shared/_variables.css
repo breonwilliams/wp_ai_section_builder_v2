@@ -80,6 +80,7 @@
     
     /* Editor borders and dividers */
     --aisb-editor-border: #2A3747;         /* Subtle borders */
+    --aisb-editor-border-subtle: #1F2937;  /* Very subtle borders */
     --aisb-editor-border-strong: #3A4757;  /* Emphasized borders */
     --aisb-editor-divider: #1A2738;        /* Section dividers */
     

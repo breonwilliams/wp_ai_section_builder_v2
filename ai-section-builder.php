@@ -1235,8 +1235,20 @@ function aisb_render_hero_section($section) {
     $eyebrow = esc_html($content['eyebrow'] ?? '');
     $headline = esc_html($content['headline'] ?? '');
     $subheadline = esc_html($content['subheadline'] ?? '');
-    $button_text = esc_html($content['button_text'] ?? '');
-    $button_url = esc_url($content['button_url'] ?? '#');
+    
+    // Handle button data - new array format or old single button
+    $buttons = isset($content['buttons']) ? $content['buttons'] : array();
+    
+    // Backward compatibility: convert old single button to array
+    if (empty($buttons) && !empty($content['button_text'])) {
+        $buttons = array(
+            array(
+                'text' => $content['button_text'],
+                'url' => $content['button_url'] ?? '#',
+                'style' => 'primary'
+            )
+        );
+    }
     
     ob_start();
     ?>
@@ -1256,9 +1268,20 @@ function aisb_render_hero_section($section) {
                         <p class="aisb-hero__body"><?php echo $subheadline; ?></p>
                     <?php endif; ?>
                     
-                    <?php if ($button_text): ?>
+                    <?php if (!empty($buttons)): ?>
                         <div class="aisb-hero__buttons">
-                            <a href="<?php echo $button_url; ?>" class="aisb-btn aisb-btn-primary"><?php echo $button_text; ?></a>
+                            <?php foreach ($buttons as $button): ?>
+                                <?php if (!empty($button['text'])): ?>
+                                    <?php 
+                                    $btn_text = esc_html($button['text']);
+                                    $btn_url = esc_url($button['url'] ?? '#');
+                                    $btn_style = esc_attr($button['style'] ?? 'primary');
+                                    ?>
+                                    <a href="<?php echo $btn_url; ?>" class="aisb-btn aisb-btn-<?php echo $btn_style; ?>">
+                                        <?php echo $btn_text; ?>
+                                    </a>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -1329,7 +1352,7 @@ function aisb_enqueue_styles() {
 
         /* Hero Heading (exact from approved design) */
         .aisb-hero__heading {
-            font-size: 48px;
+            font-size: 56px;
             font-weight: 700;
             line-height: 1.1;
             color: #1a1a1a;
@@ -1382,6 +1405,19 @@ function aisb_enqueue_styles() {
             border-color: #1d4ed8;
             color: #ffffff;
         }
+
+        /* Secondary Button */
+        .aisb-btn-secondary {
+            background-color: transparent;
+            color: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .aisb-btn-secondary:hover {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+
 
         /* Media Column */
         .aisb-hero__media {
@@ -1453,10 +1489,19 @@ function aisb_enqueue_admin_styles($hook) {
             'after'
         );
         
+        // Enqueue repeater field module
+        wp_enqueue_script(
+            'aisb-repeater-field',
+            AISB_PLUGIN_URL . 'assets/js/editor/repeater-field.js',
+            ['jquery', 'sortablejs-cdn'],
+            AISB_VERSION,
+            true
+        );
+        
         wp_enqueue_script(
             'aisb-editor-script',
             AISB_PLUGIN_URL . 'assets/js/editor/editor.js',
-            ['jquery', 'sortablejs-cdn'],
+            ['jquery', 'sortablejs-cdn', 'aisb-repeater-field'],
             AISB_VERSION,
             true
         );
