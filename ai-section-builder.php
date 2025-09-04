@@ -454,15 +454,27 @@ function aisb_render_editor_page() {
                 </h1>
             </div>
             <div class="aisb-editor-toolbar__right">
-                <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-preview-toggle" data-view="desktop">
-                    <span class="dashicons dashicons-desktop"></span>
-                </button>
-                <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-preview-toggle" data-view="tablet">
-                    <span class="dashicons dashicons-tablet"></span>
-                </button>
-                <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-preview-toggle" data-view="mobile">
-                    <span class="dashicons dashicons-smartphone"></span>
-                </button>
+                <div class="aisb-toolbar-group">
+                    <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-sidebar-toggle active" 
+                            id="aisb-toggle-sidebars" 
+                            title="<?php _e('Toggle Sidebars (Shift+S)', 'ai-section-builder'); ?>"
+                            aria-label="<?php _e('Toggle sidebars visibility', 'ai-section-builder'); ?>"
+                            aria-pressed="true">
+                        <span class="dashicons dashicons-editor-contract"></span>
+                        <span class="aisb-btn-label"><?php _e('Hide Panels', 'ai-section-builder'); ?></span>
+                    </button>
+                </div>
+                <div class="aisb-toolbar-group">
+                    <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-preview-toggle" data-view="desktop">
+                        <span class="dashicons dashicons-desktop"></span>
+                    </button>
+                    <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-preview-toggle" data-view="tablet">
+                        <span class="dashicons dashicons-tablet"></span>
+                    </button>
+                    <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-preview-toggle" data-view="mobile">
+                        <span class="dashicons dashicons-smartphone"></span>
+                    </button>
+                </div>
                 <button class="aisb-editor-btn aisb-editor-btn-primary" id="aisb-save-sections">
                     <span class="dashicons dashicons-saved"></span>
                     <?php _e('Save', 'ai-section-builder'); ?>
@@ -1214,41 +1226,48 @@ get_footer();
 }
 
 /**
- * Render Hero section - Phase 2A: Basic HTML structure
+ * Render Hero section - Using approved design structure
  */
 function aisb_render_hero_section($section) {
     // Handle both old and new section structure
     $content = isset($section['content']) ? $section['content'] : $section;
     
+    $eyebrow = esc_html($content['eyebrow'] ?? '');
     $headline = esc_html($content['headline'] ?? '');
     $subheadline = esc_html($content['subheadline'] ?? '');
     $button_text = esc_html($content['button_text'] ?? '');
     $button_url = esc_url($content['button_url'] ?? '#');
-    $background = $content['background'] ?? '#667EEA';
-    
-    // Determine background style
-    $bg_style = '';
-    if (strpos($background, 'linear-gradient') !== false) {
-        $bg_style = 'background: ' . $background;
-    } else {
-        $bg_style = 'background-color: ' . $background;
-    }
     
     ob_start();
     ?>
-    <section class="aisb-hero-section aisb-canvas-fullwidth" style="<?php echo $bg_style; ?>">
-        <div class="aisb-hero-content">
-            <?php if ($headline): ?>
-                <h1 class="aisb-hero-headline"><?php echo $headline; ?></h1>
-            <?php endif; ?>
-            
-            <?php if ($subheadline): ?>
-                <p class="aisb-hero-subheadline"><?php echo $subheadline; ?></p>
-            <?php endif; ?>
-            
-            <?php if ($button_text): ?>
-                <a href="<?php echo $button_url; ?>" class="aisb-hero-button"><?php echo $button_text; ?></a>
-            <?php endif; ?>
+    <section class="aisb-hero aisb-canvas-fullwidth">
+        <div class="aisb-hero__container">
+            <div class="aisb-hero__grid">
+                <div class="aisb-hero__content">
+                    <?php if ($eyebrow): ?>
+                        <div class="aisb-hero__eyebrow"><?php echo $eyebrow; ?></div>
+                    <?php endif; ?>
+                    
+                    <?php if ($headline): ?>
+                        <h1 class="aisb-hero__heading"><?php echo $headline; ?></h1>
+                    <?php endif; ?>
+                    
+                    <?php if ($subheadline): ?>
+                        <p class="aisb-hero__body"><?php echo $subheadline; ?></p>
+                    <?php endif; ?>
+                    
+                    <?php if ($button_text): ?>
+                        <div class="aisb-hero__buttons">
+                            <a href="<?php echo $button_url; ?>" class="aisb-btn aisb-btn-primary"><?php echo $button_text; ?></a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div class="aisb-hero__media">
+                    <div style="aspect-ratio: 16/9; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                        Hero Media
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
     <?php
@@ -1266,58 +1285,127 @@ function aisb_enqueue_styles() {
         return;
     }
     
-    // Add inline styles for Hero section
+    // Frontend hero styles (exact match to editor)
     $hero_styles = '
-        .aisb-hero-section {
-            padding: 80px 20px;
-            text-align: center;
+        /* Base Hero Structure (exact from approved design) */
+        .aisb-hero {
             position: relative;
+            padding: 96px 0;
+            background-color: #ffffff;
+            color: #1a1a1a;
         }
-        
-        .aisb-hero-content {
-            max-width: 800px;
+
+        /* Hero Container */
+        .aisb-hero__container {
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 0 24px;
         }
-        
-        .aisb-hero-headline {
+
+        /* Hero Grid Layout */
+        .aisb-hero__grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+        }
+
+        /* Content Column */
+        .aisb-hero__content {
+            max-width: 600px;
+        }
+
+        /* Eyebrow Text (exact from approved design) */
+        .aisb-hero__eyebrow {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            line-height: 1.1;
+            color: #2563eb;
+            margin-bottom: 16px;
+        }
+
+        /* Hero Heading (exact from approved design) */
+        .aisb-hero__heading {
             font-size: 48px;
             font-weight: 700;
-            line-height: 1.2;
-            margin: 0 0 20px 0;
-            color: #ffffff;
+            line-height: 1.1;
+            color: #1a1a1a;
+            margin: 0 0 24px 0;
         }
-        
-        .aisb-hero-subheadline {
-            font-size: 20px;
+
+        /* Hero Body Text (exact from approved design) */
+        .aisb-hero__body {
+            font-size: 18px;
             line-height: 1.6;
-            margin: 0 0 30px 0;
-            color: rgba(255, 255, 255, 0.9);
+            color: #64748b;
+            margin-bottom: 32px;
+            max-width: 480px;
         }
-        
-        .aisb-hero-button {
-            display: inline-block;
-            padding: 14px 32px;
-            background: #ffffff;
-            color: #667EEA;
-            text-decoration: none;
-            border-radius: 6px;
+
+        /* Hero Buttons (exact from approved design) */
+        .aisb-hero__buttons {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        /* Button Base Styles (from approved design) */
+        .aisb-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 12px 24px;
             font-size: 16px;
             font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
+            line-height: 1.2;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 200ms ease;
+            box-sizing: border-box;
         }
-        
-        .aisb-hero-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+
+        /* Primary Button */
+        .aisb-btn-primary {
+            background-color: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
         }
-        
+
+        .aisb-btn-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+            color: #ffffff;
+        }
+
+        /* Media Column */
+        .aisb-hero__media {
+            position: relative;
+        }
+
+        /* Responsive (from approved design) */
         @media (max-width: 768px) {
-            .aisb-hero-headline {
-                font-size: 36px;
+            .aisb-hero__grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
             }
             
-            .aisb-hero-subheadline {
-                font-size: 18px;
+            .aisb-hero__eyebrow {
+                font-size: 12px;
+            }
+            
+            .aisb-hero__heading {
+                font-size: 32px;
+            }
+            
+            .aisb-hero__body {
+                font-size: 16px;
+                max-width: 100%;
             }
         }
     ';

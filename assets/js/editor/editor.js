@@ -35,6 +35,9 @@
         
         // Bind events
         bindEvents();
+        
+        // Initialize sidebar toggle
+        initSidebarToggle();
     }
     
     /**
@@ -264,12 +267,7 @@
             // Auto-add section with defaults
             var section = {
                 type: sectionType,
-                content: {
-                    headline: 'Your Headline Here',
-                    subheadline: 'Add your compelling message that engages visitors',
-                    button_text: 'Get Started',
-                    button_url: '#'
-                }
+                content: Object.assign({}, heroDefaults)
             };
             
             // Add to state and render immediately
@@ -378,19 +376,52 @@
     }
     
     /**
+     * Escape HTML to prevent XSS
+     */
+    function escapeHtml(text) {
+        if (!text) return '';
+        var map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+    
+    /**
+     * Hero section field defaults
+     */
+    var heroDefaults = {
+        eyebrow: 'Welcome to the Future',
+        headline: 'Your Headline Here',
+        subheadline: 'Add your compelling message that engages visitors',
+        button_text: 'Get Started',
+        button_url: '#'
+    };
+    
+    /**
      * Generate Hero section form
      */
     function generateHeroForm(content) {
         // Use existing content or defaults
-        content = content || {
-            headline: '',
-            subheadline: '',
-            button_text: '',
-            button_url: ''
-        };
+        content = content || heroDefaults;
         
         return `
             <form id="aisb-section-form">
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="hero-eyebrow">
+                        Eyebrow Text
+                    </label>
+                    <input type="text" 
+                           id="hero-eyebrow" 
+                           name="eyebrow" 
+                           class="aisb-editor-input" 
+                           value="${escapeHtml(content.eyebrow || '')}" 
+                           placeholder="Welcome to the Future">
+                </div>
+                
                 <div class="aisb-editor-form-group">
                     <label class="aisb-editor-form-label" for="hero-headline">
                         Headline
@@ -399,7 +430,7 @@
                            id="hero-headline" 
                            name="headline" 
                            class="aisb-editor-input" 
-                           value="${content.headline || ''}" 
+                           value="${escapeHtml(content.headline || '')}" 
                            placeholder="Enter your headline text">
                 </div>
                 
@@ -410,7 +441,7 @@
                     <textarea id="hero-subheadline" 
                               name="subheadline" 
                               class="aisb-editor-textarea" 
-                              placeholder="Enter your subheadline or description">${content.subheadline || ''}</textarea>
+                              placeholder="Enter your subheadline or description">${escapeHtml(content.subheadline || '')}</textarea>
                 </div>
                 
                 <div class="aisb-editor-form-group">
@@ -421,7 +452,7 @@
                            id="hero-button-text" 
                            name="button_text" 
                            class="aisb-editor-input" 
-                           value="${content.button_text || ''}" 
+                           value="${escapeHtml(content.button_text || '')}" 
                            placeholder="Get Started">
                 </div>
                 
@@ -433,7 +464,7 @@
                            id="hero-button-url" 
                            name="button_url" 
                            class="aisb-editor-input" 
-                           value="${content.button_url || ''}" 
+                           value="${escapeHtml(content.button_url || '')}" 
                            placeholder="https://">
                 </div>
             </form>
@@ -448,6 +479,67 @@
         $('#aisb-section-form input, #aisb-section-form textarea').on('input', function() {
             updatePreview();
         });
+    }
+    
+    /**
+     * Initialize sidebar toggle functionality
+     */
+    function initSidebarToggle() {
+        var $toggleBtn = $('#aisb-toggle-sidebars');
+        var $layout = $('.aisb-editor-layout');
+        var $leftPanel = $('.aisb-editor-panel--left');
+        var $rightPanel = $('.aisb-editor-panel--right');
+        var sidebarsVisible = true;
+        
+        // Load saved state from sessionStorage
+        var savedState = sessionStorage.getItem('aisb_sidebars_visible');
+        if (savedState !== null) {
+            sidebarsVisible = savedState === 'true';
+            updateSidebarState(sidebarsVisible);
+        }
+        
+        // Toggle button click handler
+        $toggleBtn.on('click', function() {
+            sidebarsVisible = !sidebarsVisible;
+            updateSidebarState(sidebarsVisible);
+            sessionStorage.setItem('aisb_sidebars_visible', sidebarsVisible);
+        });
+        
+        // Keyboard shortcut (Shift + S)
+        $(document).on('keydown', function(e) {
+            if (e.shiftKey && e.key === 'S') {
+                e.preventDefault();
+                $toggleBtn.trigger('click');
+            }
+        });
+        
+        // Update sidebar visibility state
+        function updateSidebarState(visible) {
+            if (visible) {
+                $layout.removeClass('aisb-sidebars-hidden');
+                $leftPanel.show();
+                $rightPanel.show();
+                $toggleBtn.addClass('active')
+                    .attr('aria-pressed', 'true')
+                    .find('.dashicons')
+                    .removeClass('dashicons-editor-expand')
+                    .addClass('dashicons-editor-contract');
+                $toggleBtn.find('.aisb-btn-label').text('Hide Panels');
+            } else {
+                $layout.addClass('aisb-sidebars-hidden');
+                $leftPanel.hide();
+                $rightPanel.hide();
+                $toggleBtn.removeClass('active')
+                    .attr('aria-pressed', 'false')
+                    .find('.dashicons')
+                    .removeClass('dashicons-editor-contract')
+                    .addClass('dashicons-editor-expand');
+                $toggleBtn.find('.aisb-btn-label').text('Show Panels');
+            }
+            
+            // Trigger resize event for canvas adjustment
+            $(window).trigger('resize');
+        }
     }
     
     /**
@@ -643,15 +735,27 @@
         
         return `
             <div class="aisb-section aisb-section-hero" data-index="${index}">
-                <div class="aisb-section__inner">
-                    <h1 class="aisb-hero-headline">${content.headline || 'Your Headline Here'}</h1>
-                    <p class="aisb-hero-subheadline">${content.subheadline || 'Your subheadline text'}</p>
-                    ${content.button_text ? `
-                        <a href="${content.button_url || '#'}" class="aisb-hero-button">
-                            ${content.button_text}
-                        </a>
-                    ` : ''}
-                </div>
+                <section class="aisb-hero">
+                    <div class="aisb-hero__container">
+                        <div class="aisb-hero__grid">
+                            <div class="aisb-hero__content">
+                                ${content.eyebrow ? `<div class="aisb-hero__eyebrow">${escapeHtml(content.eyebrow)}</div>` : ''}
+                                <h1 class="aisb-hero__heading">${escapeHtml(content.headline || 'Your Headline Here')}</h1>
+                                <p class="aisb-hero__body">${escapeHtml(content.subheadline || 'Your compelling message goes here')}</p>
+                                ${content.button_text ? `
+                                    <div class="aisb-hero__buttons">
+                                        <button class="aisb-btn aisb-btn-primary">${escapeHtml(content.button_text)}</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="aisb-hero__media">
+                                <div class="placeholder-media" style="aspect-ratio: 16/9; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666;">
+                                    Hero Media
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         `;
     }
