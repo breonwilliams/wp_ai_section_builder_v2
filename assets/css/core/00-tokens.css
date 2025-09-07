@@ -8,28 +8,30 @@
 
 :root {
     /* =========================================
-       Color System (8 colors as specified)
+       SECTION Color System - FOR SECTIONS ONLY
+       8 colors that users can customize globally
+       NEVER mix with editor UI colors!
        ========================================= */
     
-    /* Light Mode Colors */
-    --aisb-color-base: #ffffff;
-    --aisb-color-text: #1a1a1a;
-    --aisb-color-muted: #64748b;
-    --aisb-color-primary: #2563eb;
-    --aisb-color-primary-hover: #1d4ed8;
-    --aisb-color-secondary: #f1f5f9;
-    --aisb-color-border: #e2e8f0;
-    --aisb-color-success: #10b981;
-    --aisb-color-error: #ef4444;
+    /* Light Mode Colors - FOR SECTIONS ONLY */
+    --aisb-color-base: #ffffff;        /* Background white */
+    --aisb-color-text: #1a1a1a;        /* Primary text black */
+    --aisb-color-muted: #64748b;       /* Secondary text, visited links - NOT PURPLE */
+    --aisb-color-primary: #2563eb;     /* Links, primary buttons */
+    --aisb-color-primary-hover: #1d4ed8; /* Hover states */
+    --aisb-color-secondary: #f1f5f9;   /* Secondary backgrounds */
+    --aisb-color-border: #e2e8f0;      /* Borders */
+    --aisb-color-success: #10b981;     /* Success states */
+    --aisb-color-error: #ef4444;       /* Error states */
     
-    /* Dark Mode Colors */
-    --aisb-color-dark-base: #1a1a1a;
-    --aisb-color-dark-text: #fafafa;
-    --aisb-color-dark-muted: #9ca3af;
-    --aisb-color-dark-primary: #60a5fa;
-    --aisb-color-dark-primary-hover: #3b82f6;
-    --aisb-color-dark-secondary: #374151;
-    --aisb-color-dark-border: #4b5563;
+    /* Dark Mode Colors - FOR SECTIONS ONLY */
+    --aisb-color-dark-base: #1a1a1a;   /* Background black */
+    --aisb-color-dark-text: #fafafa;   /* Primary text white */
+    --aisb-color-dark-muted: #9ca3af;  /* Secondary text, visited links - NOT PURPLE */
+    --aisb-color-dark-primary: #60a5fa; /* Links, primary buttons */
+    --aisb-color-dark-primary-hover: #3b82f6; /* Hover states */
+    --aisb-color-dark-secondary: #374151; /* Secondary backgrounds */
+    --aisb-color-dark-border: #4b5563; /* Borders */
     
     /* =========================================
        Spacing System (8px grid)
@@ -113,7 +115,9 @@
     --aisb-z-tooltip: 1070;
     
     /* =========================================
-       Editor Dark Theme Colors (Professional Dark UI)
+       EDITOR UI Colors - FOR EDITOR UI ONLY!
+       ⚠️ NEVER use these in sections (hero.css, etc.)
+       These are ONLY for toolbar, panels, sidebars
        ========================================= */
     /* Background elevation layers */
     --aisb-editor-bg-base: #09111A;        /* Deep blue-black base */
@@ -134,11 +138,11 @@
     --aisb-editor-text-muted: #6B7280;     /* Disabled/hints - 4.5:1 ratio */
     --aisb-editor-text-inverse: #09111A;   /* For light surfaces */
     
-    /* Editor brand colors (desaturated for dark mode) */
-    --aisb-editor-accent: #667EEA;         /* Primary brand */
-    --aisb-editor-accent-muted: #4A5FC7;   /* Desaturated */
-    --aisb-editor-accent-hover: #7B8FF5;   /* Hover state */
-    --aisb-editor-accent-bg: rgba(102, 126, 234, 0.1); /* Subtle backgrounds */
+    /* Editor brand colors - EDITOR UI ONLY - Contains PURPLE! */
+    --aisb-editor-accent: #667EEA;         /* PURPLE - NEVER use in sections! */
+    --aisb-editor-accent-muted: #4A5FC7;   /* PURPLE - NEVER use in sections! */
+    --aisb-editor-accent-hover: #7B8FF5;   /* PURPLE - NEVER use in sections! */
+    --aisb-editor-accent-bg: rgba(102, 126, 234, 0.1); /* PURPLE tint - NEVER use in sections! */
     
     /* Editor semantic colors (desaturated 20%) */
     --aisb-editor-success: #34D399;

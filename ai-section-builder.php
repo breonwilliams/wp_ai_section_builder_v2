@@ -73,8 +73,8 @@ function aisb_setup() {
     add_action('admin_menu', 'aisb_add_editor_page');
     add_action('admin_init', 'aisb_handle_editor_redirect');
     
-    // Enqueue styles
-    add_action('wp_enqueue_scripts', 'aisb_enqueue_styles');
+    // Enqueue styles with high priority (99) to ensure they load after theme styles
+    add_action('wp_enqueue_scripts', 'aisb_enqueue_styles', 99);
     add_action('admin_enqueue_scripts', 'aisb_enqueue_admin_styles');
     
     // Performance optimizations
@@ -1470,6 +1470,59 @@ function aisb_enqueue_styles() {
         array('aisb-utilities'),
         AISB_VERSION
     );
+    
+    // Add critical inline styles to ensure link colors override theme
+    // IMPORTANT: Explicit theme selectors to prevent cross-contamination
+    $inline_css = '
+        /* Critical link overrides - Explicit theme targeting */
+        
+        /* LIGHT MODE - Only .aisb-section--light */
+        .aisb-section--light .aisb-hero__body a:visited,
+        .aisb-section--light .aisb-hero__outro a:visited {
+            color: #2563eb !important;
+        }
+        .aisb-section--light .aisb-hero__body a,
+        .aisb-section--light .aisb-hero__outro a,
+        .aisb-section--light .aisb-hero__body a:link,
+        .aisb-section--light .aisb-hero__outro a:link {
+            color: #2563eb !important;
+        }
+        .aisb-section--light .aisb-hero__body a:hover,
+        .aisb-section--light .aisb-hero__outro a:hover {
+            color: #1d4ed8 !important;
+        }
+        
+        /* DARK MODE - Only .aisb-section--dark */
+        .aisb-section--dark .aisb-hero__body a:visited,
+        .aisb-section--dark .aisb-hero__outro a:visited {
+            color: #60a5fa !important;
+        }
+        .aisb-section--dark .aisb-hero__body a,
+        .aisb-section--dark .aisb-hero__outro a,
+        .aisb-section--dark .aisb-hero__body a:link,
+        .aisb-section--dark .aisb-hero__outro a:link {
+            color: #60a5fa !important;
+        }
+        .aisb-section--dark .aisb-hero__body a:hover,
+        .aisb-section--dark .aisb-hero__outro a:hover {
+            color: #3b82f6 !important;
+        }
+        
+        /* DEFAULT (no theme class) - Defaults to light */
+        .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a:visited,
+        .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a:visited {
+            color: #2563eb !important;
+        }
+        .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a,
+        .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a {
+            color: #2563eb !important;
+        }
+        .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a:hover,
+        .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a:hover {
+            color: #1d4ed8 !important;
+        }
+    ';
+    wp_add_inline_style('aisb-section-hero', $inline_css);
 }
 
 /**
@@ -1538,6 +1591,9 @@ function aisb_enqueue_admin_styles($hook) {
         
         // Enqueue WordPress media scripts for image/video selection
         wp_enqueue_media();
+        
+        // Enqueue WordPress editor scripts for TinyMCE/WYSIWYG
+        wp_enqueue_editor();
         
         // Enqueue repeater field module
         wp_enqueue_script(

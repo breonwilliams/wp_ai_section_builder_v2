@@ -388,6 +388,11 @@
         // Bind form events
         bindFormEvents();
         
+        // Initialize WYSIWYG editors with small delay for DOM
+        setTimeout(function() {
+            initWysiwygEditors();
+        }, 100);
+        
         // Initialize global blocks repeater if it's a hero section
         if (sectionType === 'hero') {
             // Use sectionContent if editing, otherwise use defaults
@@ -623,10 +628,11 @@
                     <label class="aisb-editor-form-label" for="hero-content">
                         Content
                     </label>
-                    <textarea id="hero-content" 
-                              name="content" 
-                              class="aisb-editor-textarea" 
-                              placeholder="Enter your main content">${stripHtmlTags(content.content || '')}</textarea>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="hero-content" 
+                                  name="content" 
+                                  class="aisb-editor-wysiwyg">${content.content || ''}</textarea>
+                    </div>
                 </div>
                 
                 <div class="aisb-editor-form-group">
@@ -649,10 +655,11 @@
                     <label class="aisb-editor-form-label" for="hero-outro-content">
                         Outro Content (Optional)
                     </label>
-                    <textarea id="hero-outro-content" 
-                              name="outro_content" 
-                              class="aisb-editor-textarea" 
-                              placeholder="Optional closing content">${stripHtmlTags(content.outro_content || '')}</textarea>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="hero-outro-content" 
+                                  name="outro_content" 
+                                  class="aisb-editor-wysiwyg">${content.outro_content || ''}</textarea>
+                    </div>
                 </div>
             </form>
         `;
@@ -826,6 +833,71 @@
     }
     
     /**
+     * Initialize WYSIWYG editors using WordPress TinyMCE
+     */
+    function initWysiwygEditors() {
+        // Destroy existing instances first (if any)
+        if (typeof wp !== 'undefined' && wp.editor) {
+            wp.editor.remove('hero-content');
+            wp.editor.remove('hero-outro-content');
+        }
+        
+        // Initialize TinyMCE for content fields
+        if (typeof wp !== 'undefined' && wp.editor && wp.editor.initialize) {
+            // Main content editor
+            wp.editor.initialize('hero-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink',
+                    toolbar2: '',
+                    format_tags: 'p;h2;h3;h4',
+                    paste_as_text: false,
+                    paste_remove_styles: true,
+                    paste_remove_styles_if_webkit: true,
+                    paste_strip_class_attributes: 'all',
+                    height: 200,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save(); // Save to textarea
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: {
+                    buttons: 'strong,em,link,ul,ol,li'
+                },
+                mediaButtons: false // No media button, we have our own
+            });
+            
+            // Outro content editor (simpler)
+            wp.editor.initialize('hero-outro-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'bold,italic,link,unlink',
+                    toolbar2: '',
+                    paste_as_text: false,
+                    paste_remove_styles: true,
+                    height: 150,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save(); // Save to textarea
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: {
+                    buttons: 'strong,em,link'
+                },
+                mediaButtons: false
+            });
+        } else {
+            console.warn('WordPress editor not available, falling back to textarea');
+        }
+    }
+    
+    /**
      * Bind form events
      */
     function bindFormEvents() {
@@ -959,15 +1031,19 @@
             if (editorState.currentSection !== null) {
                 var content = editorState.sections[editorState.currentSection].content;
                 content.media_type = mediaType;
-                // Clear other media when type changes
-                if (mediaType === 'none') {
-                    content.featured_image = '';
-                    content.video_url = '';
-                }
+                
+                // PRESERVE all media data regardless of type selection
+                // "None" is a display preference, not data destruction
+                // This follows modern UX patterns where "hide" != "delete"
+                // Explicit removal actions (remove buttons) handle actual data clearing
                 
                 debugLog('Media Type Updated in State', {
                     sectionIndex: editorState.currentSection,
-                    updatedContent: content
+                    updatedContent: content,
+                    preservedData: {
+                        featured_image: content.featured_image,
+                        video_url: content.video_url
+                    }
                 });
                 
                 updatePreview();
@@ -1111,6 +1187,12 @@
      * Show library mode in left panel
      */
     function showLibraryMode() {
+        // Destroy WYSIWYG editors before hiding
+        if (typeof wp !== 'undefined' && wp.editor) {
+            wp.editor.remove('hero-content');
+            wp.editor.remove('hero-outro-content');
+        }
+        
         $('#aisb-edit-mode').hide();
         $('#aisb-edit-content').empty();
         $('#aisb-library-mode').show();
@@ -1142,12 +1224,8 @@
         
         // Convert form data to object
         $.each(formData, function(i, field) {
-            // Handle content field - wrap in paragraphs
-            if (field.name === 'content' || field.name === 'outro_content') {
-                content[field.name] = wrapInParagraphs(field.value);
-            } else {
-                content[field.name] = field.value;
-            }
+            // Content fields are now handled by TinyMCE - preserve HTML
+            content[field.name] = field.value;
         });
         
         debugLog('updatePreview - Content from Form', content);

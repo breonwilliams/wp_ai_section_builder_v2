@@ -6,6 +6,80 @@ This document contains critical architectural decisions and rules that MUST be f
 
 ---
 
+## 🔴 CRITICAL: Design System Separation - NEVER MIX THESE
+
+### SECTION DESIGN SYSTEM (8 Colors ONLY)
+**These are the ONLY colors allowed in section styles (hero.css, features.css, etc.):**
+
+#### Light Mode Section Colors:
+- `#ffffff` - Base/White background
+- `#1a1a1a` - Text/Black primary text
+- `#64748b` - Muted/Gray secondary text (USE FOR VISITED LINKS)
+- `#2563eb` - Primary/Blue (links, primary buttons)
+- `#1d4ed8` - Primary Hover/Darker Blue
+- `#f1f5f9` - Secondary/Light Gray background
+- `#e2e8f0` - Border/Light Gray
+- `#10b981` - Success/Green (rarely used)
+
+#### Dark Mode Section Colors:
+- `#1a1a1a` - Base/Black background
+- `#fafafa` - Text/White primary text
+- `#9ca3af` - Muted/Light Gray (USE FOR VISITED LINKS)
+- `#60a5fa` - Primary/Light Blue (links, primary buttons)
+- `#3b82f6` - Primary Hover/Blue
+- `#374151` - Secondary/Dark Gray background
+- `#4b5563` - Border/Gray
+- Success inherits from light mode
+
+### EDITOR UI DESIGN SYSTEM (Completely Separate)
+**These colors are ONLY for editor UI (toolbar, panels, sidebars) - NEVER use in sections:**
+- `#667EEA` - Editor Accent/Purple ❌ NEVER IN SECTIONS
+- `#09111A` - Editor Background
+- `#4A5FC7` - Editor Accent Muted
+- All `--aisb-editor-*` variables
+
+### ❌ ABSOLUTELY FORBIDDEN IN SECTIONS
+1. **NO PURPLE COLORS** - Never use #4338ca, #818cf8, #667EEA, or any purple
+2. **NO COLORS OUTSIDE THE 8-COLOR PALETTE** - No #93c5fd or other non-system colors
+3. **NO EDITOR UI COLORS** - Never use --aisb-editor-* variables in sections
+4. **NO MIXING** - Section styles and editor UI are completely separate systems
+
+### ✅ CORRECT Link Styles for Sections
+```css
+/* CRITICAL: Links now maintain primary color even when visited for better UX */
+
+/* Light Mode Links - USE ONLY SYSTEM COLORS */
+.aisb-section--light .aisb-hero__body a,
+.aisb-section--light .aisb-hero__body a:visited {
+    color: #2563eb !important; /* Primary - ALWAYS blue, even visited */
+}
+.aisb-section--light .aisb-hero__body a:hover {
+    color: #1d4ed8 !important; /* Primary Hover */
+}
+
+/* Dark Mode Links - USE ONLY SYSTEM COLORS */
+.aisb-section--dark .aisb-hero__body a,
+.aisb-section--dark .aisb-hero__body a:visited {
+    color: #60a5fa !important; /* Dark Primary - ALWAYS light blue */
+}
+.aisb-section--dark .aisb-hero__body a:hover {
+    color: #3b82f6 !important; /* Dark Primary Hover */
+}
+
+/* Default (no theme class) - Defaults to light mode */
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a,
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a:visited {
+    color: #2563eb !important; /* Primary - same as light */
+}
+```
+
+### Why This Matters
+- Users will have **global color settings** to customize these 8 colors
+- Mixing systems breaks the customization feature
+- Design consistency is critical for professional appearance
+
+---
+
 ## CSS Architecture - CRITICAL RULES
 
 ### File Structure and Responsibilities (PRODUCTION READY)
@@ -167,6 +241,31 @@ wp_enqueue_style(
 
 ---
 
+## 🔴 CRITICAL: Theme Class Requirements
+
+### ALWAYS Use Explicit Theme Selectors
+To prevent style bleeding between themes, ALWAYS use explicit theme class selectors:
+
+```css
+/* ✅ CORRECT - Explicit theme targeting */
+.aisb-section--light .aisb-hero__body { }
+.aisb-section--dark .aisb-hero__body { }
+
+/* ❌ WRONG - Generic selector that affects all themes */
+.aisb-section .aisb-hero__body { }
+```
+
+### Theme Class Priority Order
+1. **Explicit theme classes** (`.aisb-section--light`, `.aisb-section--dark`)
+2. **Default fallback** (`.aisb-section:not(.aisb-section--light):not(.aisb-section--dark)`)
+
+### Why This Matters
+- Prevents light mode styles from affecting dark mode preview
+- Ensures editor preview matches frontend exactly
+- Avoids cascade conflicts between themes
+
+---
+
 ## Testing Checklist
 
 Before marking any CSS work as complete:
@@ -177,6 +276,9 @@ Before marking any CSS work as complete:
 - [ ] Styles are identical in editor preview and frontend
 - [ ] No console errors about undefined CSS variables
 - [ ] Media (images/videos) display correctly in both contexts
+- [ ] Links maintain correct color in all states (default, visited, hover)
+- [ ] No style bleeding between light/dark themes in editor preview
+- [ ] Media placeholders show correct theme-specific styles
 
 ---
 

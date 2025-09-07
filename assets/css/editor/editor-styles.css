@@ -876,6 +876,54 @@ body.aisb-editor-active .aisb-editor-wrapper {
 }
 
 /* =========================================
+   WYSIWYG Editor Styles
+   ========================================= */
+.aisb-editor-wysiwyg-container {
+    background: var(--aisb-editor-bg-surface);
+    border: 1px solid var(--aisb-editor-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* Override WordPress editor styles for dark theme */
+.aisb-editor-wysiwyg-container .mce-tinymce {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.aisb-editor-wysiwyg-container .wp-editor-container {
+    border: none;
+}
+
+/* Ensure proper styling for TinyMCE content area */
+.aisb-editor-wysiwyg-container iframe {
+    background: var(--aisb-editor-bg-base) !important;
+}
+
+/* Style the quicktags toolbar */
+.aisb-editor-wysiwyg-container .quicktags-toolbar {
+    background: var(--aisb-editor-bg-hover);
+    border-bottom: 1px solid var(--aisb-editor-border);
+    padding: 4px;
+}
+
+/* =========================================
+   Media Selector Button Fix
+   ========================================= */
+/* Override any external styles (WordPress/theme) that affect our media buttons */
+.aisb-media-selector button#select-featured-image {
+    padding: 0 24px !important; /* Proper horizontal padding */
+    height: 32px;
+    overflow: visible !important; /* Override any external overflow hidden */
+}
+
+/* Ensure button content is properly spaced */
+.aisb-media-selector .aisb-editor-btn-with-icon {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+
+/* =========================================
    Responsive Preview Controls
    ========================================= */
 .aisb-preview-toggle {
