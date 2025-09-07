@@ -20,8 +20,16 @@
             targetIndex: null
         },
         lastSaved: null,
-        sortableInstance: null
+        sortableInstance: null,
+        debug: false // Debug mode - set to true to troubleshoot
     };
+    
+    // Debug helper
+    function debugLog(context, data) {
+        if (editorState.debug) {
+            console.log(`[AISB DEBUG - ${context}]:`, data);
+        }
+    }
     
     /**
      * Initialize editor
@@ -225,17 +233,23 @@
      * Reinitialize Sortable.js after DOM changes
      */
     function reinitializeSortable() {
+        // Clean up existing instance safely
         if (editorState.sortableInstance) {
             try {
-                editorState.sortableInstance.destroy();
+                // Check if the instance and its element still exist
+                if (editorState.sortableInstance.el && editorState.sortableInstance.destroy) {
+                    editorState.sortableInstance.destroy();
+                }
             } catch (error) {
-                console.warn('AISB: Error destroying sortable instance:', error);
+                // Silent fail - instance already destroyed or invalid
             }
+            editorState.sortableInstance = null;
         }
         
         // Reinitialize if drag-drop is enabled
         var features = (window.aisbEditor && window.aisbEditor.features) || {};
-        if (features.dragDrop && typeof Sortable !== 'undefined') {
+        var sortableContainer = document.querySelector('.aisb-sections-list');
+        if (features.dragDrop && typeof Sortable !== 'undefined' && sortableContainer) {
             setTimeout(initSortableJS, 10); // Small delay for DOM updates
         }
     }
@@ -374,13 +388,15 @@
         // Bind form events
         bindFormEvents();
         
-        // Initialize button repeater if it's a hero section
+        // Initialize global blocks repeater if it's a hero section
         if (sectionType === 'hero') {
             // Use sectionContent if editing, otherwise use defaults
             var content = sectionContent || heroDefaults;
+            // Migrate old structure if needed
+            content = migrateOldFieldNames(content);
             // Small delay to ensure DOM is ready
             setTimeout(function() {
-                initButtonRepeater(content);
+                initGlobalBlocksRepeater(content);
             }, 50);
         }
     }
@@ -401,102 +417,60 @@
     }
     
     /**
-     * Hero section field defaults
+     * Strip HTML tags for textarea display
      */
-    var heroDefaults = {
-        eyebrow: 'Welcome to the Future',
-        headline: 'Your Headline Here',
-        subheadline: 'Add your compelling message that engages visitors',
-        // New button array structure
-        buttons: [
-            {
-                id: 'btn_default_1',
-                text: 'Get Started',
-                url: '#',
-                style: 'primary'
-            },
-            {
-                id: 'btn_default_2',
-                text: 'Learn More',
-                url: '#about',
-                style: 'secondary'
-            }
-        ],
-        // Keep old fields for backward compatibility (will be migrated)
-        button_text: '',
-        button_url: ''
-    };
-    
-    /**
-     * Generate Hero section form
-     */
-    function generateHeroForm(content) {
-        // Use existing content or defaults
-        content = content || heroDefaults;
-        
-        return `
-            <form id="aisb-section-form">
-                <div class="aisb-editor-form-group">
-                    <label class="aisb-editor-form-label" for="hero-eyebrow">
-                        Eyebrow Text
-                    </label>
-                    <input type="text" 
-                           id="hero-eyebrow" 
-                           name="eyebrow" 
-                           class="aisb-editor-input" 
-                           value="${escapeHtml(content.eyebrow || '')}" 
-                           placeholder="Welcome to the Future">
-                </div>
-                
-                <div class="aisb-editor-form-group">
-                    <label class="aisb-editor-form-label" for="hero-headline">
-                        Headline
-                    </label>
-                    <input type="text" 
-                           id="hero-headline" 
-                           name="headline" 
-                           class="aisb-editor-input" 
-                           value="${escapeHtml(content.headline || '')}" 
-                           placeholder="Enter your headline text">
-                </div>
-                
-                <div class="aisb-editor-form-group">
-                    <label class="aisb-editor-form-label" for="hero-subheadline">
-                        Subheadline
-                    </label>
-                    <textarea id="hero-subheadline" 
-                              name="subheadline" 
-                              class="aisb-editor-textarea" 
-                              placeholder="Enter your subheadline or description">${escapeHtml(content.subheadline || '')}</textarea>
-                </div>
-                
-                <div class="aisb-editor-form-group">
-                    <label class="aisb-editor-form-label">
-                        Buttons
-                    </label>
-                    <div id="hero-buttons-repeater" class="aisb-repeater-container">
-                        <!-- Button repeater will be initialized here -->
-                    </div>
-                </div>
-            </form>
-        `;
+    function stripHtmlTags(html) {
+        if (!html) return '';
+        // Remove <p> tags but keep content
+        return html.replace(/<p>/g, '').replace(/<\/p>/g, '\n').replace(/<[^>]*>/g, '').trim();
     }
     
     /**
-     * Initialize button repeater
+     * Wrap plain text in paragraph tags
      */
-    function initButtonRepeater(content) {
-        // Ensure container exists before initialization
-        var $container = $('#hero-buttons-repeater');
-        if (!$container.length) {
-            console.error('AISB: Button repeater container not found');
-            return;
+    function wrapInParagraphs(text) {
+        if (!text) return '';
+        // Split by newlines and wrap each in <p> tags
+        return text.split('\n').filter(line => line.trim()).map(line => `<p>${escapeHtml(line)}</p>`).join('\n');
+    }
+    
+    /**
+     * Migrate old field names to new standardized structure
+     */
+    function migrateOldFieldNames(content) {
+        if (!content) return heroDefaults;
+        
+        // Start with defaults and merge content on top to preserve all fields
+        var migrated = $.extend({}, heroDefaults, content);
+        
+        // Migrate field names
+        if ('eyebrow' in content && !('eyebrow_heading' in content)) {
+            migrated.eyebrow_heading = content.eyebrow;
+            delete migrated.eyebrow;
+        }
+        if ('headline' in content && !('heading' in content)) {
+            migrated.heading = content.headline;
+            delete migrated.headline;
+        }
+        if ('subheadline' in content && !('content' in content)) {
+            // Wrap in paragraph tags if not already
+            var text = content.subheadline;
+            migrated.content = text.includes('<p>') ? text : `<p>${text}</p>`;
+            delete migrated.subheadline;
         }
         
-        // Migrate old button data if needed
-        var buttons = content.buttons || [];
-        if (!buttons.length && content.button_text) {
-            buttons = [{
+        // Migrate buttons to global_blocks
+        if (content.buttons && !content.global_blocks) {
+            migrated.global_blocks = content.buttons.map(function(btn) {
+                return $.extend({ type: 'button' }, btn);
+            });
+            delete migrated.buttons;
+        }
+        
+        // Migrate old single button fields
+        if (content.button_text && !migrated.global_blocks) {
+            migrated.global_blocks = [{
+                type: 'button',
                 id: 'btn_migrated_1',
                 text: content.button_text,
                 url: content.button_url || '#',
@@ -504,30 +478,296 @@
             }];
         }
         
+        // Migrate media fields to featured_image
+        if (content.media_type === 'image' && content.media_image_url) {
+            migrated.featured_image = content.media_image_url;
+        }
+        
+        // Add default variants if not present
+        if (!migrated.theme_variant) {
+            migrated.theme_variant = 'dark';
+        }
+        if (!migrated.layout_variant) {
+            migrated.layout_variant = 'content-left';
+        }
+        
+        // Clean up ONLY truly obsolete fields
+        // DO NOT delete media_type or video_url - we use those!
+        delete migrated.media_image_id;
+        delete migrated.media_image_url;
+        delete migrated.media_image_alt;
+        delete migrated.media_video_type;
+        delete migrated.button_text;
+        delete migrated.button_url;
+        
+        return migrated;
+    }
+    
+    /**
+     * Hero section field defaults - Standardized structure
+     */
+    var heroDefaults = {
+        // Standard content fields
+        eyebrow_heading: 'Welcome to the Future',
+        heading: 'Your Headline Here',
+        content: '<p>Add your compelling message that engages visitors</p>',
+        outro_content: '',
+        
+        // Media fields
+        media_type: 'none',
+        featured_image: '',
+        video_url: '',
+        
+        // Global blocks for nested components
+        global_blocks: [
+            {
+                type: 'button',
+                id: 'btn_default_1',
+                text: 'Get Started',
+                url: '#',
+                style: 'primary'
+            },
+            {
+                type: 'button',
+                id: 'btn_default_2',
+                text: 'Learn More',
+                url: '#about',
+                style: 'secondary'
+            }
+        ],
+        
+        // Variant fields
+        theme_variant: 'dark',  // 'light' | 'dark'
+        layout_variant: 'content-left',  // 'content-left' | 'content-right' | 'center'
+        
+        // CTA fields (for future use)
+        primary_cta_label: '',
+        primary_cta_url: '',
+        secondary_cta_label: '',
+        secondary_cta_url: ''
+    };
+    
+    /**
+     * Generate Hero section form - Standardized fields
+     */
+    function generateHeroForm(content) {
+        // Use existing content or defaults
+        content = content || heroDefaults;
+        
+        // Migrate old field names if present
+        content = migrateOldFieldNames(content);
+        
+        return `
+            <form id="aisb-section-form">
+                <!-- Variant Controls -->
+                <div class="aisb-editor-form-group aisb-variant-controls">
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Theme</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'light' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="light">
+                                <span class="dashicons dashicons-sun"></span> Light
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'dark' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="dark">
+                                <span class="dashicons dashicons-moon"></span> Dark
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Layout</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-left' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-left">
+                                <span class="dashicons dashicons-align-left"></span> Left
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'center' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="center">
+                                <span class="dashicons dashicons-align-center"></span> Center
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-right' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-right">
+                                <span class="dashicons dashicons-align-right"></span> Right
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content Fields -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="hero-eyebrow-heading">
+                        Eyebrow Heading
+                    </label>
+                    <input type="text" 
+                           id="hero-eyebrow-heading" 
+                           name="eyebrow_heading" 
+                           class="aisb-editor-input" 
+                           value="${escapeHtml(content.eyebrow_heading || '')}" 
+                           placeholder="Welcome to the Future">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="hero-heading">
+                        Heading
+                    </label>
+                    <input type="text" 
+                           id="hero-heading" 
+                           name="heading" 
+                           class="aisb-editor-input" 
+                           value="${escapeHtml(content.heading || '')}" 
+                           placeholder="Enter your main heading">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="hero-content">
+                        Content
+                    </label>
+                    <textarea id="hero-content" 
+                              name="content" 
+                              class="aisb-editor-textarea" 
+                              placeholder="Enter your main content">${stripHtmlTags(content.content || '')}</textarea>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Featured Image
+                    </label>
+                    ${generateMediaField(content)}
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Global Blocks
+                    </label>
+                    <div id="hero-global-blocks" class="aisb-repeater-container">
+                        <!-- Global blocks repeater will be initialized here -->
+                    </div>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="hero-outro-content">
+                        Outro Content (Optional)
+                    </label>
+                    <textarea id="hero-outro-content" 
+                              name="outro_content" 
+                              class="aisb-editor-textarea" 
+                              placeholder="Optional closing content">${stripHtmlTags(content.outro_content || '')}</textarea>
+                </div>
+            </form>
+        `;
+    }
+    
+    /**
+     * Generate media field with support for images and videos
+     */
+    function generateMediaField(content) {
+        var mediaType = content.media_type || 'none';
+        var imageUrl = content.featured_image || '';
+        var videoUrl = content.video_url || '';
+        
+        debugLog('generateMediaField', {
+            mediaType: mediaType,
+            imageUrl: imageUrl,
+            videoUrl: videoUrl,
+            fullContent: content
+        });
+        
+        return `
+            <div class="aisb-media-selector">
+                <!-- Media Type Selector -->
+                <div class="aisb-media-type-selector">
+                    <label class="aisb-radio-label">
+                        <input type="radio" name="media_type" value="none" ${mediaType === 'none' ? 'checked' : ''}>
+                        <span>None</span>
+                    </label>
+                    <label class="aisb-radio-label">
+                        <input type="radio" name="media_type" value="image" ${mediaType === 'image' ? 'checked' : ''}>
+                        <span>Image</span>
+                    </label>
+                    <label class="aisb-radio-label">
+                        <input type="radio" name="media_type" value="video" ${mediaType === 'video' ? 'checked' : ''}>
+                        <span>Video</span>
+                    </label>
+                </div>
+                
+                <!-- Image Selection (shown when media_type is 'image') -->
+                <div class="aisb-media-image-controls" style="${mediaType === 'image' ? '' : 'display:none'}">
+                    ${imageUrl ? `
+                        <div class="aisb-media-preview">
+                            <img src="${escapeHtml(imageUrl)}" alt="Featured image">
+                            <button type="button" class="aisb-media-remove" data-media-action="remove-image">
+                                <span class="dashicons dashicons-no-alt"></span>
+                            </button>
+                        </div>
+                    ` : ''}
+                    <button type="button" class="aisb-editor-btn aisb-editor-btn-ghost aisb-editor-btn-with-icon" id="select-featured-image">
+                        <span class="dashicons dashicons-format-image"></span>
+                        <span>${imageUrl ? 'Change Image' : 'Select Image'}</span>
+                    </button>
+                    <input type="hidden" name="featured_image" value="${escapeHtml(imageUrl)}">
+                </div>
+                
+                <!-- Video URL Input (shown when media_type is 'video') -->
+                <div class="aisb-media-video-controls" style="${mediaType === 'video' ? '' : 'display:none'}">
+                    <input type="url" 
+                           name="video_url" 
+                           class="aisb-editor-input" 
+                           value="${escapeHtml(videoUrl)}"
+                           placeholder="Enter YouTube URL or video file URL">
+                    <p class="aisb-editor-help-text">
+                        Supports YouTube URLs (e.g., https://youtube.com/watch?v=...) or direct video file URLs
+                    </p>
+                </div>
+            </div>
+        `;
+    }
+    
+    
+    /**
+     * Initialize global blocks repeater (universal component system)
+     */
+    function initGlobalBlocksRepeater(content) {
+        // Ensure container exists before initialization
+        var $container = $('#hero-global-blocks');
+        if (!$container.length) {
+            console.error('AISB: Global blocks container not found');
+            return;
+        }
+        
+        // Get global blocks (already migrated from buttons)
+        var globalBlocks = content.global_blocks || [];
+        
         // Initialize repeater field
-        var buttonRepeater = $container.aisbRepeaterField({
-            fieldName: 'buttons',
-            items: buttons,
+        var globalBlocksRepeater = $container.aisbRepeaterField({
+            fieldName: 'global_blocks',
+            items: globalBlocks,
             defaultItem: {
+                type: 'button',
                 text: 'Button Text',
                 url: '#',
                 style: 'primary'
             },
-            maxItems: 5,
+            maxItems: 10,
             minItems: 0,
-            itemLabel: 'Button',
-            addButtonText: 'Add Button',
+            itemLabel: 'Component',
+            addButtonText: 'Add Component',
             template: function(item, index) {
-                return buttonRepeaterTemplate(item, index);
+                // For now, only support buttons, but structure allows for expansion
+                if (item.type === 'button') {
+                    return globalBlockButtonTemplate(item, index);
+                }
+                // Future: Add support for cards, lists, features, etc.
+                return '<div>Unknown component type</div>';
             },
             onUpdate: function(items) {
-                // Update the section content with button data
+                // Update the section content with global blocks data
                 if (editorState.currentSection !== null && editorState.sections[editorState.currentSection]) {
-                    // Preserve existing content and update buttons
-                    editorState.sections[editorState.currentSection].content.buttons = items;
+                    // Preserve existing content and update global blocks
+                    editorState.sections[editorState.currentSection].content.global_blocks = items;
                     editorState.isDirty = true;
                     
-                    // Re-render the preview section without triggering full form update
+                    // Re-render the preview section
                     var section = editorState.sections[editorState.currentSection];
                     var sectionHtml = renderSection(section, editorState.currentSection);
                     $('.aisb-section[data-index="' + editorState.currentSection + '"]').replaceWith(sectionHtml);
@@ -538,13 +778,13 @@
             }
         });
         
-        return buttonRepeater;
+        return globalBlocksRepeater;
     }
     
     /**
-     * Button repeater item template
+     * Global block button template (component template)
      */
-    function buttonRepeaterTemplate(button, index) {
+    function globalBlockButtonTemplate(button, index) {
         var styles = [
             { value: 'primary', label: 'Primary' },
             { value: 'secondary', label: 'Secondary' }
@@ -589,9 +829,171 @@
      * Bind form events
      */
     function bindFormEvents() {
-        // Live preview on input
-        $('#aisb-section-form input, #aisb-section-form textarea').on('input', function() {
+        // Live preview on input - use delegate for dynamic elements
+        $(document).on('input', '#aisb-section-form input, #aisb-section-form textarea', function() {
             updatePreview();
+        });
+        
+        // Variant toggle buttons
+        $(document).on('click', '.aisb-toggle-btn', function(e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var variantType = $btn.data('variant-type');
+            var variantValue = $btn.data('variant-value');
+            
+            // Update active state
+            $btn.siblings().removeClass('active');
+            $btn.addClass('active');
+            
+            // Update section content
+            if (editorState.currentSection !== null) {
+                var content = editorState.sections[editorState.currentSection].content;
+                if (variantType === 'theme') {
+                    content.theme_variant = variantValue;
+                } else if (variantType === 'layout') {
+                    content.layout_variant = variantValue;
+                }
+                updatePreview();
+            }
+        });
+        
+        // Initialize media handlers
+        initMediaHandlers();
+    }
+    
+    /**
+     * Initialize media selection handlers
+     */
+    function initMediaHandlers() {
+        var mediaFrame;
+        
+        // Featured image selection
+        $(document).on('click', '#select-featured-image', function(e) {
+            e.preventDefault();
+            
+            // If the media frame already exists, reopen it
+            if (mediaFrame) {
+                mediaFrame.open();
+                return;
+            }
+            
+            // Create the media frame
+            mediaFrame = wp.media({
+                title: 'Select Hero Image',
+                button: {
+                    text: 'Use This Image'
+                },
+                multiple: false,
+                library: {
+                    type: 'image'
+                }
+            });
+            
+            // When an image is selected, run a callback
+            mediaFrame.on('select', function() {
+                var attachment = mediaFrame.state().get('selection').first().toJSON();
+                
+                debugLog('Image Selected from Media Library', {
+                    url: attachment.url,
+                    currentSection: editorState.currentSection
+                });
+                
+                // Update the section content
+                if (editorState.currentSection !== null) {
+                    var content = editorState.sections[editorState.currentSection].content;
+                    content.featured_image = attachment.url;
+                    
+                    debugLog('Image URL Set in State', {
+                        sectionIndex: editorState.currentSection,
+                        updatedContent: content
+                    });
+                    
+                    // Re-render the media field
+                    $('.aisb-media-selector').replaceWith(generateMediaField(content));
+                    updatePreview();
+                }
+            });
+            
+            // Finally, open the modal
+            mediaFrame.open();
+        });
+        
+        // Remove media actions
+        $(document).on('click', '[data-media-action]', function(e) {
+            e.preventDefault();
+            var action = $(this).data('media-action');
+            
+            if (editorState.currentSection !== null) {
+                var content = editorState.sections[editorState.currentSection].content;
+                
+                if (action === 'remove-image') {
+                    content.featured_image = '';
+                    $('.aisb-media-selector').replaceWith(generateMediaField(content));
+                }
+                
+                updatePreview();
+            }
+        });
+        
+        // Handle media type switching
+        $(document).on('change', 'input[name="media_type"]', function() {
+            var mediaType = $(this).val();
+            var $selector = $(this).closest('.aisb-media-selector');
+            
+            debugLog('Media Type Changed', {
+                newType: mediaType,
+                currentSection: editorState.currentSection
+            });
+            
+            // Hide all media controls
+            $selector.find('.aisb-media-image-controls, .aisb-media-video-controls').hide();
+            
+            // Show the selected control
+            if (mediaType === 'image') {
+                $selector.find('.aisb-media-image-controls').show();
+            } else if (mediaType === 'video') {
+                $selector.find('.aisb-media-video-controls').show();
+            }
+            
+            // Update the content immediately and persist
+            if (editorState.currentSection !== null) {
+                var content = editorState.sections[editorState.currentSection].content;
+                content.media_type = mediaType;
+                // Clear other media when type changes
+                if (mediaType === 'none') {
+                    content.featured_image = '';
+                    content.video_url = '';
+                }
+                
+                debugLog('Media Type Updated in State', {
+                    sectionIndex: editorState.currentSection,
+                    updatedContent: content
+                });
+                
+                updatePreview();
+            }
+        });
+        
+        // Handle video URL input changes
+        $(document).on('input', 'input[name="video_url"]', function() {
+            var videoUrl = $(this).val();
+            
+            debugLog('Video URL Changed', {
+                url: videoUrl,
+                currentSection: editorState.currentSection
+            });
+            
+            if (editorState.currentSection !== null) {
+                var content = editorState.sections[editorState.currentSection].content;
+                content.video_url = videoUrl;
+                
+                debugLog('Video URL Updated in State', {
+                    sectionIndex: editorState.currentSection,
+                    updatedContent: content
+                });
+                
+                updatePreview();
+            }
         });
     }
     
@@ -619,9 +1021,17 @@
             sessionStorage.setItem('aisb_sidebars_visible', sidebarsVisible);
         });
         
-        // Keyboard shortcut (Shift + S)
+        // Keyboard shortcut (Shift + S) - Only when not typing in input fields
         $(document).on('keydown', function(e) {
-            if (e.shiftKey && e.key === 'S') {
+            // Check if user is typing in an input field
+            var tagName = e.target.tagName.toLowerCase();
+            var isTyping = tagName === 'input' || 
+                          tagName === 'textarea' || 
+                          tagName === 'select' ||
+                          e.target.contentEditable === 'true';
+            
+            // Only trigger shortcut when NOT typing
+            if (!isTyping && e.shiftKey && e.key === 'S') {
                 e.preventDefault();
                 $toggleBtn.trigger('click');
             }
@@ -721,19 +1131,57 @@
     function updatePreview() {
         if (editorState.currentSection === null) return;
         
+        debugLog('updatePreview - Starting', {
+            currentSection: editorState.currentSection
+        });
+        
         var formData = $('#aisb-section-form').serializeArray();
         var content = {};
         
+        debugLog('updatePreview - Form Data', formData);
+        
         // Convert form data to object
         $.each(formData, function(i, field) {
-            content[field.name] = field.value;
+            // Handle content field - wrap in paragraphs
+            if (field.name === 'content' || field.name === 'outro_content') {
+                content[field.name] = wrapInParagraphs(field.value);
+            } else {
+                content[field.name] = field.value;
+            }
         });
         
-        // IMPORTANT: Preserve button data managed by repeater
+        debugLog('updatePreview - Content from Form', content);
+        
+        // IMPORTANT: Preserve complex data that's managed outside the form
         var currentSection = editorState.sections[editorState.currentSection];
-        if (currentSection && currentSection.content && currentSection.content.buttons) {
-            content.buttons = currentSection.content.buttons;
+        if (currentSection && currentSection.content) {
+            // Preserve global blocks managed by repeater
+            if (currentSection.content.global_blocks) {
+                content.global_blocks = currentSection.content.global_blocks;
+            }
+            
+            // Preserve variant data managed by toggle buttons
+            if (currentSection.content.theme_variant) {
+                content.theme_variant = currentSection.content.theme_variant;
+            }
+            if (currentSection.content.layout_variant) {
+                content.layout_variant = currentSection.content.layout_variant;
+            }
+            
+            // ALWAYS preserve media fields - they are managed outside the form
+            // The form doesn't serialize hidden inputs properly
+            if (currentSection.content.media_type !== undefined) {
+                content.media_type = currentSection.content.media_type;
+            }
+            if (currentSection.content.featured_image !== undefined) {
+                content.featured_image = currentSection.content.featured_image;
+            }
+            if (currentSection.content.video_url !== undefined) {
+                content.video_url = currentSection.content.video_url;
+            }
         }
+        
+        debugLog('updatePreview - Final Content After Merge', content);
         
         // Update section in state
         if (editorState.sections[editorState.currentSection]) {
@@ -821,7 +1269,7 @@
             var $item = $(this);
             var section = editorState.sections[index];
             if (section) {
-                var title = section.content.headline || 'Untitled Section';
+                var title = section.content.heading || section.content.headline || 'Untitled Section';
                 var type = section.type.charAt(0).toUpperCase() + section.type.slice(1);
                 
                 $item.attr('data-index', index);
@@ -848,59 +1296,158 @@
     }
     
     /**
-     * Render hero buttons
+     * Render media preview based on type and content
      */
-    function renderHeroButtons(content) {
-        var buttons = content.buttons || [];
+    function renderMediaPreview(content) {
+        var mediaType = content.media_type || 'none';
+        var imageUrl = content.featured_image || '';
+        var videoUrl = content.video_url || '';
         
-        // Backward compatibility: convert old single button to array
-        if (!buttons.length && content.button_text) {
-            buttons = [{
-                text: content.button_text,
-                url: content.button_url || '#',
-                style: 'primary'
-            }];
-        }
+        debugLog('renderMediaPreview Called', {
+            mediaType: mediaType,
+            imageUrl: imageUrl,
+            videoUrl: videoUrl,
+            fullContent: content
+        });
         
-        // Return empty if no buttons
-        if (!buttons.length) {
+        // No media
+        if (mediaType === 'none') {
+            debugLog('renderMediaPreview - No Media Type', 'Returning empty');
             return '';
         }
         
-        // Generate button HTML
-        var buttonHtml = buttons.map(function(button) {
-            if (!button.text) return ''; // Skip empty buttons
-            
-            var styleClass = 'aisb-btn-' + (button.style || 'primary');
-            return `<button class="aisb-btn ${styleClass}">${escapeHtml(button.text)}</button>`;
-        }).join('');
+        // Image media
+        if (mediaType === 'image') {
+            if (imageUrl) {
+                debugLog('renderMediaPreview - Rendering Image', imageUrl);
+                return `
+                    <div class="aisb-hero__media">
+                        <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(content.heading || '')}" />
+                    </div>
+                `;
+            } else {
+                debugLog('renderMediaPreview - Showing Image Placeholder', 'No image URL');
+                // Show placeholder with SVG
+                return `
+                    <div class="aisb-hero__media">
+                        <div class="aisb-media-placeholder aisb-media-placeholder--image">
+                            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="8" y="12" width="48" height="40" rx="4" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+                                <circle cx="22" cy="26" r="4" stroke="currentColor" stroke-width="2"/>
+                                <path d="M8 40L22 26L32 36L40 28L56 44V48C56 50.2091 54.2091 52 52 52H12C9.79086 52 8 50.2091 8 48V40Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Image Placeholder</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
         
-        // Wrap in buttons container
-        return buttonHtml ? `<div class="aisb-hero__buttons">${buttonHtml}</div>` : '';
+        // Video media
+        if (mediaType === 'video') {
+            if (videoUrl) {
+                debugLog('renderMediaPreview - Processing Video', videoUrl);
+                // Check if YouTube
+                var youtubeMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
+                if (youtubeMatch && youtubeMatch[1]) {
+                    debugLog('renderMediaPreview - YouTube Video Detected', youtubeMatch[1]);
+                    return `
+                        <div class="aisb-hero__media">
+                            <iframe class="aisb-hero__video" 
+                                    src="https://www.youtube-nocookie.com/embed/${youtubeMatch[1]}" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
+                    `;
+                } else {
+                    // Self-hosted video
+                    return `
+                        <div class="aisb-hero__media">
+                            <video class="aisb-hero__video" controls>
+                                <source src="${escapeHtml(videoUrl)}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    `;
+                }
+            } else {
+                // Show placeholder with SVG
+                return `
+                    <div class="aisb-hero__media">
+                        <div class="aisb-media-placeholder aisb-media-placeholder--video">
+                            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="8" y="16" width="48" height="32" rx="4" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+                                <path d="M26 24V40L40 32L26 24Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                                <circle cx="48" cy="22" r="2" fill="currentColor"/>
+                                <circle cx="48" cy="42" r="2" fill="currentColor"/>
+                            </svg>
+                            <span>Video Placeholder</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        return '';
     }
     
     /**
-     * Render Hero section
+     * Render global blocks (buttons, cards, etc.)
+     */
+    function renderGlobalBlocks(blocks) {
+        if (!blocks || !blocks.length) return '';
+        
+        var html = '';
+        var buttons = blocks.filter(function(block) { return block.type === 'button'; });
+        
+        // Render buttons if any
+        if (buttons.length) {
+            var buttonHtml = buttons.map(function(button) {
+                if (!button.text) return '';
+                var styleClass = 'aisb-btn-' + (button.style || 'primary');
+                return `<button class="aisb-btn ${styleClass}">${escapeHtml(button.text)}</button>`;
+            }).join('');
+            
+            if (buttonHtml) {
+                html += `<div class="aisb-hero__buttons">${buttonHtml}</div>`;
+            }
+        }
+        
+        // Future: Add rendering for other block types (cards, lists, etc.)
+        
+        return html;
+    }
+    
+    
+    /**
+     * Render Hero section with standardized fields
      */
     function renderHeroSection(section, index) {
-        var content = section.content;
+        var content = migrateOldFieldNames(section.content || section);
+        
+        // Build class list based on variants
+        var sectionClasses = [
+            'aisb-section',
+            'aisb-section-hero',
+            'aisb-section--' + (content.theme_variant || 'dark'),
+            'aisb-section--' + (content.layout_variant || 'content-left')
+        ].join(' ');
         
         return `
-            <div class="aisb-section aisb-section-hero" data-index="${index}">
+            <div class="${sectionClasses}" data-index="${index}">
                 <section class="aisb-hero">
                     <div class="aisb-hero__container">
                         <div class="aisb-hero__grid">
                             <div class="aisb-hero__content">
-                                ${content.eyebrow ? `<div class="aisb-hero__eyebrow">${escapeHtml(content.eyebrow)}</div>` : ''}
-                                <h1 class="aisb-hero__heading">${escapeHtml(content.headline || 'Your Headline Here')}</h1>
-                                <p class="aisb-hero__body">${escapeHtml(content.subheadline || 'Your compelling message goes here')}</p>
-                                ${renderHeroButtons(content)}
+                                ${content.eyebrow_heading ? `<div class="aisb-hero__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
+                                <h1 class="aisb-hero__heading">${escapeHtml(content.heading || 'Your Headline Here')}</h1>
+                                <div class="aisb-hero__body">${content.content || '<p>Your compelling message goes here</p>'}</div>
+                                ${renderGlobalBlocks(content.global_blocks)}
+                                ${content.outro_content ? `<div class="aisb-hero__outro">${content.outro_content}</div>` : ''}
                             </div>
-                            <div class="aisb-hero__media">
-                                <div class="placeholder-media" style="aspect-ratio: 16/9; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666;">
-                                    Hero Media
-                                </div>
-                            </div>
+                            ${renderMediaPreview(content)}
                         </div>
                     </div>
                 </section>
@@ -1312,10 +1859,40 @@
         }
     }
     
+    // Debug helper for testing media system
+    window.debugMediaSystem = function() {
+        console.log('=== MEDIA SYSTEM DEBUG ===');
+        console.log('Current Section Index:', editorState.currentSection);
+        
+        if (editorState.currentSection !== null) {
+            var content = editorState.sections[editorState.currentSection].content;
+            console.log('Current Section Content:', content);
+            console.log('Media Type:', content.media_type);
+            console.log('Featured Image:', content.featured_image);
+            console.log('Video URL:', content.video_url);
+            
+            // Check what renderMediaPreview would return
+            var preview = renderMediaPreview(content);
+            console.log('renderMediaPreview Output:', preview);
+            
+            // Check DOM
+            var $mediaInPreview = $('.aisb-section[data-index="' + editorState.currentSection + '"] .aisb-hero__media');
+            console.log('Media element in preview exists:', $mediaInPreview.length > 0);
+            if ($mediaInPreview.length > 0) {
+                console.log('Media element HTML:', $mediaInPreview[0].outerHTML);
+            }
+        } else {
+            console.log('No section currently selected');
+        }
+        
+        console.log('=== END DEBUG ===');
+    };
+    
     // Initialize on document ready
     $(document).ready(function() {
         if ($('.aisb-editor-wrapper').length) {
             console.log('AISB: Initializing editor...');
+            console.log('Debug mode enabled. Use window.debugMediaSystem() in console to check media state.');
             initEditor();
             console.log('AISB: Editor initialization complete');
         }

@@ -1,0 +1,164 @@
+/**
+ * AI Section Builder - Design Tokens
+ * Core design system variables used across all components
+ * 
+ * @package AISB
+ * @version 2.0.0
+ */
+
+:root {
+    /* =========================================
+       Color System (8 colors as specified)
+       ========================================= */
+    
+    /* Light Mode Colors */
+    --aisb-color-base: #ffffff;
+    --aisb-color-text: #1a1a1a;
+    --aisb-color-muted: #64748b;
+    --aisb-color-primary: #2563eb;
+    --aisb-color-primary-hover: #1d4ed8;
+    --aisb-color-secondary: #f1f5f9;
+    --aisb-color-border: #e2e8f0;
+    --aisb-color-success: #10b981;
+    --aisb-color-error: #ef4444;
+    
+    /* Dark Mode Colors */
+    --aisb-color-dark-base: #1a1a1a;
+    --aisb-color-dark-text: #fafafa;
+    --aisb-color-dark-muted: #9ca3af;
+    --aisb-color-dark-primary: #60a5fa;
+    --aisb-color-dark-primary-hover: #3b82f6;
+    --aisb-color-dark-secondary: #374151;
+    --aisb-color-dark-border: #4b5563;
+    
+    /* =========================================
+       Spacing System (8px grid)
+       ========================================= */
+    --aisb-space-xs: 8px;
+    --aisb-space-sm: 16px;
+    --aisb-space-md: 24px;
+    --aisb-space-lg: 32px;
+    --aisb-space-xl: 48px;
+    --aisb-space-2xl: 64px;
+    --aisb-space-3xl: 96px;
+    
+    /* =========================================
+       Typography
+       ========================================= */
+    
+    /* Font Families */
+    --aisb-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --aisb-font-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", monospace;
+    
+    /* Font Sizes */
+    --aisb-text-xs: 12px;
+    --aisb-text-sm: 14px;
+    --aisb-text-base: 16px;
+    --aisb-text-lg: 18px;
+    --aisb-text-xl: 20px;
+    --aisb-text-2xl: 24px;
+    --aisb-text-3xl: 30px;
+    --aisb-text-4xl: 36px;
+    --aisb-text-5xl: 48px;
+    --aisb-text-6xl: 56px;
+    
+    /* Font Weights */
+    --aisb-font-normal: 400;
+    --aisb-font-medium: 500;
+    --aisb-font-semibold: 600;
+    --aisb-font-bold: 700;
+    
+    /* Line Heights */
+    --aisb-leading-tight: 1.2;
+    --aisb-leading-normal: 1.5;
+    --aisb-leading-relaxed: 1.6;
+    --aisb-leading-loose: 2;
+    
+    /* =========================================
+       Border Radius
+       ========================================= */
+    --aisb-radius-sm: 4px;
+    --aisb-radius-base: 6px;
+    --aisb-radius-md: 8px;
+    --aisb-radius-lg: 12px;
+    --aisb-radius-xl: 16px;
+    --aisb-radius-full: 9999px;
+    
+    /* =========================================
+       Shadows
+       ========================================= */
+    --aisb-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --aisb-shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --aisb-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --aisb-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --aisb-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* =========================================
+       Transitions
+       ========================================= */
+    --aisb-transition-fast: 150ms ease;
+    --aisb-transition-base: 200ms ease;
+    --aisb-transition-slow: 300ms ease;
+    
+    /* =========================================
+       Z-Index Scale
+       ========================================= */
+    --aisb-z-base: 1;
+    --aisb-z-dropdown: 1000;
+    --aisb-z-sticky: 1020;
+    --aisb-z-fixed: 1030;
+    --aisb-z-backdrop: 1040;
+    --aisb-z-modal: 1050;
+    --aisb-z-popover: 1060;
+    --aisb-z-tooltip: 1070;
+    
+    /* =========================================
+       Editor Dark Theme Colors (Professional Dark UI)
+       ========================================= */
+    /* Background elevation layers */
+    --aisb-editor-bg-base: #09111A;        /* Deep blue-black base */
+    --aisb-editor-bg-surface: #0F1823;     /* Elevated surface */
+    --aisb-editor-bg-panel: #141F2E;       /* Panel background */
+    --aisb-editor-bg-elevated: #1A2738;    /* Highest elevation */
+    --aisb-editor-bg-hover: #1E2B3D;       /* Hover state */
+    
+    /* Editor borders and dividers */
+    --aisb-editor-border: #2A3747;         /* Subtle borders */
+    --aisb-editor-border-subtle: #1F2937;  /* Very subtle borders */
+    --aisb-editor-border-strong: #3A4757;  /* Emphasized borders */
+    --aisb-editor-divider: #1A2738;        /* Section dividers */
+    
+    /* Editor text hierarchy (WCAG AAA compliant) */
+    --aisb-editor-text-primary: #E8EAED;   /* Main text - 15.8:1 ratio */
+    --aisb-editor-text-secondary: #9CA3AF; /* Secondary text - 7.2:1 ratio */
+    --aisb-editor-text-muted: #6B7280;     /* Disabled/hints - 4.5:1 ratio */
+    --aisb-editor-text-inverse: #09111A;   /* For light surfaces */
+    
+    /* Editor brand colors (desaturated for dark mode) */
+    --aisb-editor-accent: #667EEA;         /* Primary brand */
+    --aisb-editor-accent-muted: #4A5FC7;   /* Desaturated */
+    --aisb-editor-accent-hover: #7B8FF5;   /* Hover state */
+    --aisb-editor-accent-bg: rgba(102, 126, 234, 0.1); /* Subtle backgrounds */
+    
+    /* Editor semantic colors (desaturated 20%) */
+    --aisb-editor-success: #34D399;
+    --aisb-editor-success-bg: rgba(52, 211, 153, 0.1);
+    --aisb-editor-warning: #FBBF24;
+    --aisb-editor-danger: #F87171;
+    --aisb-editor-danger-bg: rgba(248, 113, 113, 0.1);
+    --aisb-editor-info: #60A5FA;
+    
+    /* Editor-Specific Spacing (Tighter for UI density) */
+    --aisb-editor-space-xs: 3px;
+    --aisb-editor-space-sm: 5px;
+    --aisb-editor-space-md: 8px;
+    --aisb-editor-space-lg: 13px;
+    --aisb-editor-space-xl: 21px;
+    --aisb-editor-space-2xl: 34px;
+    --aisb-editor-space-3xl: 55px;
+    
+    /* Editor layout dimensions */
+    --aisb-editor-toolbar-height: 48px;
+    --aisb-editor-panel-left-width: 280px;
+    --aisb-editor-panel-right-width: 320px;
+}

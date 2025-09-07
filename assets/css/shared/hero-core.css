@@ -1,0 +1,449 @@
+/**
+ * Hero Section Core Styles
+ * Unified styles for both editor and frontend
+ * Based on 8-color global design system
+ * Uses 8px grid spacing system
+ */
+
+/* Import design tokens */
+@import url('../shared/_variables.css');
+
+/* =========================================
+   Base Hero Structure
+   ========================================= */
+.aisb-hero {
+    position: relative;
+    padding: 96px 0; /* var(--space-3xl) */
+    background-color: #ffffff;
+    color: #1a1a1a;
+    transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* Container */
+.aisb-hero__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px; /* var(--space-md) */
+}
+
+/* Grid Layout - Default (content-left) */
+.aisb-hero__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 96px; /* var(--space-3xl) */
+    align-items: center;
+}
+
+/* Content Column */
+.aisb-hero__content {
+    max-width: 600px;
+}
+
+/* Eyebrow Text */
+.aisb-hero__eyebrow {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    color: #2563eb;
+    margin-bottom: 16px; /* var(--space-sm) */
+    transition: color 200ms ease;
+}
+
+/* Heading */
+.aisb-hero__heading {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #1a1a1a;
+    margin: 0 0 24px 0; /* var(--space-md) */
+    transition: color 200ms ease;
+}
+
+/* Body Text */
+.aisb-hero__body {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #64748b;
+    margin-bottom: 32px; /* var(--space-lg) */
+    max-width: 480px;
+    transition: color 200ms ease;
+}
+
+.aisb-hero__body p {
+    margin: 0 0 16px 0;
+}
+
+.aisb-hero__body p:last-child {
+    margin-bottom: 0;
+}
+
+/* Outro Content - Proper spacing from design system */
+.aisb-hero__outro {
+    margin-top: 32px; /* var(--space-lg) */
+    font-size: 16px;
+    line-height: 1.6;
+    color: #64748b;
+    transition: color 200ms ease;
+}
+
+.aisb-hero__outro p {
+    margin: 0 0 16px 0;
+}
+
+.aisb-hero__outro p:last-child {
+    margin-bottom: 0;
+}
+
+/* Buttons Container */
+.aisb-hero__buttons {
+    display: flex;
+    gap: 24px; /* var(--space-md) */
+    flex-wrap: wrap;
+    margin-top: 32px; /* var(--space-lg) */
+}
+
+/* Media Column */
+.aisb-hero__media {
+    position: relative;
+}
+
+/* Image Constraints - Fix for oversized images */
+.aisb-hero__media img,
+.aisb-hero__image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    max-width: 100%;
+}
+
+/* Video Styles */
+.aisb-hero__media iframe,
+.aisb-hero__media video,
+.aisb-hero__video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    max-width: 100%;
+    background: #000;
+}
+
+/* Media Placeholders */
+.aisb-media-placeholder {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: #64748b;
+    font-size: 14px;
+    transition: all 200ms ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.aisb-media-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(0, 0, 0, 0.02) 10px,
+        rgba(0, 0, 0, 0.02) 20px
+    );
+    pointer-events: none;
+}
+
+.aisb-section--dark .aisb-media-placeholder {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%);
+    border-color: rgba(148, 163, 184, 0.2);
+    color: #94a3b8;
+}
+
+.aisb-media-placeholder svg {
+    width: 64px;
+    height: 64px;
+    opacity: 0.6;
+    color: currentColor;
+}
+
+.aisb-media-placeholder span {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+/* =========================================
+   Theme Variant: Light (Default)
+   ========================================= */
+.aisb-section--light {
+    background-color: #ffffff;
+    color: #1a1a1a;
+}
+
+/* Apply background directly to hero element for proper cascade */
+.aisb-section--light .aisb-hero {
+    background-color: #ffffff;
+    color: #1a1a1a;
+}
+
+.aisb-section--light .aisb-hero__eyebrow {
+    color: #2563eb;
+}
+
+.aisb-section--light .aisb-hero__heading {
+    color: #1a1a1a;
+}
+
+.aisb-section--light .aisb-hero__body,
+.aisb-section--light .aisb-hero__outro {
+    color: #64748b;
+}
+
+/* =========================================
+   Theme Variant: Dark
+   ========================================= */
+.aisb-section--dark {
+    background-color: #1a1a1a;
+    color: #fafafa;
+}
+
+/* Apply background directly to hero element for proper cascade */
+.aisb-section--dark .aisb-hero {
+    background-color: #1a1a1a;
+    color: #fafafa;
+}
+
+.aisb-section--dark .aisb-hero__eyebrow {
+    color: #60a5fa; /* Primary Alt for better contrast */
+}
+
+.aisb-section--dark .aisb-hero__heading {
+    color: #fafafa;
+}
+
+.aisb-section--dark .aisb-hero__body,
+.aisb-section--dark .aisb-hero__outro {
+    color: #9ca3af; /* Muted light for dark backgrounds */
+}
+
+/* =========================================
+   Layout Variant: Content Left (Default)
+   ========================================= */
+.aisb-section--content-left .aisb-hero__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 96px;
+}
+
+/* =========================================
+   Layout Variant: Content Right
+   ========================================= */
+.aisb-section--content-right .aisb-hero__grid {
+    grid-template-columns: 1fr 1fr;
+    direction: rtl; /* Flip the grid */
+}
+
+.aisb-section--content-right .aisb-hero__content,
+.aisb-section--content-right .aisb-hero__media {
+    direction: ltr; /* Reset text direction */
+}
+
+/* =========================================
+   Layout Variant: Center
+   ========================================= */
+.aisb-section--center .aisb-hero__grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.aisb-section--center .aisb-hero__content {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.aisb-section--center .aisb-hero__eyebrow {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.aisb-section--center .aisb-hero__body {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 600px;
+}
+
+.aisb-section--center .aisb-hero__outro {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 600px;
+}
+
+.aisb-section--center .aisb-hero__buttons {
+    justify-content: center;
+}
+
+.aisb-section--center .aisb-hero__media {
+    margin-top: 64px; /* var(--space-2xl) */
+}
+
+/* =========================================
+   Button Styles
+   ========================================= */
+.aisb-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.2;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 200ms ease;
+    white-space: nowrap;
+}
+
+/* Primary Button */
+.aisb-btn-primary {
+    background-color: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+.aisb-btn-primary:hover {
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+/* Dark mode primary */
+.aisb-section--dark .aisb-btn-primary {
+    background-color: #60a5fa;
+    border-color: #60a5fa;
+    color: #1a1a1a;
+}
+
+.aisb-section--dark .aisb-btn-primary:hover {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+/* Secondary Button */
+.aisb-btn-secondary {
+    background-color: transparent;
+    color: #2563eb;
+    border-color: #2563eb;
+}
+
+.aisb-btn-secondary:hover {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+/* Dark mode secondary */
+.aisb-section--dark .aisb-btn-secondary {
+    color: #60a5fa;
+    border-color: #60a5fa;
+}
+
+.aisb-section--dark .aisb-btn-secondary:hover {
+    background-color: #60a5fa;
+    color: #1a1a1a;
+}
+
+/* Focus state for accessibility */
+.aisb-btn:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
+}
+
+.aisb-section--dark .aisb-btn:focus-visible {
+    outline-color: #60a5fa;
+}
+
+/* =========================================
+   Mobile Responsive
+   ========================================= */
+@media (max-width: 768px) {
+    .aisb-hero {
+        padding: 64px 0; /* var(--space-2xl) */
+    }
+    
+    .aisb-hero__container {
+        padding: 0 16px; /* var(--space-sm) */
+    }
+    
+    /* All layouts stack on mobile */
+    .aisb-hero__grid,
+    .aisb-section--content-right .aisb-hero__grid,
+    .aisb-section--center .aisb-hero__grid {
+        grid-template-columns: 1fr;
+        gap: 48px; /* var(--space-xl) */
+        direction: ltr;
+    }
+    
+    .aisb-hero__eyebrow {
+        font-size: 12px;
+    }
+    
+    .aisb-hero__heading {
+        font-size: 32px;
+    }
+    
+    .aisb-hero__body {
+        font-size: 16px;
+        max-width: 100%;
+    }
+    
+    .aisb-hero__outro {
+        font-size: 14px;
+    }
+    
+    .aisb-hero__buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .aisb-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .aisb-hero__media {
+        margin-top: 0; /* Reset center layout margin on mobile */
+    }
+}
+
+/* =========================================
+   Editor-specific adjustments
+   ========================================= */
+.aisb-editor-preview .aisb-hero {
+    /* Ensure proper rendering in editor context */
+    margin: 0;
+}
+
+.aisb-editor-preview .aisb-hero__media img {
+    /* Constrain images in editor preview */
+    max-height: 400px;
+}

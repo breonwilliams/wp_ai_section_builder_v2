@@ -1062,6 +1062,11 @@ function aisb_ajax_save_sections() {
         $sections_array = [];
     }
     
+    // Debug: Log what we're saving
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('AISB Saving Sections: ' . print_r($sections_array, true));
+    }
+    
     // Save sections
     update_post_meta($post_id, '_aisb_sections', $sections_array);
     
@@ -1165,7 +1170,7 @@ $post_id = get_the_ID();
 $sections = aisb_get_sections($post_id);
 ?>
 
-<div id="aisb-canvas" class="aisb-canvas-fullwidth">
+<div id="aisb-canvas" class="aisb-canvas">
     <style>
         /* Remove theme content constraints */
         .aisb-canvas .site-main,
@@ -1188,11 +1193,10 @@ $sections = aisb_get_sections($post_id);
             display: none !important;
         }
         
-        /* Ensure full width */
-        .aisb-canvas-fullwidth {
-            width: 100vw !important;
-            margin-left: calc(50% - 50vw) !important;
-            margin-right: calc(50% - 50vw) !important;
+        /* Ensure proper width without overflow */
+        .aisb-canvas {
+            width: 100%;
+            overflow-x: hidden;
         }
     </style>
     
@@ -1226,23 +1230,58 @@ get_footer();
 }
 
 /**
- * Render Hero section - Using approved design structure
+ * Migrate old field names to new standardized structure
  */
-function aisb_render_hero_section($section) {
-    // Handle both old and new section structure
-    $content = isset($section['content']) ? $section['content'] : $section;
+function aisb_migrate_field_names($content) {
+    if (!is_array($content)) {
+        return array();
+    }
     
-    $eyebrow = esc_html($content['eyebrow'] ?? '');
-    $headline = esc_html($content['headline'] ?? '');
-    $subheadline = esc_html($content['subheadline'] ?? '');
+    // Don't modify the original array - preserve all fields including media
+    $migrated = $content;
     
-    // Handle button data - new array format or old single button
-    $buttons = isset($content['buttons']) ? $content['buttons'] : array();
+    // Ensure media fields are preserved
+    if (!isset($migrated['media_type']) && isset($content['media_type'])) {
+        $migrated['media_type'] = $content['media_type'];
+    }
+    if (!isset($migrated['video_url']) && isset($content['video_url'])) {
+        $migrated['video_url'] = $content['video_url'];
+    }
+    if (!isset($migrated['featured_image']) && isset($content['featured_image'])) {
+        $migrated['featured_image'] = $content['featured_image'];
+    }
     
-    // Backward compatibility: convert old single button to array
-    if (empty($buttons) && !empty($content['button_text'])) {
-        $buttons = array(
+    // Migrate field names
+    if (isset($content['eyebrow']) && !isset($content['eyebrow_heading'])) {
+        $migrated['eyebrow_heading'] = $content['eyebrow'];
+        unset($migrated['eyebrow']);
+    }
+    if (isset($content['headline']) && !isset($content['heading'])) {
+        $migrated['heading'] = $content['headline'];
+        unset($migrated['headline']);
+    }
+    if (isset($content['subheadline']) && !isset($content['content'])) {
+        // Wrap in paragraph tags if not already
+        $text = $content['subheadline'];
+        $migrated['content'] = strpos($text, '<p>') !== false ? $text : '<p>' . $text . '</p>';
+        unset($migrated['subheadline']);
+    }
+    
+    // Migrate buttons to global_blocks
+    if (isset($content['buttons']) && !isset($content['global_blocks'])) {
+        $migrated['global_blocks'] = array_map(function($btn) {
+            $btn['type'] = 'button';
+            return $btn;
+        }, $content['buttons']);
+        unset($migrated['buttons']);
+    }
+    
+    // Migrate old single button fields
+    if (!empty($content['button_text']) && empty($migrated['global_blocks'])) {
+        $migrated['global_blocks'] = array(
             array(
+                'type' => 'button',
+                'id' => 'btn_migrated_1',
                 'text' => $content['button_text'],
                 'url' => $content['button_url'] ?? '#',
                 'style' => 'primary'
@@ -1250,25 +1289,97 @@ function aisb_render_hero_section($section) {
         );
     }
     
+    // Migrate media fields to featured_image
+    if (isset($content['media_type']) && $content['media_type'] === 'image' && !empty($content['media_image_url'])) {
+        $migrated['featured_image'] = $content['media_image_url'];
+    }
+    
+    // Add default variants if not present
+    if (!isset($migrated['theme_variant'])) {
+        $migrated['theme_variant'] = 'dark';
+    }
+    if (!isset($migrated['layout_variant'])) {
+        $migrated['layout_variant'] = 'content-left';
+    }
+    
+    // Clean up old fields - but NOT our current media fields!
+    // DO NOT unset media_type or video_url - we use those!
+    unset($migrated['media_image_id']);
+    unset($migrated['media_image_url']);
+    unset($migrated['media_image_alt']);
+    unset($migrated['media_video_type']);
+    unset($migrated['button_text']);
+    unset($migrated['button_url']);
+    
+    return $migrated;
+}
+
+/**
+ * Render Hero section - Standardized field structure
+ */
+function aisb_render_hero_section($section) {
+    // Handle both old and new section structure
+    $content = isset($section['content']) ? $section['content'] : $section;
+    
+    // Migrate old field names to new structure
+    $content = aisb_migrate_field_names($content);
+    
+    // Debug: Log what we're getting (always log for troubleshooting)
+    error_log('AISB Hero Section Content: ' . print_r($content, true));
+    
+    // Extract standardized fields
+    $eyebrow_heading = esc_html($content['eyebrow_heading'] ?? '');
+    $heading = esc_html($content['heading'] ?? '');
+    $content_text = wp_kses_post($content['content'] ?? '');
+    $outro_content = wp_kses_post($content['outro_content'] ?? '');
+    $featured_image = esc_url($content['featured_image'] ?? '');
+    $media_type = sanitize_text_field($content['media_type'] ?? 'none');
+    $video_url = esc_url($content['video_url'] ?? '');
+    
+    // Debug: Log extracted media fields
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log("AISB Media - Type: $media_type, Image: $featured_image, Video: $video_url");
+    }
+    
+    // Get variants
+    $theme_variant = sanitize_text_field($content['theme_variant'] ?? 'dark');
+    $layout_variant = sanitize_text_field($content['layout_variant'] ?? 'content-left');
+    
+    // Get global blocks (buttons for now)
+    $global_blocks = isset($content['global_blocks']) ? $content['global_blocks'] : array();
+    
+    // Build section classes based on variants
+    $section_classes = array(
+        'aisb-hero',
+        'aisb-section--' . $theme_variant,
+        'aisb-section--' . $layout_variant
+    );
+    
     ob_start();
     ?>
-    <section class="aisb-hero aisb-canvas-fullwidth">
+    <section class="<?php echo esc_attr(implode(' ', $section_classes)); ?>">
         <div class="aisb-hero__container">
             <div class="aisb-hero__grid">
                 <div class="aisb-hero__content">
-                    <?php if ($eyebrow): ?>
-                        <div class="aisb-hero__eyebrow"><?php echo $eyebrow; ?></div>
+                    <?php if ($eyebrow_heading): ?>
+                        <div class="aisb-hero__eyebrow"><?php echo $eyebrow_heading; ?></div>
                     <?php endif; ?>
                     
-                    <?php if ($headline): ?>
-                        <h1 class="aisb-hero__heading"><?php echo $headline; ?></h1>
+                    <?php if ($heading): ?>
+                        <h1 class="aisb-hero__heading"><?php echo $heading; ?></h1>
                     <?php endif; ?>
                     
-                    <?php if ($subheadline): ?>
-                        <p class="aisb-hero__body"><?php echo $subheadline; ?></p>
+                    <?php if ($content_text): ?>
+                        <div class="aisb-hero__body"><?php echo $content_text; ?></div>
                     <?php endif; ?>
                     
-                    <?php if (!empty($buttons)): ?>
+                    <?php 
+                    // Render global blocks (buttons for now)
+                    $buttons = array_filter($global_blocks, function($block) {
+                        return isset($block['type']) && $block['type'] === 'button';
+                    });
+                    
+                    if (!empty($buttons)): ?>
                         <div class="aisb-hero__buttons">
                             <?php foreach ($buttons as $button): ?>
                                 <?php if (!empty($button['text'])): ?>
@@ -1284,12 +1395,42 @@ function aisb_render_hero_section($section) {
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
+                    
+                    <?php if ($outro_content): ?>
+                        <div class="aisb-hero__outro"><?php echo $outro_content; ?></div>
+                    <?php endif; ?>
                 </div>
-                <div class="aisb-hero__media">
-                    <div style="aspect-ratio: 16/9; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
-                        Hero Media
+                <?php 
+                // Render media based on type
+                if ($media_type === 'image' && $featured_image): ?>
+                    <div class="aisb-hero__media">
+                        <img src="<?php echo $featured_image; ?>" 
+                             alt="<?php echo esc_attr($heading); ?>" 
+                             class="aisb-hero__image">
                     </div>
-                </div>
+                <?php elseif ($media_type === 'video' && $video_url): ?>
+                    <div class="aisb-hero__media">
+                        <?php 
+                        // Check if it's a YouTube URL
+                        $is_youtube = preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/', $video_url, $matches);
+                        
+                        if ($is_youtube && isset($matches[1])): 
+                            $youtube_id = $matches[1];
+                        ?>
+                            <iframe class="aisb-hero__video" 
+                                    src="https://www.youtube-nocookie.com/embed/<?php echo esc_attr($youtube_id); ?>" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen>
+                            </iframe>
+                        <?php else: ?>
+                            <video class="aisb-hero__video" controls>
+                                <source src="<?php echo $video_url; ?>" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -1301,152 +1442,34 @@ function aisb_render_hero_section($section) {
  * Enqueue frontend styles
  */
 function aisb_enqueue_styles() {
-    // Phase 2A: Add basic Hero section styles
-    
     // Only enqueue if we have active sections
     if (!aisb_has_sections()) {
         return;
     }
     
-    // Frontend hero styles (exact match to editor)
-    $hero_styles = '
-        /* Base Hero Structure (exact from approved design) */
-        .aisb-hero {
-            position: relative;
-            padding: 96px 0;
-            background-color: #ffffff;
-            color: #1a1a1a;
-        }
-
-        /* Hero Container */
-        .aisb-hero__container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        /* Hero Grid Layout */
-        .aisb-hero__grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 48px;
-            align-items: center;
-        }
-
-        /* Content Column */
-        .aisb-hero__content {
-            max-width: 600px;
-        }
-
-        /* Eyebrow Text (exact from approved design) */
-        .aisb-hero__eyebrow {
-            display: inline-block;
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            line-height: 1.1;
-            color: #2563eb;
-            margin-bottom: 16px;
-        }
-
-        /* Hero Heading (exact from approved design) */
-        .aisb-hero__heading {
-            font-size: 56px;
-            font-weight: 700;
-            line-height: 1.1;
-            color: #1a1a1a;
-            margin: 0 0 24px 0;
-        }
-
-        /* Hero Body Text (exact from approved design) */
-        .aisb-hero__body {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #64748b;
-            margin-bottom: 32px;
-            max-width: 480px;
-        }
-
-        /* Hero Buttons (exact from approved design) */
-        .aisb-hero__buttons {
-            display: flex;
-            gap: 24px;
-            flex-wrap: wrap;
-        }
-
-        /* Button Base Styles (from approved design) */
-        .aisb-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 48px;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            line-height: 1.2;
-            border-radius: 6px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 200ms ease;
-            box-sizing: border-box;
-        }
-
-        /* Primary Button */
-        .aisb-btn-primary {
-            background-color: #2563eb;
-            color: #ffffff;
-            border-color: #2563eb;
-        }
-
-        .aisb-btn-primary:hover {
-            background-color: #1d4ed8;
-            border-color: #1d4ed8;
-            color: #ffffff;
-        }
-
-        /* Secondary Button */
-        .aisb-btn-secondary {
-            background-color: transparent;
-            color: #2563eb;
-            border-color: #2563eb;
-        }
-
-        .aisb-btn-secondary:hover {
-            background-color: #2563eb;
-            color: #ffffff;
-        }
-
-
-        /* Media Column */
-        .aisb-hero__media {
-            position: relative;
-        }
-
-        /* Responsive (from approved design) */
-        @media (max-width: 768px) {
-            .aisb-hero__grid {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-            
-            .aisb-hero__eyebrow {
-                font-size: 12px;
-            }
-            
-            .aisb-hero__heading {
-                font-size: 32px;
-            }
-            
-            .aisb-hero__body {
-                font-size: 16px;
-                max-width: 100%;
-            }
-        }
-    ';
+    // Enqueue core design tokens first
+    wp_enqueue_style(
+        'aisb-tokens',
+        AISB_PLUGIN_URL . 'assets/css/core/00-tokens.css',
+        array(),
+        AISB_VERSION
+    );
     
-    wp_add_inline_style('wp-block-library', $hero_styles);
+    // Enqueue utility classes
+    wp_enqueue_style(
+        'aisb-utilities',
+        AISB_PLUGIN_URL . 'assets/css/core/02-utilities.css',
+        array('aisb-tokens'),
+        AISB_VERSION
+    );
+    
+    // For now, load hero section styles (will be dynamic in future)
+    wp_enqueue_style(
+        'aisb-section-hero',
+        AISB_PLUGIN_URL . 'assets/css/sections/hero.css',
+        array('aisb-utilities'),
+        AISB_VERSION
+    );
 }
 
 /**
@@ -1465,10 +1488,34 @@ function aisb_enqueue_admin_styles($hook) {
     
     // Load editor styles on editor page
     if ($hook === 'admin_page_aisb-editor') {
+        // Load core design system first
+        wp_enqueue_style(
+            'aisb-tokens',
+            AISB_PLUGIN_URL . 'assets/css/core/00-tokens.css',
+            [],
+            AISB_VERSION
+        );
+        
+        wp_enqueue_style(
+            'aisb-utilities',
+            AISB_PLUGIN_URL . 'assets/css/core/02-utilities.css',
+            ['aisb-tokens'],
+            AISB_VERSION
+        );
+        
+        // Load section styles (same as frontend for consistency)
+        wp_enqueue_style(
+            'aisb-section-hero',
+            AISB_PLUGIN_URL . 'assets/css/sections/hero.css',
+            ['aisb-utilities'],
+            AISB_VERSION
+        );
+        
+        // Then load editor UI styles (toolbar, panels, etc. - NOT section styles)
         wp_enqueue_style(
             'aisb-editor-styles',
             AISB_PLUGIN_URL . 'assets/css/editor/editor-styles.css',
-            [],
+            ['aisb-section-hero'], // Depends on section styles
             AISB_VERSION
         );
         
@@ -1488,6 +1535,9 @@ function aisb_enqueue_admin_styles($hook) {
             AISB_PLUGIN_URL . 'assets/js/vendor/sortable.min.js\">\\x3C/script>");',
             'after'
         );
+        
+        // Enqueue WordPress media scripts for image/video selection
+        wp_enqueue_media();
         
         // Enqueue repeater field module
         wp_enqueue_script(

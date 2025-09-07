@@ -1,15 +1,14 @@
 /**
- * AI Section Builder - Visual Editor Styles
- * Dark theme professional editor interface
+ * AI Section Builder - Editor UI Styles
+ * ONLY styles for the editor interface (toolbar, panels, sidebars)
+ * Section styles are loaded separately from /sections/ directory
  * 
  * @package AISB
- * @since 2.0.0
+ * @version 2.0.0
  */
 
-/* =========================================
-   Imports
-   ========================================= */
-@import url('../shared/_variables.css');
+/* Import design tokens for editor variables */
+@import url('../core/00-tokens.css');
 
 /* =========================================
    Editor Base Styles
@@ -317,6 +316,18 @@ body.aisb-editor-active .aisb-editor-wrapper {
     font-size: 16px;
     width: 16px;
     height: 16px;
+    line-height: 1;
+}
+
+/* Button with icon and text */
+.aisb-editor-btn-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--aisb-editor-space-sm);
+    padding: 0 var(--aisb-editor-space-lg);
+}
+
+.aisb-editor-btn-with-icon span:not(.dashicons) {
     line-height: 1;
 }
 
@@ -798,6 +809,41 @@ body.aisb-editor-active .aisb-editor-wrapper {
     opacity: 1;
 }
 
+/* Media Type Selector */
+.aisb-media-type-selector {
+    display: flex;
+    gap: var(--aisb-editor-space-lg);
+    margin-bottom: var(--aisb-editor-space-lg);
+}
+
+.aisb-radio-label {
+    display: flex;
+    align-items: center;
+    gap: var(--aisb-editor-space-sm);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--aisb-editor-text-primary);
+}
+
+.aisb-radio-label input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.aisb-media-image-controls,
+.aisb-media-video-controls {
+    transition: opacity var(--aisb-transition-fast);
+}
+
+.aisb-editor-help-text {
+    font-size: 12px;
+    color: var(--aisb-editor-text-muted);
+    margin-top: var(--aisb-editor-space-sm);
+    line-height: 1.4;
+}
+
 /* Color picker */
 .aisb-editor-color-picker {
     display: flex;
@@ -894,168 +940,19 @@ body.aisb-editor-active .aisb-editor-wrapper {
     box-shadow: inset 0 0 0 2px var(--aisb-editor-accent);
 }
 
-/* Old hero styles completely removed */
+/* Hero styles moved to shared/hero-core.css for consistency */
+
+
+
+
+
+
 
 /* =========================================
-   Hero Section Styles (Exact Copy of Approved Design)
+   Section Button Styles
    ========================================= */
-
-/* Design tokens (from approved design-tokens.css) */
-:root {
-    --color-primary: #2563eb;
-    --color-text: #1a1a1a;
-    --color-text-muted: #64748b;
-    --color-background: #ffffff;
-    --container-max-width: 1200px;
-    --section-padding-y: 96px;
-    --section-padding-x: 24px;
-    --space-sm: 16px;
-    --space-md: 24px;
-    --space-lg: 32px;
-    --space-3xl: 48px;
-    --font-size-eyebrow: 14px;
-    --font-size-h1: 56px;
-    --font-size-body: 18px;
-    --font-weight-bold: 700;
-    --font-weight-semibold: 600;
-    --line-height-tight: 1.1;
-    --line-height-normal: 1.6;
-}
-
-/* Base Hero Structure (exact from approved design) */
-.aisb-hero {
-    position: relative;
-    padding: var(--section-padding-y) 0;
-    background-color: var(--color-background);
-    color: var(--color-text);
-}
-
-/* Hero Container */
-.aisb-hero__container {
-    max-width: var(--container-max-width);
-    margin: 0 auto;
-    padding: 0 var(--section-padding-x);
-}
-
-/* Hero Grid Layout */
-.aisb-hero__grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-3xl);
-    align-items: center;
-}
-
-/* Content Column */
-.aisb-hero__content {
-    max-width: 600px;
-}
-
-/* Eyebrow Text (exact from approved design) */
-.aisb-hero__eyebrow {
-    display: inline-block;
-    font-size: var(--font-size-eyebrow);
-    font-weight: var(--font-weight-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    line-height: var(--line-height-tight);
-    color: var(--color-primary);
-    margin-bottom: var(--space-sm);
-}
-
-/* Hero Heading (exact from approved design) */
-.aisb-hero__heading {
-    font-size: 56px;
-    font-weight: var(--font-weight-bold);
-    line-height: var(--line-height-tight);
-    color: var(--color-text);
-    margin: 0 0 var(--space-md) 0;
-}
-
-/* Hero Body Text (exact from approved design) */
-.aisb-hero__body {
-    font-size: var(--font-size-body);
-    line-height: var(--line-height-normal);
-    color: var(--color-text-muted);
-    margin-bottom: var(--space-lg);
-    max-width: 480px;
-}
-
-/* Hero Buttons (exact from approved design) */
-.aisb-hero__buttons {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-}
-
-/* Button Base Styles (from approved components.css) */
-.aisb-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 48px;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: var(--font-weight-semibold);
-    line-height: 1.2;
-    border-radius: 6px;
-    border: 2px solid transparent;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 200ms ease;
-    box-sizing: border-box;
-}
-
-/* Button base styling for preview - increased specificity for button elements */
-.aisb-editor-sections .aisb-btn,
-.aisb-editor-sections button.aisb-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 48px;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.2;
-    border-radius: 6px;
-    border-width: 2px;
-    border-style: solid;
-    border-color: transparent;
-    text-decoration: none;
-    transition: all 200ms ease;
-    cursor: pointer;
-    background: transparent;
-    font-family: inherit;
-}
-
-/* Primary Button - increased specificity */
-.aisb-btn-primary,
-.aisb-editor-sections button.aisb-btn-primary {
-    background-color: var(--color-primary);
-    color: #ffffff;
-    border-color: var(--color-primary);
-}
-
-.aisb-btn-primary:hover,
-.aisb-editor-sections button.aisb-btn-primary:hover {
-    background-color: #1d4ed8;
-    border-color: #1d4ed8;
-    color: #ffffff;
-}
-
-/* Secondary Button - increased specificity */
-.aisb-btn-secondary,
-.aisb-editor-sections button.aisb-btn-secondary {
-    background-color: transparent;
-    color: var(--color-primary);
-    border-color: var(--color-primary);
-}
-
-.aisb-btn-secondary:hover,
-.aisb-editor-sections button.aisb-btn-secondary:hover {
-    background-color: var(--color-primary);
-    color: #ffffff;
-}
-
+/* Button styles are handled by hero-core.css for consistency */
+/* This ensures identical rendering in editor preview and frontend */
 
 /* Media Column */
 .aisb-hero__media {
@@ -1201,6 +1098,183 @@ body.aisb-editor-active .aisb-editor-wrapper {
     box-shadow: 0 0 0 3px var(--aisb-editor-accent-bg);
     background: var(--aisb-editor-bg-surface);
     background-color: var(--aisb-editor-bg-surface);
+}
+
+/* =========================================
+   Variant Controls - Fixed stacking layout
+   ========================================= */
+.aisb-variant-controls {
+    display: flex;
+    flex-direction: column; /* Stack vertically to prevent horizontal scroll */
+    gap: var(--aisb-editor-space-lg);
+    padding-bottom: var(--aisb-editor-space-lg);
+    border-bottom: 1px solid var(--aisb-editor-border);
+    margin-bottom: var(--aisb-editor-space-lg);
+}
+
+.aisb-variant-group {
+    width: 100%; /* Full width of sidebar */
+}
+
+.aisb-variant-group .aisb-editor-form-label {
+    margin-bottom: var(--aisb-editor-space-sm);
+}
+
+.aisb-toggle-group {
+    display: flex;
+    gap: 4px;
+    background: var(--aisb-editor-bg-base);
+    border: 1px solid var(--aisb-editor-border);
+    border-radius: var(--aisb-radius-md);
+    padding: 2px;
+}
+
+.aisb-toggle-btn {
+    flex: 1;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    color: var(--aisb-editor-text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: var(--aisb-radius-sm);
+    cursor: pointer;
+    transition: all var(--aisb-transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.aisb-toggle-btn:hover {
+    color: var(--aisb-editor-text-primary);
+    background: var(--aisb-editor-bg-hover);
+}
+
+.aisb-toggle-btn.active {
+    background: var(--aisb-editor-accent);
+    color: #ffffff;
+}
+
+.aisb-toggle-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+}
+
+/* =========================================
+   Media Selector Styles
+   ========================================= */
+.aisb-media-selector {
+    margin-top: var(--aisb-editor-space-lg);
+}
+
+.aisb-media-type-selector,
+.aisb-video-type-selector {
+    display: flex;
+    gap: var(--aisb-editor-space-md);
+    margin-bottom: var(--aisb-editor-space-lg);
+}
+
+.aisb-radio-label {
+    display: flex;
+    align-items: center;
+    gap: var(--aisb-editor-space-sm);
+    cursor: pointer;
+    color: var(--aisb-editor-text-primary);
+    font-size: 13px;
+}
+
+.aisb-radio-label input[type="radio"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+.aisb-media-content {
+    padding: var(--aisb-editor-space-lg);
+    background: var(--aisb-editor-bg-surface);
+    border: 1px solid var(--aisb-editor-border);
+    border-radius: 6px;
+}
+
+.aisb-media-preview {
+    position: relative;
+    margin-bottom: var(--aisb-editor-space-lg);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.aisb-media-preview img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.aisb-media-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--aisb-transition-fast);
+}
+
+.aisb-media-remove:hover {
+    background: rgba(220, 53, 69, 0.9);
+}
+
+.aisb-media-empty {
+    text-align: center;
+    color: var(--aisb-editor-text-muted);
+    padding: var(--aisb-editor-space-xl);
+}
+
+.aisb-video-input {
+    margin-top: var(--aisb-editor-space-lg);
+}
+
+.aisb-media-video-selected {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--aisb-editor-space-md);
+    padding: var(--aisb-editor-space-md);
+    background: var(--aisb-editor-bg-base);
+    border: 1px solid var(--aisb-editor-border);
+    border-radius: 4px;
+}
+
+.aisb-media-video-selected span {
+    color: var(--aisb-editor-text-primary);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Video wrapper for responsive iframe */
+.aisb-video-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+}
+
+.aisb-video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
 }
 
 /* Responsive (from approved design) */
