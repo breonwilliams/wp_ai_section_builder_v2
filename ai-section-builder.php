@@ -73,6 +73,9 @@ function aisb_setup() {
     add_action('admin_menu', 'aisb_add_editor_page');
     add_action('admin_init', 'aisb_handle_editor_redirect');
     
+    // REST API endpoint for page/post search
+    add_action('rest_api_init', 'aisb_register_rest_routes');
+    
     // Enqueue styles with high priority (99) to ensure they load after theme styles
     add_action('wp_enqueue_scripts', 'aisb_enqueue_styles', 99);
     add_action('admin_enqueue_scripts', 'aisb_enqueue_admin_styles');
@@ -1387,8 +1390,13 @@ function aisb_render_hero_section($section) {
                                     $btn_text = esc_html($button['text']);
                                     $btn_url = esc_url($button['url'] ?? '#');
                                     $btn_style = esc_attr($button['style'] ?? 'primary');
+                                    $btn_target = isset($button['target']) && $button['target'] === '_blank' ? '_blank' : '_self';
+                                    $btn_rel = $btn_target === '_blank' ? 'noopener noreferrer' : '';
                                     ?>
-                                    <a href="<?php echo $btn_url; ?>" class="aisb-btn aisb-btn-<?php echo $btn_style; ?>">
+                                    <a href="<?php echo $btn_url; ?>" 
+                                       class="aisb-btn aisb-btn-<?php echo $btn_style; ?>"
+                                       target="<?php echo esc_attr($btn_target); ?>"
+                                       <?php if ($btn_rel): ?>rel="<?php echo esc_attr($btn_rel); ?>"<?php endif; ?>>
                                         <?php echo $btn_text; ?>
                                     </a>
                                 <?php endif; ?>
@@ -1595,6 +1603,11 @@ function aisb_enqueue_admin_styles($hook) {
         // Enqueue WordPress editor scripts for TinyMCE/WYSIWYG
         wp_enqueue_editor();
         
+        // Enqueue jQuery UI Autocomplete (built into WordPress)
+        wp_enqueue_script('jquery-ui-core');
+        wp_enqueue_script('jquery-ui-widget');
+        wp_enqueue_script('jquery-ui-autocomplete');
+        
         // Enqueue repeater field module
         wp_enqueue_script(
             'aisb-repeater-field',
@@ -1616,6 +1629,8 @@ function aisb_enqueue_admin_styles($hook) {
         wp_localize_script('aisb-editor-script', 'aisbEditor', array(
             'nonce' => wp_create_nonce('aisb_editor_nonce'),
             'ajaxUrl' => admin_url('admin-ajax.php'),
+            'restUrl' => rest_url('aisb/v1/'),
+            'restNonce' => wp_create_nonce('wp_rest'),
             'features' => array(
                 'dragDrop' => true, // Now enabled with Sortable.js
                 'autoSave' => true,
@@ -2145,6 +2160,82 @@ function aisb_get_multiple_post_sections($post_ids) {
     }
     
     return $sections_data;
+}
+
+/**
+ * Register REST API routes for link selection
+ */
+function aisb_register_rest_routes() {
+    register_rest_route('aisb/v1', '/search-content', array(
+        'methods' => 'GET',
+        'callback' => 'aisb_search_content_callback',
+        'permission_callback' => function() {
+            return current_user_can('edit_posts');
+        },
+        'args' => array(
+            'search' => array(
+                'required' => false,
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+            ),
+            'per_page' => array(
+                'required' => false,
+                'type' => 'integer',
+                'default' => 20,
+            ),
+        ),
+    ));
+}
+
+/**
+ * REST API callback for searching pages and posts
+ */
+function aisb_search_content_callback($request) {
+    $search_term = $request->get_param('search');
+    $per_page = $request->get_param('per_page');
+    
+    // Build query args
+    $args = array(
+        'post_type' => array('page', 'post'),
+        'post_status' => 'publish',
+        'posts_per_page' => $per_page,
+        'orderby' => 'relevance',
+        'order' => 'DESC',
+    );
+    
+    if (!empty($search_term)) {
+        $args['s'] = $search_term;
+    }
+    
+    $query = new WP_Query($args);
+    $results = array();
+    
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            $post_type_obj = get_post_type_object(get_post_type());
+            
+            $results[] = array(
+                'id' => get_the_ID(),
+                'text' => get_the_title() . ' (' . $post_type_obj->labels->singular_name . ')',
+                'url' => get_permalink(),
+                'type' => get_post_type(),
+            );
+        }
+        wp_reset_postdata();
+    }
+    
+    // Add option for custom URL at the beginning
+    if (empty($search_term) || strpos(strtolower('custom url'), strtolower($search_term)) !== false) {
+        array_unshift($results, array(
+            'id' => 'custom',
+            'text' => '— Enter Custom URL —',
+            'url' => '',
+            'type' => 'custom',
+        ));
+    }
+    
+    return rest_ensure_response(array('results' => $results));
 }
 
 /**

@@ -122,6 +122,9 @@ body.aisb-editor-active .aisb-editor-wrapper {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    /* Maintain editor UI font size */
+    font-size: 13px;
+    line-height: 1.5;
 }
 
 .aisb-editor-panel--left {
@@ -208,6 +211,20 @@ body.aisb-editor-active .aisb-editor-wrapper {
     background: #FFFFFF; /* White canvas background */
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
     transition: all 0.3s ease;
+    /* Base font context for rem calculations */
+    font-size: 16px;
+    /* Remove line-height - let sections define their own */
+}
+
+/* =========================================
+   Preview Canvas Base Context
+   Non-destructive base for section rendering
+   ========================================= */
+.aisb-editor-canvas__inner .aisb-section {
+    /* Base context only - sections handle their own styles */
+    font-size: 16px; /* Base rem calculation context */
+    /* Let hero.css and other section styles handle everything else */
+    /* No resets - sections are the single source of truth */
 }
 
 /* Sidebar Hidden States - Full Width Canvas */
@@ -1344,4 +1361,78 @@ body.aisb-editor-active .aisb-editor-wrapper {
         font-size: 16px;
         max-width: 100%;
     }
+}
+
+/* =========================================
+   jQuery UI Autocomplete - Dark Theme
+   ========================================= */
+
+/* Autocomplete dropdown */
+.ui-autocomplete {
+    background-color: var(--aisb-editor-bg-elevated);
+    border: 1px solid var(--aisb-editor-border-strong);
+    border-radius: 6px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 10000;
+}
+
+/* Autocomplete items */
+.ui-autocomplete .ui-menu-item {
+    border: none;
+    margin: 0;
+}
+
+.ui-autocomplete .ui-menu-item-wrapper {
+    padding: 8px 12px;
+    color: var(--aisb-editor-text-primary);
+    border: none;
+    display: block;
+    cursor: pointer;
+}
+
+.ui-autocomplete .ui-menu-item-wrapper:hover,
+.ui-autocomplete .ui-state-active,
+.ui-autocomplete .ui-state-focus {
+    background-color: var(--aisb-editor-accent-bg);
+    color: var(--aisb-editor-accent);
+    border: none;
+    margin: 0;
+}
+
+/* Custom item styling */
+.aisb-autocomplete-item {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Loading state */
+.ui-autocomplete-loading {
+    background-image: url('data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==');
+    background-position: right center;
+    background-repeat: no-repeat;
+    padding-right: 24px;
+}
+
+/* Checkbox styling for link target option */
+.aisb-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--aisb-editor-text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.aisb-checkbox-label:hover {
+    color: var(--aisb-editor-text-primary);
+}
+
+.aisb-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
 }

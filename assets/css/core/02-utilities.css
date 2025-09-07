@@ -10,100 +10,146 @@
    Button Components
    ========================================= */
    
-/* Base Button Styles - Used across all sections */
-.aisb-btn {
+/* Base Button Styles - Works for both <button> and <a> elements */
+.aisb-btn,
+a.aisb-btn,
+button.aisb-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-height: 48px;
     padding: 12px 24px;
-    font-size: 16px;
+    font-size: 16px !important; /* Explicit to override editor inheritance */
     font-weight: 500;
     line-height: 1.2;
     border-radius: 6px;
     border: 2px solid transparent;
     cursor: pointer;
-    text-decoration: none;
+    text-decoration: none !important;
     transition: all 200ms ease;
     white-space: nowrap;
     font-family: inherit;
+    box-sizing: border-box;
+}
+
+/* Reset button element defaults */
+button.aisb-btn {
+    background: none;
+    font: inherit;
+    color: inherit;
 }
 
 /* Primary Button - Light Mode */
-.aisb-btn-primary {
+.aisb-btn-primary,
+button.aisb-btn-primary,
+a.aisb-btn-primary {
     background-color: #2563eb;
     color: #ffffff;
     border-color: #2563eb;
 }
 
 .aisb-btn-primary:hover,
-.aisb-btn-primary:focus {
+.aisb-btn-primary:focus,
+button.aisb-btn-primary:hover,
+button.aisb-btn-primary:focus,
+a.aisb-btn-primary:hover,
+a.aisb-btn-primary:focus {
     background-color: #1d4ed8;
     border-color: #1d4ed8;
     color: #ffffff;
 }
 
 /* Primary Button - Dark Mode */
-.aisb-section--dark .aisb-btn-primary {
+.aisb-section--dark .aisb-btn-primary,
+.aisb-section--dark button.aisb-btn-primary,
+.aisb-section--dark a.aisb-btn-primary {
     background-color: #60a5fa;
     border-color: #60a5fa;
     color: #1a1a1a;
 }
 
 .aisb-section--dark .aisb-btn-primary:hover,
-.aisb-section--dark .aisb-btn-primary:focus {
+.aisb-section--dark .aisb-btn-primary:focus,
+.aisb-section--dark button.aisb-btn-primary:hover,
+.aisb-section--dark button.aisb-btn-primary:focus,
+.aisb-section--dark a.aisb-btn-primary:hover,
+.aisb-section--dark a.aisb-btn-primary:focus {
     background-color: #3b82f6;
     border-color: #3b82f6;
     color: #1a1a1a;
 }
 
 /* Secondary Button - Light Mode */
-.aisb-btn-secondary {
+.aisb-btn-secondary,
+button.aisb-btn-secondary,
+a.aisb-btn-secondary {
     background-color: transparent;
     color: #2563eb;
     border-color: #2563eb;
 }
 
 .aisb-btn-secondary:hover,
-.aisb-btn-secondary:focus {
+.aisb-btn-secondary:focus,
+button.aisb-btn-secondary:hover,
+button.aisb-btn-secondary:focus,
+a.aisb-btn-secondary:hover,
+a.aisb-btn-secondary:focus {
     background-color: #2563eb;
     color: #ffffff;
     border-color: #2563eb;
 }
 
 /* Secondary Button - Dark Mode */
-.aisb-section--dark .aisb-btn-secondary {
+.aisb-section--dark .aisb-btn-secondary,
+.aisb-section--dark button.aisb-btn-secondary,
+.aisb-section--dark a.aisb-btn-secondary {
     background-color: transparent;
     color: #60a5fa;
     border-color: #60a5fa;
 }
 
 .aisb-section--dark .aisb-btn-secondary:hover,
-.aisb-section--dark .aisb-btn-secondary:focus {
+.aisb-section--dark .aisb-btn-secondary:focus,
+.aisb-section--dark button.aisb-btn-secondary:hover,
+.aisb-section--dark button.aisb-btn-secondary:focus,
+.aisb-section--dark a.aisb-btn-secondary:hover,
+.aisb-section--dark a.aisb-btn-secondary:focus {
     background-color: #60a5fa;
     color: #1a1a1a;
     border-color: #60a5fa;
 }
 
 /* Ghost Button */
-.aisb-btn-ghost {
+.aisb-btn-ghost,
+button.aisb-btn-ghost,
+a.aisb-btn-ghost {
     background-color: transparent;
     color: #64748b;
     border-color: transparent;
 }
 
 .aisb-btn-ghost:hover,
-.aisb-btn-ghost:focus {
+.aisb-btn-ghost:focus,
+button.aisb-btn-ghost:hover,
+button.aisb-btn-ghost:focus,
+a.aisb-btn-ghost:hover,
+a.aisb-btn-ghost:focus {
     background-color: #f1f5f9;
     color: #1a1a1a;
 }
 
-.aisb-section--dark .aisb-btn-ghost {
+.aisb-section--dark .aisb-btn-ghost,
+.aisb-section--dark button.aisb-btn-ghost,
+.aisb-section--dark a.aisb-btn-ghost {
     color: #9ca3af;
 }
 
 .aisb-section--dark .aisb-btn-ghost:hover,
-.aisb-section--dark .aisb-btn-ghost:focus {
+.aisb-section--dark .aisb-btn-ghost:focus,
+.aisb-section--dark button.aisb-btn-ghost:hover,
+.aisb-section--dark button.aisb-btn-ghost:focus,
+.aisb-section--dark a.aisb-btn-ghost:hover,
+.aisb-section--dark a.aisb-btn-ghost:focus {
     background-color: #374151;
     color: #fafafa;
 }
@@ -112,13 +158,13 @@
 .aisb-btn-sm {
     min-height: 36px;
     padding: 8px 16px;
-    font-size: 14px;
+    font-size: 14px !important;
 }
 
 .aisb-btn-lg {
     min-height: 56px;
     padding: 16px 32px;
-    font-size: 18px;
+    font-size: 18px !important;
 }
 
 /* Button States */

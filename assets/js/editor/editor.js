@@ -388,6 +388,11 @@
         // Bind form events
         bindFormEvents();
         
+        // Initialize autocomplete on URL fields after form is rendered
+        setTimeout(function() {
+            initializeUrlAutocomplete();
+        }, 300);
+        
         // Initialize WYSIWYG editors with small delay for DOM
         setTimeout(function() {
             initWysiwygEditors();
@@ -753,6 +758,7 @@
                 type: 'button',
                 text: 'Button Text',
                 url: '#',
+                target: '_self',
                 style: 'primary'
             },
             maxItems: 10,
@@ -782,8 +788,18 @@
                     // Update save status
                     updateSaveStatus('unsaved');
                 }
+                
+                // Re-initialize autocomplete on URL fields after render
+                setTimeout(function() {
+                    initializeUrlAutocomplete();
+                }, 150);
             }
         });
+        
+        // Initialize autocomplete on any existing URL fields after repeater renders
+        setTimeout(function() {
+            initializeUrlAutocomplete();
+        }, 250);
         
         return globalBlocksRepeater;
     }
@@ -816,10 +832,18 @@
                 <div class="aisb-repeater-field-group">
                     <label>Button URL</label>
                     <input type="text" 
-                           class="aisb-editor-input aisb-repeater-field" 
+                           class="aisb-editor-input aisb-repeater-field aisb-url-autocomplete" 
                            data-field="url" 
                            value="${escapeHtml(button.url || '')}" 
-                           placeholder="#">
+                           placeholder="Start typing page name or enter URL">
+                    <label class="aisb-checkbox-label">
+                        <input type="checkbox" 
+                               class="aisb-repeater-field" 
+                               data-field="target" 
+                               value="_blank"
+                               ${button.target === '_blank' ? 'checked' : ''}>
+                        Open in new tab
+                    </label>
                 </div>
                 <div class="aisb-repeater-field-group">
                     <label>Button Style</label>
@@ -1485,7 +1509,9 @@
             var buttonHtml = buttons.map(function(button) {
                 if (!button.text) return '';
                 var styleClass = 'aisb-btn-' + (button.style || 'primary');
-                return `<button class="aisb-btn ${styleClass}">${escapeHtml(button.text)}</button>`;
+                
+                // In preview, render as button tags (not links) to avoid styling issues
+                return `<button class="aisb-btn ${styleClass}" type="button">${escapeHtml(button.text)}</button>`;
             }).join('');
             
             if (buttonHtml) {
@@ -1966,12 +1992,107 @@
         console.log('=== END DEBUG ===');
     };
     
+    /**
+     * Initialize URL autocomplete using jQuery UI
+     */
+    function initializeUrlAutocomplete() {
+        // Check if jQuery UI autocomplete is available
+        if (!$.fn.autocomplete) {
+            return; // Silently fail if not loaded
+        }
+        
+        $('.aisb-url-autocomplete').each(function() {
+            var $input = $(this);
+            
+            // Skip if already initialized
+            if ($input.hasClass('ui-autocomplete-input')) {
+                return;
+            }
+            
+            $input.autocomplete({
+                minLength: 2,
+                delay: 300,
+                source: function(request, response) {
+                    $.ajax({
+                        url: aisbEditor.restUrl + 'search-content',
+                        type: 'GET',
+                        dataType: 'json',
+                        headers: {
+                            'X-WP-Nonce': aisbEditor.restNonce
+                        },
+                        data: {
+                            search: request.term,
+                            per_page: 10
+                        },
+                        success: function(data) {
+                            if (data && data.results) {
+                                var items = $.map(data.results, function(item) {
+                                    if (item.type === 'custom') {
+                                        return null; // Skip the custom option
+                                    }
+                                    return {
+                                        label: item.text,
+                                        value: item.url
+                                    };
+                                });
+                                response(items);
+                            } else {
+                                response([]);
+                            }
+                        },
+                        error: function() {
+                            response([]); // Return empty results on error
+                        }
+                    });
+                },
+                select: function(event, ui) {
+                    // Update the input with the URL
+                    $(this).val(ui.item.value).trigger('input');
+                    
+                    // Check if external link and auto-check "open in new tab"
+                    if (ui.item.value && ui.item.value.startsWith('http') && 
+                        !ui.item.value.includes(window.location.hostname)) {
+                        $(this).closest('.aisb-repeater-field-group')
+                            .find('[data-field="target"]')
+                            .prop('checked', true);
+                    }
+                    
+                    return false; // Prevent default behavior
+                },
+                focus: function(event, ui) {
+                    // Show the label in the input while navigating
+                    $(this).val(ui.item.value);
+                    return false;
+                }
+            });
+            
+            // Custom render item if autocomplete was successfully initialized
+            var autocompleteInstance = $input.data('ui-autocomplete');
+            if (autocompleteInstance) {
+                autocompleteInstance._renderItem = function(ul, item) {
+                    return $('<li>')
+                        .append('<div class="aisb-autocomplete-item">' + item.label + '</div>')
+                        .appendTo(ul);
+                };
+            }
+        });
+    }
+    
+    // Initialize autocomplete whenever buttons are rendered
+    $(document).on('aisb:repeater:item-added aisb:repeater:items-rendered', function() {
+        setTimeout(initializeUrlAutocomplete, 100);
+    });
+    
     // Initialize on document ready
     $(document).ready(function() {
         if ($('.aisb-editor-wrapper').length) {
             console.log('AISB: Initializing editor...');
             console.log('Debug mode enabled. Use window.debugMediaSystem() in console to check media state.');
             initEditor();
+            
+            // Initialize autocomplete on any existing URL fields
+            setTimeout(initializeUrlAutocomplete, 500);
+            
             console.log('AISB: Editor initialization complete');
         }
     });

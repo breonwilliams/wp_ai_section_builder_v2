@@ -76,6 +76,8 @@
 
 .aisb-hero__body p {
     margin: 0 0 16px 0;
+    font-size: inherit; /* Explicitly inherit from .aisb-hero__body */
+    line-height: inherit; /* Maintain parent line-height */
 }
 
 .aisb-hero__body p:last-child {
@@ -93,6 +95,8 @@
 
 .aisb-hero__outro p {
     margin: 0 0 16px 0;
+    font-size: inherit; /* Explicitly inherit from .aisb-hero__outro */
+    line-height: inherit; /* Maintain parent line-height */
 }
 
 .aisb-hero__outro p:last-child {
