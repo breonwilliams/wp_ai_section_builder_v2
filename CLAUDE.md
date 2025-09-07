@@ -8,25 +8,32 @@ This document contains critical architectural decisions and rules that MUST be f
 
 ## CSS Architecture - CRITICAL RULES
 
-### File Structure and Responsibilities
+### File Structure and Responsibilities (PRODUCTION READY)
 
 ```
 /assets/css/
-├── core/                    # Shared design system components
-│   ├── 00-tokens.css       # CSS variables and design tokens
-│   ├── 01-reset.css        # CSS reset/normalize
-│   └── 02-utilities.css    # Reusable utility classes
+├── core/                    # Single source of truth for design system
+│   ├── 00-tokens.css       # ALL CSS variables (section + editor tokens)
+│   └── 02-utilities.css    # Shared components (buttons, etc.)
 ├── sections/                # Section-specific styles (ONE FILE PER SECTION)
-│   ├── hero.css            # Hero section ONLY
-│   ├── features.css        # Features section ONLY
-│   ├── testimonials.css    # Testimonials section ONLY
-│   └── [section-name].css  # Each section isolated
+│   └── hero.css            # Hero section - imports core tokens & utilities
 ├── editor/
-│   └── editor-ui.css       # Editor UI ONLY (toolbar, panels, sidebars)
-└── shared/
-    ├── _variables.css      # Legacy - being migrated to core/00-tokens.css
-    └── hero-core.css       # Current hero styles - will move to sections/hero.css
+│   └── editor-styles.css   # Editor UI ONLY - imports core tokens
+└── admin/
+    ├── admin-styles.css    # Admin interface - imports core tokens
+    └── components/
+        └── _buttons.css    # Admin-specific button styles
 ```
+
+### 🟢 PRODUCTION READY STATUS
+- ✅ Legacy `/shared/` directory DELETED (duplicates removed)
+- ✅ Legacy `/design-system/` directory DELETED (duplicates removed)
+- ✅ Single source of truth established for all styles
+- ✅ All imports updated to use `core/00-tokens.css`
+- ✅ No undefined CSS variables
+- ✅ No duplicate button styles
+- ✅ Editor dark theme restored and working
+- ✅ Frontend viewport overflow fixed
 
 ### 🔴 NEVER DO THIS
 
@@ -72,7 +79,7 @@ This document contains critical architectural decisions and rules that MUST be f
 
 ---
 
-## PHP Enqueuing Strategy
+## PHP Enqueuing Strategy (UPDATED FOR PRODUCTION)
 
 ### Frontend (Performance Optimized)
 ```php
@@ -88,37 +95,45 @@ foreach ($sections as $section) {
 }
 ```
 
-### Editor (Everything Available)
+### Editor (PRODUCTION READY)
 ```php
-// Load shared hero-core.css for all section styles
+// Load hero section styles (includes core tokens + utilities via @import)
 wp_enqueue_style(
-    'aisb-hero-core',
-    AISB_PLUGIN_URL . 'assets/css/shared/hero-core.css',
+    'aisb-hero-section',
+    AISB_PLUGIN_URL . 'assets/css/sections/hero.css',
     [],
     AISB_VERSION
 );
 
-// Load editor UI separately - NEVER includes section styles
+// Load editor UI separately - imports core/00-tokens.css for editor variables
 wp_enqueue_style(
     'aisb-editor-ui',
-    AISB_PLUGIN_URL . 'assets/css/editor/editor-ui.css',
-    ['aisb-hero-core'], // Depends on section styles
+    AISB_PLUGIN_URL . 'assets/css/editor/editor-styles.css',
+    [],
     AISB_VERSION
 );
 ```
 
 ---
 
-## Current Issues Being Fixed
+## Issues Fixed in Production Cleanup
 
-### Button Styling Inconsistency (Fixed)
+### ✅ Button Styling Inconsistency (RESOLVED)
 - **Problem**: Editor CSS was overriding button styles with undefined variables
-- **Solution**: Removed ALL button styles from editor-ui.css, now using hero-core.css only
-- **Location**: Button styles are in `assets/css/shared/hero-core.css` lines 311-383
+- **Solution**: Removed duplicate button styles, single source in `core/02-utilities.css`
+- **Admin buttons**: Separate styles in `admin/components/_buttons.css` (different design)
 
-### Media Fields Not Persisting (Fixed)
-- **Problem**: Migration function was deleting media_type and video_url fields
-- **Solution**: Modified `aisb_migrate_field_names()` to preserve these fields
+### ✅ Editor Dark Theme (RESOLVED)
+- **Problem**: Editor UI lost all styling when shared directory was removed
+- **Solution**: All editor variables added to `core/00-tokens.css`, editor imports this
+
+### ✅ Frontend Viewport Overflow (RESOLVED)
+- **Problem**: Hero section causing horizontal scroll with `width: 100vw` hack
+- **Solution**: Removed viewport hack, using proper container with `max-width: 1200px`
+
+### ✅ Duplicate Files Cleanup (RESOLVED)
+- **Problem**: Multiple directories with duplicate styles causing confusion
+- **Solution**: Deleted `/shared/` and `/design-system/` directories entirely
 
 ---
 
@@ -167,19 +182,19 @@ Before marking any CSS work as complete:
 
 ## Migration Plan
 
-### Current State (December 2024)
-- `/assets/css/sections/hero.css` contains hero section styles
-- `/assets/css/core/00-tokens.css` contains ALL design tokens (including editor variables)
-- `/assets/css/core/02-utilities.css` contains shared components (buttons, etc.)
-- `editor-styles.css` imports tokens for editor UI variables (required!)
-- Button overrides removed from editor-styles.css
+### ✅ PRODUCTION READY STATE (January 2025)
+- `/assets/css/core/00-tokens.css` - Single source of truth for ALL CSS variables
+- `/assets/css/core/02-utilities.css` - Shared components (buttons, etc.)
+- `/assets/css/sections/hero.css` - Hero section styles (imports core files)
+- `/assets/css/editor/editor-styles.css` - Editor UI only (imports tokens)
+- `/assets/css/admin/admin-styles.css` - Admin interface (imports tokens)
+- All duplicate directories deleted (`/shared/`, `/design-system/`)
+- All imports updated to use single source files
+- No undefined CSS variables
+- No duplicate button styles
 
-### Target State
-- Each section has its own CSS file in `/sections/`
-- Editor UI completely separated from section styles
-- Dynamic CSS loading based on page content
-
-### Do NOT create new files unless explicitly needed for new sections
+### ⚠️ CRITICAL: Do NOT recreate deleted directories
+The `/shared/` and `/design-system/` directories have been permanently deleted to eliminate confusion. All styles are now properly organized in the structure above.
 
 ---
 

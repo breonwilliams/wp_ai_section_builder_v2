@@ -11,7 +11,7 @@
    ========================================= */
 
 /* 1. Variables and base setup */
-@import url('../shared/_variables.css');
+@import url('../core/00-tokens.css');
 
 /* 2. Component styles */
 @import url('components/_buttons.css');
