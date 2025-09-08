@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Section Builder - Admin UI Style Test</title>
+    
+    <!-- WordPress Admin Base Styles (simulate) -->
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f0f0f1;
+            margin: 0;
+            padding: 20px;
+        }
+        .postbox {
+            background: #fff;
+            border: 1px solid #c3c4c7;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+        .postbox .inside {
+            padding: 12px;
+        }
+        .dashicons {
+            font-family: dashicons;
+            display: inline-block;
+            line-height: 1;
+            font-weight: 400;
+            font-style: normal;
+            speak: never;
+            text-decoration: inherit;
+            text-transform: none;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
+            vertical-align: top;
+        }
+        .dashicons-yes:before { content: "\f147"; }
+        .dashicons-warning:before { content: "\f227"; }
+        .dashicons-info:before { content: "\f348"; }
+        .dashicons-admin-customizer:before { content: "\f540"; }
+    </style>
+    
+    <!-- AI Section Builder Admin Styles -->
+    <link rel="stylesheet" href="../assets/css/admin/admin-styles.css">
+</head>
+<body>
+    <h1>AI Section Builder - Admin UI Component Test</h1>
+    
+    <!-- Meta Box Test -->
+    <div class="postbox" id="aisb_meta_box">
+        <h2 class="hndle">AI Section Builder</h2>
+        <div class="inside">
+            <div class="aisb-meta-box-container">
+                <!-- Ready Status -->
+                <div class="aisb-meta-box-status status-ready">
+                    <div class="aisb-meta-box-status__title">
+                        <span class="dashicons dashicons-info"></span>
+                        Ready for Page Builder
+                    </div>
+                    <p class="aisb-meta-box-status__description">
+                        No page builders detected. You can activate AI Section Builder.
+                    </p>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="aisb-meta-box-actions">
+                    <button class="aisb-btn-launch">
+                        <span class="dashicons dashicons-admin-customizer"></span>
+                        Launch Builder
+                    </button>
+                    <button class="aisb-btn-secondary">
+                        View Documentation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Button Components Test -->
+    <div class="postbox">
+        <h2 class="hndle">Button Components</h2>
+        <div class="inside">
+            <div class="aisb-btn-group">
+                <button class="aisb-btn aisb-btn-primary">Primary Button</button>
+                <button class="aisb-btn aisb-btn-secondary">Secondary Button</button>
+                <button class="aisb-btn aisb-btn-success">Success Button</button>
+                <button class="aisb-btn aisb-btn-danger">Danger Button</button>
+                <button class="aisb-btn aisb-btn-ghost">Ghost Button</button>
+            </div>
+            
+            <br><br>
+            
+            <div class="aisb-btn-group">
+                <button class="aisb-btn aisb-btn-primary aisb-btn-sm">Small</button>
+                <button class="aisb-btn aisb-btn-primary">Default</button>
+                <button class="aisb-btn aisb-btn-primary aisb-btn-lg">Large</button>
+            </div>
+            
+            <br><br>
+            
+            <div class="aisb-btn-group">
+                <button class="aisb-btn aisb-btn-primary" disabled>Disabled</button>
+                <button class="aisb-btn aisb-btn-primary aisb-btn-loading">Loading</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status Cards Test -->
+    <div class="postbox">
+        <h2 class="hndle">Status Cards</h2>
+        <div class="inside">
+            <div class="aisb-status-card aisb-status-ready">
+                <div class="aisb-status-card__header">
+                    <span class="aisb-status-card__icon">
+                        <span class="dashicons dashicons-info"></span>
+                    </span>
+                    Ready Status
+                </div>
+                <div class="aisb-status-card__content">
+                    <p>This is an informational status card.</p>
+                </div>
+            </div>
+            
+            <div class="aisb-status-card aisb-status-active">
+                <div class="aisb-status-card__header">
+                    <span class="aisb-status-card__icon">
+                        <span class="dashicons dashicons-yes"></span>
+                    </span>
+                    Active Status
+                </div>
+                <div class="aisb-status-card__content">
+                    <p>This is a success/active status card.</p>
+                </div>
+            </div>
+            
+            <div class="aisb-status-card aisb-status-warning">
+                <div class="aisb-status-card__header">
+                    <span class="aisb-status-card__icon">
+                        <span class="dashicons dashicons-warning"></span>
+                    </span>
+                    Warning Status
+                </div>
+                <div class="aisb-status-card__content">
+                    <p>This is a warning status card with a list:</p>
+                    <ul class="aisb-status-card__list">
+                        <li>First warning item</li>
+                        <li>Second warning item</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Empty State Test -->
+    <div class="postbox">
+        <h2 class="hndle">Empty State</h2>
+        <div class="inside">
+            <div class="aisb-meta-box-empty">
+                <div class="aisb-meta-box-empty__icon">
+                    <span class="dashicons dashicons-admin-customizer"></span>
+                </div>
+                <h3 class="aisb-meta-box-empty__title">No Sections Created</h3>
+                <p class="aisb-meta-box-empty__description">
+                    Get started by launching the builder to create your first section.
+                </p>
+                <button class="aisb-btn aisb-btn-primary">
+                    <span class="dashicons dashicons-admin-customizer"></span>
+                    Launch Builder
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CSS Variables Test -->
+    <div class="postbox">
+        <h2 class="hndle">CSS Variables Test</h2>
+        <div class="inside">
+            <div id="css-vars-test"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Test that CSS variables are loading correctly
+        const testVars = [
+            '--aisb-wp-primary',
+            '--aisb-wp-success', 
+            '--aisb-gray-300',
+            '--aisb-font-sm',
+            '--aisb-space-lg',
+            '--aisb-radius-sm',
+            '--aisb-line-normal'
+        ];
+        
+        const container = document.getElementById('css-vars-test');
+        const computedStyle = getComputedStyle(document.documentElement);
+        
+        let html = '<h4>Variable Resolution Check:</h4><ul>';
+        testVars.forEach(varName => {
+            const value = computedStyle.getPropertyValue(varName);
+            const status = value ? '✅' : '❌';
+            html += `<li>${status} <code>${varName}</code>: ${value || 'NOT DEFINED'}</li>`;
+        });
+        html += '</ul>';
+        
+        container.innerHTML = html;
+    </script>
+</body>
+</html>

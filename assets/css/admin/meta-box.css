@@ -1,0 +1,285 @@
+/**
+ * Meta Box Styles
+ * Specific styling for AI Section Builder meta box in WordPress page editor
+ * 
+ * @package AISB
+ * @since 2.0.0
+ */
+
+/* =========================================
+   Meta Box Container Styles
+   ========================================= */
+#aisb_meta_box .inside {
+    padding: 0;
+    margin: 0;
+}
+
+.aisb-meta-box-container {
+    padding: var(--aisb-space-lg);
+    background: #ffffff;
+}
+
+/* =========================================
+   Status Card in Meta Box
+   ========================================= */
+.aisb-meta-box-status {
+    background-color: #f0f6fc;
+    border-left: 3px solid var(--aisb-wp-info);
+    border-radius: var(--aisb-radius-sm);
+    padding: var(--aisb-space-md) var(--aisb-space-lg);
+    margin-bottom: var(--aisb-space-lg);
+}
+
+.aisb-meta-box-status.status-ready {
+    background-color: #f0f6fc;
+    border-left-color: var(--aisb-wp-info);
+}
+
+.aisb-meta-box-status.status-active {
+    background-color: #f0fdf4;
+    border-left-color: var(--aisb-wp-success);
+}
+
+.aisb-meta-box-status.status-warning {
+    background-color: #fffbeb;
+    border-left-color: var(--aisb-wp-warning);
+}
+
+/* Status Title */
+.aisb-meta-box-status__title {
+    display: flex;
+    align-items: center;
+    gap: var(--aisb-space-sm);
+    font-size: var(--aisb-font-md);
+    font-weight: var(--aisb-font-semibold);
+    color: var(--aisb-gray-900);
+    margin: 0 0 var(--aisb-space-xs) 0;
+}
+
+.aisb-meta-box-status__title .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--aisb-wp-info);
+}
+
+.aisb-meta-box-status.status-active .aisb-meta-box-status__title .dashicons {
+    color: var(--aisb-wp-success);
+}
+
+.aisb-meta-box-status.status-warning .aisb-meta-box-status__title .dashicons {
+    color: var(--aisb-wp-warning);
+}
+
+/* Status Description */
+.aisb-meta-box-status__description {
+    color: var(--aisb-gray-600);
+    font-size: var(--aisb-font-sm);
+    line-height: var(--aisb-line-relaxed);
+    margin: 0;
+}
+
+/* =========================================
+   Meta Box Actions Section
+   ========================================= */
+.aisb-meta-box-actions {
+    display: flex;
+    gap: var(--aisb-space-md);
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: var(--aisb-space-lg);
+    padding-top: var(--aisb-space-lg);
+    border-top: 1px solid var(--aisb-gray-200);
+}
+
+/* Launch Builder Button - Primary Action */
+.aisb-meta-box-actions .aisb-btn-launch {
+    background-color: var(--aisb-wp-primary);
+    border: 1px solid var(--aisb-wp-primary);
+    color: #ffffff;
+    padding: 6px 16px;
+    height: 32px;
+    border-radius: var(--aisb-radius-sm);
+    font-size: var(--aisb-font-sm);
+    font-weight: var(--aisb-font-regular);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all var(--aisb-transition-base);
+}
+
+.aisb-meta-box-actions .aisb-btn-launch:hover {
+    background-color: var(--aisb-wp-primary-hover);
+    border-color: var(--aisb-wp-primary-hover);
+    color: #ffffff;
+}
+
+.aisb-meta-box-actions .aisb-btn-launch:focus {
+    outline: 2px solid var(--aisb-wp-primary);
+    outline-offset: 2px;
+}
+
+.aisb-meta-box-actions .aisb-btn-launch .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+}
+
+/* Secondary Actions */
+.aisb-meta-box-actions .aisb-btn-secondary {
+    background-color: #ffffff;
+    border: 1px solid var(--aisb-gray-300);
+    color: var(--aisb-gray-700);
+    padding: 6px 16px;
+    height: 32px;
+    border-radius: var(--aisb-radius-sm);
+    font-size: var(--aisb-font-sm);
+    font-weight: var(--aisb-font-regular);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all var(--aisb-transition-base);
+}
+
+.aisb-meta-box-actions .aisb-btn-secondary:hover {
+    background-color: var(--aisb-gray-50);
+    border-color: var(--aisb-gray-400);
+    color: var(--aisb-gray-900);
+}
+
+.aisb-meta-box-actions .aisb-btn-secondary:focus {
+    outline: 2px solid var(--aisb-wp-primary);
+    outline-offset: 2px;
+}
+
+/* =========================================
+   Meta Box Info Section
+   ========================================= */
+.aisb-meta-box-info {
+    margin-top: var(--aisb-space-xl);
+    padding: var(--aisb-space-md);
+    background-color: var(--aisb-gray-50);
+    border-radius: var(--aisb-radius-sm);
+}
+
+.aisb-meta-box-info__title {
+    font-size: var(--aisb-font-sm);
+    font-weight: var(--aisb-font-semibold);
+    color: var(--aisb-gray-900);
+    margin: 0 0 var(--aisb-space-sm) 0;
+}
+
+.aisb-meta-box-info__list {
+    margin: 0;
+    padding: 0 0 0 var(--aisb-space-lg);
+    list-style: disc;
+}
+
+.aisb-meta-box-info__list li {
+    font-size: var(--aisb-font-sm);
+    color: var(--aisb-gray-600);
+    line-height: var(--aisb-line-relaxed);
+    margin-bottom: var(--aisb-space-xs);
+}
+
+.aisb-meta-box-info__list li:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================================
+   Empty State
+   ========================================= */
+.aisb-meta-box-empty {
+    text-align: center;
+    padding: var(--aisb-space-2xl) var(--aisb-space-lg);
+}
+
+.aisb-meta-box-empty__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background-color: var(--aisb-gray-100);
+    border-radius: var(--aisb-radius-full);
+    margin: 0 auto var(--aisb-space-lg);
+}
+
+.aisb-meta-box-empty__icon .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: var(--aisb-gray-400);
+}
+
+.aisb-meta-box-empty__title {
+    font-size: var(--aisb-font-lg);
+    font-weight: var(--aisb-font-semibold);
+    color: var(--aisb-gray-900);
+    margin: 0 0 var(--aisb-space-sm) 0;
+}
+
+.aisb-meta-box-empty__description {
+    font-size: var(--aisb-font-sm);
+    color: var(--aisb-gray-600);
+    line-height: var(--aisb-line-relaxed);
+    margin: 0 0 var(--aisb-space-lg) 0;
+}
+
+/* =========================================
+   Loading State
+   ========================================= */
+.aisb-meta-box-loading {
+    text-align: center;
+    padding: var(--aisb-space-xl);
+}
+
+.aisb-meta-box-loading__spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--aisb-gray-200);
+    border-top-color: var(--aisb-wp-primary);
+    border-radius: 50%;
+    animation: aisb-spin 0.8s linear infinite;
+}
+
+.aisb-meta-box-loading__text {
+    margin-top: var(--aisb-space-md);
+    font-size: var(--aisb-font-sm);
+    color: var(--aisb-gray-600);
+}
+
+/* =========================================
+   Responsive Adjustments
+   ========================================= */
+@media (max-width: 782px) {
+    .aisb-meta-box-container {
+        padding: var(--aisb-space-md);
+    }
+    
+    .aisb-meta-box-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .aisb-meta-box-actions .aisb-btn-launch,
+    .aisb-meta-box-actions .aisb-btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* =========================================
+   Animation
+   ========================================= */
+@keyframes aisb-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

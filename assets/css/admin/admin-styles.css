@@ -16,6 +16,7 @@
 /* 2. Component styles */
 @import url('components/_buttons.css');
 @import url('components/_cards.css');
+@import url('meta-box.css');
 
 /* =========================================
    Admin Base Styles
@@ -106,7 +107,7 @@
     border: 1px solid var(--aisb-gray-300);
     border-radius: var(--aisb-radius-sm);
     font-size: var(--aisb-font-sm);
-    line-height: var(--aisb-line-base);
+    line-height: var(--aisb-line-normal);
     background-color: #ffffff;
     transition: border-color var(--aisb-transition-base);
 }

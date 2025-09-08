@@ -165,4 +165,64 @@
     --aisb-editor-toolbar-height: 48px;
     --aisb-editor-panel-left-width: 280px;
     --aisb-editor-panel-right-width: 320px;
+    
+    /* =========================================
+       WordPress Admin Integration
+       For admin UI components (meta boxes, admin pages)
+       ========================================= */
+    
+    /* WordPress Admin Colors */
+    --aisb-wp-primary: #2271b1;        /* WP admin blue */
+    --aisb-wp-primary-hover: #135e96;  /* WP admin blue hover */
+    --aisb-wp-success: #00a32a;        /* WP admin green */
+    --aisb-wp-warning: #dba617;        /* WP admin yellow */
+    --aisb-wp-danger: #d63638;         /* WP admin red */
+    --aisb-wp-info: #72aee6;           /* WP admin info blue */
+    
+    /* Gray Scale for Admin UI */
+    --aisb-gray-50: #f9fafb;
+    --aisb-gray-100: #f3f4f6;
+    --aisb-gray-200: #e5e7eb;
+    --aisb-gray-300: #d1d5db;
+    --aisb-gray-400: #9ca3af;
+    --aisb-gray-500: #6b7280;
+    --aisb-gray-600: #4b5563;
+    --aisb-gray-700: #374151;
+    --aisb-gray-800: #1f2937;
+    --aisb-gray-900: #111827;
+    
+    /* Font Size Aliases for Admin Components */
+    --aisb-font-xs: 12px;
+    --aisb-font-sm: 13px;
+    --aisb-font-md: 14px;
+    --aisb-font-lg: 16px;
+    --aisb-font-xl: 18px;
+    --aisb-font-2xl: 20px;
+    --aisb-font-3xl: 24px;
+    
+    /* Font Weight Aliases */
+    --aisb-font-light: 300;
+    --aisb-font-regular: 400;
+    --aisb-font-medium: 500;
+    --aisb-font-semibold: 600;
+    --aisb-font-bold: 700;
+    
+    /* Line Height Aliases for Admin */
+    --aisb-line-tight: 1.2;
+    --aisb-line-normal: 1.5;
+    --aisb-line-relaxed: 1.6;
+    --aisb-line-loose: 2;
+    
+    /* Border Radius Aliases (match existing) */
+    --aisb-radius-xs: 2px;
+    --aisb-radius-sm: 4px;
+    --aisb-radius-md: 6px;
+    --aisb-radius-lg: 8px;
+    
+    /* Shadow Aliases (match existing) */
+    --aisb-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --aisb-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    
+    /* Transition Aliases */
+    --aisb-transition-base: 200ms ease;
 }
