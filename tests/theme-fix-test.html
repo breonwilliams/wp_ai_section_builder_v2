@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Fix Verification Test</title>
+    
+    <!-- Load CSS files in the correct order (as they should be on frontend) -->
+    <link rel="stylesheet" href="../assets/css/core/00-tokens.css">
+    <link rel="stylesheet" href="../assets/css/core/01-base.css">
+    <link rel="stylesheet" href="../assets/css/core/02-utilities.css">
+    <link rel="stylesheet" href="../assets/css/sections/hero.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        
+        .test-info {
+            background: #09111A;
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .test-info h2 {
+            margin: 0 0 10px;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            background: #ccc;
+        }
+        
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .test-pass {
+            background: rgba(52, 211, 153, 0.2);
+            color: #34D399;
+        }
+        
+        .test-fail {
+            background: rgba(248, 113, 113, 0.2);
+            color: #F87171;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h2>CSS Architecture Fix Verification</h2>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-grid">
+        <!-- Light Theme Section -->
+        <section class="aisb-section aisb-hero aisb-section--light aisb-section--content-left">
+            <div class="aisb-hero__container">
+                <div class="aisb-hero__content">
+                    <span class="aisb-hero__eyebrow">Light Theme</span>
+                    <h1 class="aisb-hero__heading">Should Have White Background</h1>
+                    <div class="aisb-hero__body">
+                        <p>This section should have a white background with dark text.</p>
+                        <p><a href="#">Links should be blue</a></p>
+                    </div>
+                    <div class="aisb-hero__buttons">
+                        <button class="aisb-btn aisb-btn-primary">Primary Button</button>
+                        <button class="aisb-btn aisb-btn-secondary">Secondary</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Dark Theme Section -->
+        <section class="aisb-section aisb-hero aisb-section--dark aisb-section--content-left">
+            <div class="aisb-hero__container">
+                <div class="aisb-hero__content">
+                    <span class="aisb-hero__eyebrow">Dark Theme</span>
+                    <h1 class="aisb-hero__heading">Should Have Dark Background</h1>
+                    <div class="aisb-hero__body">
+                        <p>This section should have a dark background with light text.</p>
+                        <p><a href="#">Links should be light blue</a></p>
+                    </div>
+                    <div class="aisb-hero__buttons">
+                        <button class="aisb-btn aisb-btn-primary">Primary Button</button>
+                        <button class="aisb-btn aisb-btn-secondary">Secondary</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // Run tests after page loads
+        window.addEventListener('load', function() {
+            const results = [];
+            
+            // Test 1: Check if base CSS loaded
+            const root = document.documentElement;
+            const rootStyles = getComputedStyle(root);
+            const tokenLoaded = rootStyles.getPropertyValue('--aisb-color-primary').trim();
+            results.push({
+                name: 'Design tokens loaded',
+                passed: tokenLoaded === '#2563eb'
+            });
+            
+            // Test 2: Check light section background
+            const lightSection = document.querySelector('.aisb-section--light');
+            const lightStyles = getComputedStyle(lightSection);
+            const lightBg = lightStyles.backgroundColor;
+            const isWhite = lightBg === 'rgb(255, 255, 255)' || lightBg === 'rgba(255, 255, 255, 1)';
+            results.push({
+                name: 'Light section has white background',
+                passed: isWhite,
+                actual: lightBg
+            });
+            
+            // Test 3: Check dark section background
+            const darkSection = document.querySelector('.aisb-section--dark');
+            const darkStyles = getComputedStyle(darkSection);
+            const darkBg = darkStyles.backgroundColor;
+            const isDark = darkBg === 'rgb(26, 26, 26)' || darkBg === 'rgba(26, 26, 26, 1)';
+            results.push({
+                name: 'Dark section has dark background',
+                passed: isDark,
+                actual: darkBg
+            });
+            
+            // Test 4: Check context variables
+            const lightVars = getComputedStyle(lightSection);
+            const darkVars = getComputedStyle(darkSection);
+            
+            const lightSectionBg = lightVars.getPropertyValue('--section-bg').trim();
+            const darkSectionBg = darkVars.getPropertyValue('--section-bg').trim();
+            
+            results.push({
+                name: 'Context variables working',
+                passed: lightSectionBg && darkSectionBg && lightSectionBg !== darkSectionBg
+            });
+            
+            // Test 5: Check button adaptation
+            const lightBtn = document.querySelector('.aisb-section--light .aisb-btn-primary');
+            const darkBtn = document.querySelector('.aisb-section--dark .aisb-btn-primary');
+            
+            const lightBtnBg = getComputedStyle(lightBtn).backgroundColor;
+            const darkBtnBg = getComputedStyle(darkBtn).backgroundColor;
+            
+            results.push({
+                name: 'Buttons adapt to theme',
+                passed: lightBtnBg !== darkBtnBg
+            });
+            
+            // Display results
+            const resultsDiv = document.getElementById('test-results');
+            let allPassed = true;
+            
+            results.forEach(test => {
+                const div = document.createElement('div');
+                div.className = test.passed ? 'test-result test-pass' : 'test-result test-fail';
+                div.textContent = `${test.passed ? '✅' : '❌'} ${test.name}`;
+                if (test.actual && !test.passed) {
+                    div.textContent += ` (got: ${test.actual})`;
+                }
+                resultsDiv.appendChild(div);
+                
+                if (!test.passed) allPassed = false;
+            });
+            
+            // Overall status
+            const summary = document.createElement('div');
+            summary.style.marginTop = '10px';
+            summary.style.fontSize = '16px';
+            summary.style.fontWeight = 'bold';
+            
+            if (allPassed) {
+                summary.style.color = '#34D399';
+                summary.textContent = '🎉 All tests passed! Dark theme is working correctly.';
+            } else {
+                summary.style.color = '#F87171';
+                summary.textContent = '⚠️ Some tests failed. Check the results above.';
+            }
+            resultsDiv.appendChild(summary);
+            
+            // Log detailed info for debugging
+            console.log('Test Results:', results);
+            console.log('Light Section CSS Variables:', {
+                bg: lightVars.getPropertyValue('--section-bg'),
+                text: lightVars.getPropertyValue('--section-text'),
+                button: lightVars.getPropertyValue('--section-button-primary')
+            });
+            console.log('Dark Section CSS Variables:', {
+                bg: darkVars.getPropertyValue('--section-bg'),
+                text: darkVars.getPropertyValue('--section-text'),
+                button: darkVars.getPropertyValue('--section-button-primary')
+            });
+        });
+    </script>
+</body>
+</html>

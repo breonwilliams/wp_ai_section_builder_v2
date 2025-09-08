@@ -20,8 +20,23 @@
          * Initialize global settings
          */
         init: function() {
+            // Ensure initial panel visibility state
+            this.initializePanels();
             this.bindEvents();
             this.loadCurrentSettings();
+        },
+        
+        /**
+         * Initialize panel visibility
+         */
+        initializePanels: function() {
+            // Ensure sections panel is shown initially
+            $('.aisb-panel-content').hide();
+            $('#aisb-panel-sections').show().addClass('active');
+            
+            // Ensure sections tab is active
+            $('.aisb-panel-tab').removeClass('active');
+            $('#aisb-tab-sections').addClass('active');
         },
         
         /**
@@ -30,39 +45,35 @@
         bindEvents: function() {
             var self = this;
             
-            // Open panel
-            $('#aisb-global-settings-btn').on('click', function(e) {
+            // Main panel tab switching (Sections vs Settings)
+            $(document).on('click', '.aisb-panel-tab', function(e) {
                 e.preventDefault();
-                self.openPanel();
+                var panel = $(this).data('panel');
+                self.switchMainPanel(panel);
             });
             
-            // Close panel
-            $('#aisb-close-global-settings, #aisb-cancel-global-settings').on('click', function(e) {
-                e.preventDefault();
-                self.closePanel();
-            });
-            
-            // Close on overlay click
-            $('.aisb-global-settings-panel__overlay').on('click', function() {
-                self.closePanel();
-            });
-            
-            // Tab switching
-            $('.aisb-global-settings-tab').on('click', function(e) {
+            // Settings sub-tab switching (Colors, Typography, Layout)
+            $(document).on('click', '.aisb-settings-tab', function(e) {
                 e.preventDefault();
                 var tab = $(this).data('tab');
-                self.switchTab(tab);
+                self.switchSettingsTab(tab);
             });
             
-            // Color input sync
-            $('.aisb-color-input-wrapper input[type="color"]').on('input', function() {
+            // Global settings button in toolbar
+            $(document).on('click', '#aisb-global-settings-btn, #aisb-tab-settings', function(e) {
+                e.preventDefault();
+                self.openSettingsPanel();
+            });
+            
+            // Color input sync - use delegated events
+            $(document).on('input', '.aisb-color-input-wrapper input[type="color"]', function() {
                 var $textInput = $(this).siblings('.aisb-color-text');
                 $textInput.val($(this).val());
                 self.updatePreview();
                 self.markDirty();
             });
             
-            $('.aisb-color-input-wrapper .aisb-color-text').on('input', function() {
+            $(document).on('input', '.aisb-color-input-wrapper .aisb-color-text', function() {
                 var $colorInput = $(this).siblings('input[type="color"]');
                 var value = $(this).val();
                 
@@ -74,27 +85,27 @@
                 }
             });
             
-            // Number input changes
-            $('.aisb-global-settings-panel input[type="number"]').on('input', function() {
+            // Number input changes - use delegated events
+            $(document).on('input', '.aisb-settings-content input[type="number"]', function() {
                 self.validateNumberInput($(this));
                 self.updatePreview();
                 self.markDirty();
             });
             
-            // Text input changes
-            $('.aisb-global-settings-panel input[type="text"]:not(.aisb-color-text)').on('input', function() {
+            // Text input changes - use delegated events
+            $(document).on('input', '.aisb-settings-content input[type="text"]:not(.aisb-color-text)', function() {
                 self.updatePreview();
                 self.markDirty();
             });
             
             // Save settings
-            $('#aisb-save-global-settings').on('click', function(e) {
+            $(document).on('click', '#aisb-save-global-settings', function(e) {
                 e.preventDefault();
                 self.saveSettings();
             });
             
             // Reset settings
-            $('#aisb-reset-global-settings').on('click', function(e) {
+            $(document).on('click', '#aisb-reset-global-settings', function(e) {
                 e.preventDefault();
                 self.resetSettings();
             });
@@ -104,12 +115,7 @@
                 // Cmd/Ctrl + , to open settings
                 if ((e.metaKey || e.ctrlKey) && e.key === ',') {
                     e.preventDefault();
-                    self.openPanel();
-                }
-                
-                // Escape to close
-                if (e.key === 'Escape' && $('#aisb-global-settings-panel').hasClass('active')) {
-                    self.closePanel();
+                    self.openSettingsPanel();
                 }
             });
         },
@@ -117,47 +123,50 @@
         /**
          * Open settings panel
          */
-        openPanel: function() {
-            $('#aisb-global-settings-panel').show().addClass('active');
-            $('body').css('overflow', 'hidden');
+        openSettingsPanel: function() {
+            // Switch to settings tab
+            $('.aisb-panel-tab').removeClass('active');
+            $('#aisb-tab-settings').addClass('active');
+            
+            // Hide all panels and show settings panel
+            $('.aisb-panel-content').removeClass('active').hide();
+            $('#aisb-panel-settings').addClass('active').show();
+            
+            // Load settings if not already loaded
             this.loadCurrentSettings();
         },
         
         /**
-         * Close settings panel
+         * Switch main panel (Sections vs Settings)
          */
-        closePanel: function() {
-            var self = this;
+        switchMainPanel: function(panel) {
+            // Update tab buttons
+            $('.aisb-panel-tab').removeClass('active');
+            $('.aisb-panel-tab[data-panel="' + panel + '"]').addClass('active');
             
-            if (this.isDirty) {
-                if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
-                    return;
-                }
-            }
+            // Hide all panels first
+            $('.aisb-panel-content').removeClass('active').hide();
             
-            $('#aisb-global-settings-panel').removeClass('active');
-            setTimeout(function() {
-                $('#aisb-global-settings-panel').hide();
-            }, 300);
-            $('body').css('overflow', '');
+            // Show the selected panel
+            $('#aisb-panel-' + panel).addClass('active').show();
             
-            // Reset to original if not saved
-            if (this.isDirty) {
-                this.restoreOriginalSettings();
+            // Load settings when switching to settings panel
+            if (panel === 'settings') {
+                this.loadCurrentSettings();
             }
         },
         
         /**
-         * Switch tabs
+         * Switch settings sub-tabs
          */
-        switchTab: function(tab) {
+        switchSettingsTab: function(tab) {
             // Update tab buttons
-            $('.aisb-global-settings-tab').removeClass('active');
-            $('.aisb-global-settings-tab[data-tab="' + tab + '"]').addClass('active');
+            $('.aisb-settings-tab').removeClass('active');
+            $('.aisb-settings-tab[data-tab="' + tab + '"]').addClass('active');
             
             // Update tab content
-            $('.aisb-global-settings-tab-content').removeClass('active');
-            $('.aisb-global-settings-tab-content[data-tab-content="' + tab + '"]').addClass('active');
+            $('.aisb-settings-panel').removeClass('active');
+            $('.aisb-settings-panel[data-panel="' + tab + '"]').addClass('active');
         },
         
         /**

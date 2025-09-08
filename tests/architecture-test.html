@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Architecture Test - Theme Inheritance</title>
+    
+    <!-- Load the new architecture files -->
+    <link rel="stylesheet" href="../assets/css/core/00-tokens.css">
+    <link rel="stylesheet" href="../assets/css/core/01-base.css">
+    <link rel="stylesheet" href="../assets/css/core/02-utilities.css">
+    <link rel="stylesheet" href="../assets/css/sections/hero.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        
+        .test-header {
+            padding: 20px;
+            background: #09111A;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-btn {
+            padding: 8px 16px;
+            background: #667EEA;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        
+        .test-btn:hover {
+            background: #7B8FF5;
+        }
+        
+        .test-btn.active {
+            background: #34D399;
+        }
+        
+        .test-info {
+            margin-left: auto;
+            font-size: 14px;
+            color: #9CA3AF;
+        }
+        
+        .test-status {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .test-status.pass {
+            background: #34D399;
+        }
+        
+        .test-status.fail {
+            background: #F87171;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <div class="test-controls">
+            <h3 style="margin: 0;">CSS Architecture Test</h3>
+            <button class="test-btn" onclick="setTheme('light')">Light Theme</button>
+            <button class="test-btn" onclick="setTheme('dark')">Dark Theme</button>
+            <button class="test-btn" onclick="setTheme('none')">No Theme</button>
+            <button class="test-btn" onclick="runTests()">Run Tests</button>
+            <div class="test-info">
+                <span class="test-status" id="test-indicator"></span>
+                <span id="test-message">Click "Run Tests" to verify</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Test Section 1: Light Theme -->
+    <section class="aisb-section aisb-section--light" id="test-section-1">
+        <div class="aisb-hero">
+            <div class="aisb-hero__container">
+                <div class="aisb-hero__content">
+                    <span class="aisb-hero__eyebrow">Light Theme Test</span>
+                    <h1 class="aisb-hero__heading">This is Light Mode</h1>
+                    <div class="aisb-hero__body">
+                        <p>Body text should use muted color. <a href="#">Links should be primary blue</a> and <a href="#visited">visited links</a> should be muted.</p>
+                    </div>
+                    <div class="aisb-hero__buttons">
+                        <button class="aisb-btn aisb-btn-primary">Primary Button</button>
+                        <button class="aisb-btn aisb-btn-secondary">Secondary Button</button>
+                        <button class="aisb-btn aisb-btn-ghost">Ghost Button</button>
+                    </div>
+                    <div class="aisb-hero__outro">
+                        <p>Outro text with <a href="#">another link</a> for testing.</p>
+                    </div>
+                </div>
+                <div class="aisb-hero__media">
+                    <div class="aisb-media-placeholder">
+                        <span>Media Placeholder</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Test Section 2: Dark Theme -->
+    <section class="aisb-section aisb-section--dark" id="test-section-2">
+        <div class="aisb-hero">
+            <div class="aisb-hero__container">
+                <div class="aisb-hero__content">
+                    <span class="aisb-hero__eyebrow">Dark Theme Test</span>
+                    <h1 class="aisb-hero__heading">This is Dark Mode</h1>
+                    <div class="aisb-hero__body">
+                        <p>Body text should use dark muted color. <a href="#">Links should be light blue</a> and <a href="#visited">visited links</a> should be dark muted.</p>
+                    </div>
+                    <div class="aisb-hero__buttons">
+                        <button class="aisb-btn aisb-btn-primary">Primary Button</button>
+                        <button class="aisb-btn aisb-btn-secondary">Secondary Button</button>
+                        <button class="aisb-btn aisb-btn-ghost">Ghost Button</button>
+                    </div>
+                    <div class="aisb-hero__outro">
+                        <p>Outro text with <a href="#">another link</a> for testing.</p>
+                    </div>
+                </div>
+                <div class="aisb-hero__media">
+                    <div class="aisb-media-placeholder">
+                        <span>Media Placeholder</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Test Section 3: Dynamic Theme Switching -->
+    <section class="aisb-section aisb-section--light" id="test-section-dynamic">
+        <div class="aisb-hero">
+            <div class="aisb-hero__container">
+                <div class="aisb-hero__content">
+                    <span class="aisb-hero__eyebrow">Dynamic Theme</span>
+                    <h1 class="aisb-hero__heading">Theme Switching Test</h1>
+                    <div class="aisb-hero__body">
+                        <p>Use the buttons above to switch this section's theme. All colors should update automatically.</p>
+                    </div>
+                    <div class="aisb-hero__buttons">
+                        <button class="aisb-btn aisb-btn-primary">Primary Button</button>
+                        <button class="aisb-btn aisb-btn-secondary">Secondary Button</button>
+                        <button class="aisb-btn aisb-btn-ghost">Ghost Button</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script>
+        function setTheme(theme) {
+            const section = document.getElementById('test-section-dynamic');
+            section.className = 'aisb-section';
+            
+            if (theme === 'light') {
+                section.classList.add('aisb-section--light');
+            } else if (theme === 'dark') {
+                section.classList.add('aisb-section--dark');
+            }
+            
+            // Update active button
+            document.querySelectorAll('.test-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        function runTests() {
+            let allPassed = true;
+            const tests = [];
+            
+            // Test 1: Check if context variables are working
+            const lightSection = document.querySelector('.aisb-section--light');
+            const darkSection = document.querySelector('.aisb-section--dark');
+            
+            const lightStyles = getComputedStyle(lightSection);
+            const darkStyles = getComputedStyle(darkSection);
+            
+            // Test light mode background
+            const lightBg = lightStyles.getPropertyValue('--section-bg').trim();
+            if (!lightBg) {
+                tests.push({name: 'Light mode context variables', passed: false});
+                allPassed = false;
+            } else {
+                tests.push({name: 'Light mode context variables', passed: true});
+            }
+            
+            // Test dark mode background
+            const darkBg = darkStyles.getPropertyValue('--section-bg').trim();
+            if (!darkBg || darkBg === lightBg) {
+                tests.push({name: 'Dark mode context variables', passed: false});
+                allPassed = false;
+            } else {
+                tests.push({name: 'Dark mode context variables', passed: true});
+            }
+            
+            // Test button color inheritance
+            const lightBtn = document.querySelector('.aisb-section--light .aisb-btn-primary');
+            const darkBtn = document.querySelector('.aisb-section--dark .aisb-btn-primary');
+            
+            const lightBtnBg = getComputedStyle(lightBtn).backgroundColor;
+            const darkBtnBg = getComputedStyle(darkBtn).backgroundColor;
+            
+            if (lightBtnBg === darkBtnBg) {
+                tests.push({name: 'Button theme adaptation', passed: false});
+                allPassed = false;
+            } else {
+                tests.push({name: 'Button theme adaptation', passed: true});
+            }
+            
+            // Test link colors
+            const lightLink = document.querySelector('.aisb-section--light .aisb-hero__body a');
+            const darkLink = document.querySelector('.aisb-section--dark .aisb-hero__body a');
+            
+            const lightLinkColor = getComputedStyle(lightLink).color;
+            const darkLinkColor = getComputedStyle(darkLink).color;
+            
+            if (lightLinkColor === darkLinkColor) {
+                tests.push({name: 'Link color adaptation', passed: false});
+                allPassed = false;
+            } else {
+                tests.push({name: 'Link color adaptation', passed: true});
+            }
+            
+            // Update UI
+            const indicator = document.getElementById('test-indicator');
+            const message = document.getElementById('test-message');
+            
+            if (allPassed) {
+                indicator.classList.add('pass');
+                indicator.classList.remove('fail');
+                message.textContent = '✅ All tests passed! Architecture working correctly.';
+            } else {
+                indicator.classList.add('fail');
+                indicator.classList.remove('pass');
+                const failedTests = tests.filter(t => !t.passed).map(t => t.name).join(', ');
+                message.textContent = `❌ Failed: ${failedTests}`;
+            }
+            
+            // Log detailed results
+            console.log('Test Results:', tests);
+            console.log('Light Section Variables:', {
+                bg: lightStyles.getPropertyValue('--section-bg'),
+                text: lightStyles.getPropertyValue('--section-text'),
+                link: lightStyles.getPropertyValue('--section-link')
+            });
+            console.log('Dark Section Variables:', {
+                bg: darkStyles.getPropertyValue('--section-bg'),
+                text: darkStyles.getPropertyValue('--section-text'),
+                link: darkStyles.getPropertyValue('--section-link')
+            });
+        }
+    </script>
+</body>
+</html>

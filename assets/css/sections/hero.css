@@ -6,8 +6,9 @@
  * @version 2.0.0
  */
 
-/* Import core design tokens and utilities */
+/* Import core design tokens, base architecture, and utilities */
 @import url('../core/00-tokens.css');
+@import url('../core/01-base.css');
 @import url('../core/02-utilities.css');
 
 /* =========================================
@@ -16,8 +17,7 @@
 .aisb-hero {
     position: relative;
     padding: 48px 0; /* Mobile first */
-    background-color: var(--aisb-color-base, #ffffff);
-    color: var(--aisb-color-text, #1a1a1a);
+    /* Inherits background and color from .aisb-section base class */
     transition: background-color 200ms ease, color 200ms ease;
 }
 
@@ -49,7 +49,7 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     line-height: 1.2;
-    color: var(--aisb-color-primary, #2563eb);
+    color: var(--section-link, var(--aisb-color-primary));
     margin-bottom: 12px; /* Smaller on mobile */
     transition: color 200ms ease;
 }
@@ -59,7 +59,7 @@
     font-size: 36px; /* Mobile first */
     font-weight: 700;
     line-height: var(--aisb-gs-line-height-heading, 1.2);
-    color: var(--aisb-color-text, #1a1a1a);
+    color: var(--section-text, var(--aisb-color-text));
     margin: 0 0 16px 0; /* Smaller margin on mobile */
     transition: color 200ms ease;
 }
@@ -68,7 +68,7 @@
 .aisb-hero__body {
     font-size: var(--aisb-gs-size-base, 16px);
     line-height: var(--aisb-gs-line-height-body, 1.6);
-    color: var(--aisb-color-muted, #64748b);
+    color: var(--section-text-secondary, var(--aisb-color-muted));
     margin-bottom: var(--aisb-gs-element-spacing, 24px);
     max-width: 100%; /* Full width on mobile */
     transition: color 200ms ease;
@@ -89,7 +89,7 @@
     margin-top: var(--aisb-gs-element-spacing, 24px);
     font-size: 14px; /* Smaller on mobile */
     line-height: var(--aisb-gs-line-height-body, 1.6);
-    color: var(--aisb-color-muted, #64748b);
+    color: var(--section-text-secondary, var(--aisb-color-muted));
     transition: color 200ms ease;
 }
 
@@ -104,98 +104,37 @@
 }
 
 /* =========================================
-   Link Styles - Override Theme Defaults
+   Link Styles - Simplified with context variables
+   Automatically adapts to light/dark themes
    ========================================= */
-/* IMPORTANT: Light mode uses ONLY .aisb-section--light to avoid conflicts */
-/* IMPORTANT: Dark mode uses ONLY .aisb-section--dark to avoid conflicts */
 
-/* ===========================================
-   LIGHT MODE LINKS - Explicit light theme only
-   =========================================== */
-
-/* Light mode - Visited state first (lower priority) */
-.aisb-section--light .aisb-hero__body a:visited,
-.aisb-section--light .aisb-hero__outro a:visited {
-    color: var(--aisb-color-muted, #64748b) !important; /* Muted for visited */
-    text-decoration: underline !important;
-    text-decoration-thickness: 1px !important;
-    text-underline-offset: 2px !important;
-}
-
-/* Light mode - Default and unvisited links (higher priority - comes after visited) */
-.aisb-section--light .aisb-hero__body a,
-.aisb-section--light .aisb-hero__body a:link,
-.aisb-section--light .aisb-hero__outro a,
-.aisb-section--light .aisb-hero__outro a:link {
-    color: var(--aisb-color-primary, #2563eb) !important;
-    text-decoration: underline !important;
-    text-decoration-thickness: 1px !important;
-    text-underline-offset: 2px !important;
+/* Links in body and outro text */
+.aisb-hero__body a,
+.aisb-hero__outro a {
+    color: var(--section-link, var(--aisb-color-primary));
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
     transition: all 200ms ease;
-    font-weight: inherit !important;
-    border: none !important;
-    background: none !important;
+    font-weight: inherit;
 }
 
-/* Light mode - Hover state (highest priority for interaction) */
-.aisb-section--light .aisb-hero__body a:hover,
-.aisb-section--light .aisb-hero__outro a:hover {
-    color: var(--aisb-color-primary-hover, #1d4ed8) !important;
-    text-decoration-thickness: 2px !important;
-    background: none !important;
-    border: none !important;
+.aisb-hero__body a:visited,
+.aisb-hero__outro a:visited {
+    color: var(--section-link-visited, var(--aisb-color-muted));
 }
 
-/* Light mode - Focus state for accessibility */
-.aisb-section--light .aisb-hero__body a:focus,
-.aisb-section--light .aisb-hero__outro a:focus {
-    outline: 2px solid var(--aisb-color-primary, #2563eb) !important;
-    outline-offset: 2px !important;
-    border-radius: 2px;
+.aisb-hero__body a:hover,
+.aisb-hero__outro a:hover {
+    color: var(--section-link-hover, var(--aisb-color-primary-hover));
+    text-decoration-thickness: 2px;
 }
 
-/* ===========================================
-   DEFAULT (no theme class) - Defaults to light
-   =========================================== */
-
-/* Default - Visited state first */
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a:visited,
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a:visited {
-    color: var(--aisb-color-muted, #64748b) !important;
-    text-decoration: underline !important;
-    text-decoration-thickness: 1px !important;
-    text-underline-offset: 2px !important;
-}
-
-/* Default - All links */
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a,
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a:link,
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a,
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a:link {
-    color: var(--aisb-color-primary, #2563eb) !important;
-    text-decoration: underline !important;
-    text-decoration-thickness: 1px !important;
-    text-underline-offset: 2px !important;
-    transition: all 200ms ease;
-    font-weight: inherit !important;
-    border: none !important;
-    background: none !important;
-}
-
-/* Default - Hover state */
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a:hover,
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a:hover {
-    color: var(--aisb-color-primary-hover, #1d4ed8) !important;
-    text-decoration-thickness: 2px !important;
-    background: none !important;
-    border: none !important;
-}
-
-/* Default - Focus state */
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a:focus,
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a:focus {
-    outline: 2px solid var(--aisb-color-primary, #2563eb) !important;
-    outline-offset: 2px !important;
+/* Focus state for accessibility */
+.aisb-hero__body a:focus-visible,
+.aisb-hero__outro a:focus-visible {
+    outline: 2px solid var(--section-focus-ring, var(--aisb-color-primary));
+    outline-offset: 2px;
     border-radius: 2px;
 }
 
@@ -207,7 +146,7 @@
 }
 
 .aisb-hero__heading a:hover {
-    color: var(--aisb-color-primary, #2563eb);
+    color: var(--section-link, var(--aisb-color-primary));
 }
 
 /* Buttons Container - Mobile First */
@@ -249,20 +188,21 @@
     background: var(--aisb-color-dark-base, #1a1a1a);
 }
 
-/* Media Placeholders */
-/* Default styles (fallback for sections without explicit theme) */
+/* Media Placeholders - Uses contextual variables */
 .aisb-media-placeholder {
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: linear-gradient(135deg, var(--aisb-color-secondary, #f1f5f9) 0%, var(--aisb-color-border, #e2e8f0) 100%);
-    border: 2px dashed var(--aisb-color-border, #e2e8f0);
+    background: linear-gradient(135deg, 
+        var(--section-surface-secondary, var(--aisb-color-secondary)) 0%, 
+        var(--section-border, var(--aisb-color-border)) 100%);
+    border: 2px dashed var(--section-border, var(--aisb-color-border));
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 16px;
-    color: var(--aisb-color-muted, #64748b);
+    color: var(--section-text-secondary, var(--aisb-color-muted));
     font-size: 14px;
     transition: all 200ms ease;
     position: relative;
@@ -277,8 +217,8 @@
         45deg,
         transparent,
         transparent 10px,
-        rgba(0, 0, 0, 0.02) 10px,
-        rgba(0, 0, 0, 0.02) 20px
+        var(--section-overlay, rgba(0, 0, 0, 0.02)) 10px,
+        var(--section-overlay, rgba(0, 0, 0, 0.02)) 20px
     );
     pointer-events: none;
 }
@@ -291,157 +231,13 @@
     opacity: 0.8;
 }
 
-/* Light mode placeholder - explicit light theme */
-.aisb-section--light .aisb-media-placeholder {
-    background: linear-gradient(135deg, var(--aisb-color-secondary, #f1f5f9) 0%, var(--aisb-color-border, #e2e8f0) 100%);
-    border: 2px dashed var(--aisb-color-border, #e2e8f0);
-    color: var(--aisb-color-muted, #64748b);
-}
-
-.aisb-section--light .aisb-media-placeholder::before {
-    background: repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 10px,
-        rgba(0, 0, 0, 0.02) 10px,
-        rgba(0, 0, 0, 0.02) 20px
-    );
-}
-
-/* Dark mode placeholder - explicit dark theme */
-.aisb-section--dark .aisb-media-placeholder {
-    background: linear-gradient(135deg, var(--aisb-color-dark-secondary, #374151) 0%, rgba(26, 26, 26, 0.5) 100%);
-    border: 2px dashed var(--aisb-color-dark-border, #4b5563);
-    color: var(--aisb-color-dark-muted, #9ca3af);
-}
-
-.aisb-section--dark .aisb-media-placeholder::before {
-    background: repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 10px,
-        rgba(255, 255, 255, 0.02) 10px,
-        rgba(255, 255, 255, 0.02) 20px
-    );
-}
-
-/* Default (no theme class) - same as light mode */
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-media-placeholder {
-    background: linear-gradient(135deg, var(--aisb-color-secondary, #f1f5f9) 0%, var(--aisb-color-border, #e2e8f0) 100%);
-    border: 2px dashed var(--aisb-color-border, #e2e8f0);
-    color: var(--aisb-color-muted, #64748b);
-}
-
-.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-media-placeholder::before {
-    background: repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 10px,
-        rgba(0, 0, 0, 0.02) 10px,
-        rgba(0, 0, 0, 0.02) 20px
-    );
-}
-
 /* =========================================
-   Theme Variant: Light (Default)
+   Theme Variants - Now handled by base architecture
+   Components automatically adapt via context variables
+   No need for duplicate theme-specific rules!
    ========================================= */
-.aisb-section--light {
-    background-color: var(--aisb-color-base, #ffffff);
-    color: var(--aisb-color-text, #1a1a1a);
-}
 
-/* Apply background directly to hero element for proper cascade */
-.aisb-section--light .aisb-hero {
-    background-color: var(--aisb-color-base, #ffffff);
-    color: var(--aisb-color-text, #1a1a1a);
-}
-
-.aisb-section--light .aisb-hero__eyebrow {
-    color: var(--aisb-color-primary, #2563eb);
-}
-
-.aisb-section--light .aisb-hero__heading {
-    color: var(--aisb-color-text, #1a1a1a);
-}
-
-.aisb-section--light .aisb-hero__body,
-.aisb-section--light .aisb-hero__outro {
-    color: var(--aisb-color-muted, #64748b);
-}
-
-/* =========================================
-   Theme Variant: Dark
-   ========================================= */
-.aisb-section--dark {
-    background-color: var(--aisb-color-dark-base, #1a1a1a);
-    color: var(--aisb-color-dark-text, #fafafa);
-}
-
-/* Apply background directly to hero element for proper cascade */
-.aisb-section--dark .aisb-hero {
-    background-color: var(--aisb-color-dark-base, #1a1a1a);
-    color: var(--aisb-color-dark-text, #fafafa);
-}
-
-.aisb-section--dark .aisb-hero__eyebrow {
-    color: var(--aisb-color-dark-primary, #60a5fa); /* Primary Alt for better contrast - dark mode specific */
-}
-
-.aisb-section--dark .aisb-hero__heading {
-    color: var(--aisb-color-dark-text, #fafafa);
-}
-
-.aisb-section--dark .aisb-hero__body,
-.aisb-section--dark .aisb-hero__outro {
-    color: var(--aisb-color-muted, #64748b);
-}
-
-/* Dark mode link styles - Proper cascade order */
-
-/* Visited state first (lower priority) */
-.aisb-section--dark .aisb-hero__body a:visited,
-.aisb-section--dark .aisb-hero__outro a:visited {
-    color: var(--aisb-color-dark-muted, #9ca3af) !important; /* Muted for visited */
-    text-decoration: underline !important;
-    text-decoration-thickness: 1px !important;
-    text-underline-offset: 2px !important;
-}
-
-/* Default and unvisited links (higher priority - comes after visited) */
-.aisb-section--dark .aisb-hero__body a,
-.aisb-section--dark .aisb-hero__body a:link,
-.aisb-section--dark .aisb-hero__outro a,
-.aisb-section--dark .aisb-hero__outro a:link {
-    color: var(--aisb-color-dark-primary, #60a5fa) !important; /* Light blue - always light blue */
-    text-decoration: underline !important;
-    text-decoration-thickness: 1px !important;
-    text-underline-offset: 2px !important;
-    transition: all 200ms ease;
-    font-weight: inherit !important;
-    border: none !important;
-    background: none !important;
-}
-
-/* Hover state (highest priority for interaction) */
-.aisb-section--dark .aisb-hero__body a:hover,
-.aisb-section--dark .aisb-hero__outro a:hover {
-    color: var(--aisb-color-dark-primary-hover, #3b82f6) !important; /* Darker blue on hover */
-    text-decoration-thickness: 2px !important;
-    background: none !important;
-    border: none !important;
-}
-
-/* Focus state for accessibility */
-.aisb-section--dark .aisb-hero__body a:focus,
-.aisb-section--dark .aisb-hero__outro a:focus {
-    outline: 2px solid var(--aisb-color-dark-primary, #60a5fa) !important;
-    outline-offset: 2px !important;
-    border-radius: 2px;
-}
-
-.aisb-section--dark .aisb-hero__heading a:hover {
-    color: var(--aisb-color-dark-primary, #60a5fa) !important;
-}
+/* Dark mode automatically handled by context variables in base architecture */
 
 /* =========================================
    Layout Variants - Mobile First (all stack)

@@ -40,6 +40,201 @@ body.aisb-editor-active .aisb-editor-wrapper {
 }
 
 /* =========================================
+   Panel Tab Navigation
+   ========================================= */
+.aisb-panel-tabs {
+    display: flex;
+    background: var(--aisb-editor-bg-base);
+    border-bottom: 1px solid var(--aisb-editor-border);
+    padding: 0;
+}
+
+.aisb-panel-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 8px;
+    background: transparent;
+    color: var(--aisb-editor-text-secondary);
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 200ms ease;
+}
+
+.aisb-panel-tab:hover {
+    background: var(--aisb-editor-bg-hover);
+    color: var(--aisb-editor-text-primary);
+}
+
+.aisb-panel-tab.active {
+    color: var(--aisb-editor-accent);
+    border-bottom-color: var(--aisb-editor-accent);
+    background: var(--aisb-editor-bg-surface);
+}
+
+.aisb-panel-tab .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.aisb-panel-content {
+    display: none;
+    height: calc(100% - 48px); /* Subtract tab height */
+    overflow-y: auto;
+}
+
+.aisb-panel-content.active {
+    display: block !important; /* Important to override any inline styles during transition */
+}
+
+/* =========================================
+   Settings Panel Styles
+   ========================================= */
+.aisb-settings-content {
+    padding: 0;
+}
+
+.aisb-settings-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 12px;
+    background: var(--aisb-editor-bg-base);
+    border-bottom: 1px solid var(--aisb-editor-border-subtle);
+}
+
+.aisb-settings-tab {
+    flex: 1;
+    padding: 8px 12px;
+    background: var(--aisb-editor-bg-surface);
+    color: var(--aisb-editor-text-secondary);
+    border: 1px solid var(--aisb-editor-border-subtle);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.aisb-settings-tab:hover {
+    background: var(--aisb-editor-bg-hover);
+    color: var(--aisb-editor-text-primary);
+}
+
+.aisb-settings-tab.active {
+    background: var(--aisb-editor-accent-bg);
+    color: var(--aisb-editor-accent);
+    border-color: var(--aisb-editor-accent);
+}
+
+.aisb-settings-panels {
+    padding: 16px;
+}
+
+.aisb-settings-panel {
+    display: none;
+}
+
+.aisb-settings-panel.active {
+    display: block;
+}
+
+/* Settings Groups */
+.aisb-settings-group {
+    margin-bottom: 24px;
+}
+
+.aisb-settings-group__title {
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--aisb-editor-border-subtle);
+    color: var(--aisb-editor-text-primary);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Settings Fields */
+.aisb-settings-field {
+    margin-bottom: 16px;
+}
+
+.aisb-settings-field label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--aisb-editor-text-secondary);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.aisb-settings-field input[type="text"],
+.aisb-settings-field input[type="number"] {
+    width: 100%;
+    padding: 6px 10px;
+    background: var(--aisb-editor-bg-base);
+    color: var(--aisb-editor-text-primary);
+    border: 1px solid var(--aisb-editor-border);
+    border-radius: 4px;
+    font-size: 12px;
+    transition: all 150ms ease;
+}
+
+.aisb-settings-field input[type="text"]:focus,
+.aisb-settings-field input[type="number"]:focus {
+    outline: none;
+    border-color: var(--aisb-editor-accent);
+    background: var(--aisb-editor-bg-surface);
+}
+
+/* Color Input Wrapper */
+.aisb-color-input-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.aisb-color-input-wrapper input[type="color"] {
+    width: 40px;
+    height: 32px;
+    padding: 2px;
+    background: var(--aisb-editor-bg-base);
+    border: 1px solid var(--aisb-editor-border);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.aisb-color-input-wrapper .aisb-color-text {
+    flex: 1;
+    padding: 6px 10px;
+    background: var(--aisb-editor-bg-base);
+    color: var(--aisb-editor-text-primary);
+    border: 1px solid var(--aisb-editor-border);
+    border-radius: 4px;
+    font-family: var(--aisb-font-mono);
+    font-size: 11px;
+}
+
+/* Settings Actions */
+.aisb-settings-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    padding: 16px;
+    border-top: 1px solid var(--aisb-editor-border-subtle);
+    background: var(--aisb-editor-bg-base);
+}
+
+.aisb-settings-actions .aisb-editor-btn {
+    flex: 1;
+}
+
+/* =========================================
    Editor Toolbar
    ========================================= */
 .aisb-editor-toolbar {

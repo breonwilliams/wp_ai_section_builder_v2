@@ -39,13 +39,13 @@ button.aisb-btn {
     color: inherit;
 }
 
-/* Primary Button - Light Mode */
+/* Primary Button - Uses context variables, adapts to theme automatically */
 .aisb-btn-primary,
 button.aisb-btn-primary,
 a.aisb-btn-primary {
-    background-color: #2563eb;
-    color: #ffffff;
-    border-color: #2563eb;
+    background-color: var(--section-button-primary, var(--aisb-color-primary));
+    color: var(--section-button-primary-text, #ffffff);
+    border-color: var(--section-button-primary, var(--aisb-color-primary));
 }
 
 .aisb-btn-primary:hover,
@@ -54,38 +54,18 @@ button.aisb-btn-primary:hover,
 button.aisb-btn-primary:focus,
 a.aisb-btn-primary:hover,
 a.aisb-btn-primary:focus {
-    background-color: #1d4ed8;
-    border-color: #1d4ed8;
-    color: #ffffff;
+    background-color: var(--section-button-primary-hover, var(--aisb-color-primary-hover));
+    border-color: var(--section-button-primary-hover, var(--aisb-color-primary-hover));
+    color: var(--section-button-primary-text, #ffffff);
 }
 
-/* Primary Button - Dark Mode */
-.aisb-section--dark .aisb-btn-primary,
-.aisb-section--dark button.aisb-btn-primary,
-.aisb-section--dark a.aisb-btn-primary {
-    background-color: #60a5fa;
-    border-color: #60a5fa;
-    color: #1a1a1a;
-}
-
-.aisb-section--dark .aisb-btn-primary:hover,
-.aisb-section--dark .aisb-btn-primary:focus,
-.aisb-section--dark button.aisb-btn-primary:hover,
-.aisb-section--dark button.aisb-btn-primary:focus,
-.aisb-section--dark a.aisb-btn-primary:hover,
-.aisb-section--dark a.aisb-btn-primary:focus {
-    background-color: #3b82f6;
-    border-color: #3b82f6;
-    color: #1a1a1a;
-}
-
-/* Secondary Button - Light Mode */
+/* Secondary Button - Uses context variables, adapts to theme automatically */
 .aisb-btn-secondary,
 button.aisb-btn-secondary,
 a.aisb-btn-secondary {
     background-color: transparent;
-    color: #2563eb;
-    border-color: #2563eb;
+    color: var(--section-button-secondary-text, var(--aisb-color-primary));
+    border-color: var(--section-button-secondary-border, var(--aisb-color-primary));
 }
 
 .aisb-btn-secondary:hover,
@@ -94,37 +74,17 @@ button.aisb-btn-secondary:hover,
 button.aisb-btn-secondary:focus,
 a.aisb-btn-secondary:hover,
 a.aisb-btn-secondary:focus {
-    background-color: #2563eb;
-    color: #ffffff;
-    border-color: #2563eb;
+    background-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary));
+    color: var(--section-button-secondary-hover-text, #ffffff);
+    border-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary));
 }
 
-/* Secondary Button - Dark Mode */
-.aisb-section--dark .aisb-btn-secondary,
-.aisb-section--dark button.aisb-btn-secondary,
-.aisb-section--dark a.aisb-btn-secondary {
-    background-color: transparent;
-    color: #60a5fa;
-    border-color: #60a5fa;
-}
-
-.aisb-section--dark .aisb-btn-secondary:hover,
-.aisb-section--dark .aisb-btn-secondary:focus,
-.aisb-section--dark button.aisb-btn-secondary:hover,
-.aisb-section--dark button.aisb-btn-secondary:focus,
-.aisb-section--dark a.aisb-btn-secondary:hover,
-.aisb-section--dark a.aisb-btn-secondary:focus {
-    background-color: #60a5fa;
-    color: #1a1a1a;
-    border-color: #60a5fa;
-}
-
-/* Ghost Button */
+/* Ghost Button - Uses context variables, adapts to theme automatically */
 .aisb-btn-ghost,
 button.aisb-btn-ghost,
 a.aisb-btn-ghost {
     background-color: transparent;
-    color: #64748b;
+    color: var(--section-button-ghost-text, var(--aisb-color-muted));
     border-color: transparent;
 }
 
@@ -134,24 +94,8 @@ button.aisb-btn-ghost:hover,
 button.aisb-btn-ghost:focus,
 a.aisb-btn-ghost:hover,
 a.aisb-btn-ghost:focus {
-    background-color: #f1f5f9;
-    color: #1a1a1a;
-}
-
-.aisb-section--dark .aisb-btn-ghost,
-.aisb-section--dark button.aisb-btn-ghost,
-.aisb-section--dark a.aisb-btn-ghost {
-    color: #9ca3af;
-}
-
-.aisb-section--dark .aisb-btn-ghost:hover,
-.aisb-section--dark .aisb-btn-ghost:focus,
-.aisb-section--dark button.aisb-btn-ghost:hover,
-.aisb-section--dark button.aisb-btn-ghost:focus,
-.aisb-section--dark a.aisb-btn-ghost:hover,
-.aisb-section--dark a.aisb-btn-ghost:focus {
-    background-color: #374151;
-    color: #fafafa;
+    background-color: var(--section-button-ghost-hover-bg, var(--aisb-color-secondary));
+    color: var(--section-button-ghost-hover-text, var(--aisb-color-text));
 }
 
 /* Button Sizes */
@@ -174,14 +118,10 @@ a.aisb-btn-ghost:focus {
     cursor: not-allowed;
 }
 
-/* Focus Accessibility */
+/* Focus Accessibility - Uses context variables */
 .aisb-btn:focus-visible {
-    outline: 3px solid #2563eb;
+    outline: 3px solid var(--section-focus-ring, var(--aisb-color-primary));
     outline-offset: 2px;
-}
-
-.aisb-section--dark .aisb-btn:focus-visible {
-    outline-color: #60a5fa;
 }
 
 /* =========================================

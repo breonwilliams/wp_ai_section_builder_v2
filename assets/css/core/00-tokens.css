@@ -34,6 +34,45 @@
     --aisb-color-dark-border: #4b5563; /* Borders */
     
     /* =========================================
+       Semantic Design Tokens
+       Maps raw colors to their usage context
+       Components should use these, not raw colors
+       ========================================= */
+    
+    /* Interactive Elements - Default to light mode */
+    --aisb-interactive-primary: var(--aisb-color-primary);
+    --aisb-interactive-primary-hover: var(--aisb-color-primary-hover);
+    --aisb-interactive-primary-text: #ffffff;
+    --aisb-interactive-secondary: var(--aisb-color-primary);
+    --aisb-interactive-secondary-hover: var(--aisb-color-primary);
+    --aisb-interactive-secondary-text: var(--aisb-color-primary);
+    
+    /* Content Hierarchy - Default to light mode */
+    --aisb-content-primary: var(--aisb-color-text);
+    --aisb-content-secondary: var(--aisb-color-muted);
+    --aisb-content-inverse: var(--aisb-color-base);
+    --aisb-content-link: var(--aisb-color-primary);
+    --aisb-content-link-hover: var(--aisb-color-primary-hover);
+    --aisb-content-link-visited: var(--aisb-color-muted);
+    
+    /* Surface & Backgrounds - Default to light mode */
+    --aisb-surface-primary: var(--aisb-color-base);
+    --aisb-surface-secondary: var(--aisb-color-secondary);
+    --aisb-surface-elevated: var(--aisb-color-base);
+    --aisb-surface-overlay: rgba(0, 0, 0, 0.05);
+    
+    /* Borders & Dividers - Default to light mode */
+    --aisb-border-primary: var(--aisb-color-border);
+    --aisb-border-secondary: var(--aisb-color-border);
+    --aisb-border-interactive: var(--aisb-color-primary);
+    
+    /* Feedback States */
+    --aisb-feedback-success: var(--aisb-color-success);
+    --aisb-feedback-error: var(--aisb-color-error);
+    --aisb-feedback-warning: #f59e0b;
+    --aisb-feedback-info: var(--aisb-color-primary);
+    
+    /* =========================================
        Spacing System (8px grid)
        ========================================= */
     --aisb-space-xs: 8px;

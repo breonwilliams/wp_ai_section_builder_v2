@@ -998,6 +998,7 @@
                 if (editorState.currentSection !== null) {
                     var content = editorState.sections[editorState.currentSection].content;
                     content.featured_image = attachment.url;
+                    content.media_type = 'image'; // Ensure media type is set
                     
                     debugLog('Image URL Set in State', {
                         sectionIndex: editorState.currentSection,
@@ -1007,7 +1008,19 @@
                     // Re-render the media field
                     $('.aisb-media-selector').replaceWith(generateMediaField(content));
                     updatePreview();
+                    
+                    // Force re-render of sections to ensure immediate update
+                    renderSections();
                 }
+            });
+            
+            // Fix aria-hidden focus warning when modal opens
+            mediaFrame.on('open', function() {
+                // Remove aria-hidden from modal elements to prevent focus warning
+                setTimeout(function() {
+                    $('.media-modal').removeAttr('aria-hidden');
+                    $('.media-modal-backdrop').removeAttr('aria-hidden');
+                }, 100);
             });
             
             // Finally, open the modal
@@ -1202,6 +1215,13 @@
      * Show edit mode in left panel
      */
     function showEditMode(formHtml) {
+        // Ensure sections panel is active
+        $('.aisb-panel-tab').removeClass('active');
+        $('#aisb-tab-sections').addClass('active');
+        $('.aisb-panel-content').removeClass('active');
+        $('#aisb-panel-sections').addClass('active');
+        
+        // Show edit mode
         $('#aisb-library-mode').hide();
         $('#aisb-edit-content').html(formHtml);
         $('#aisb-edit-mode').show();
@@ -1216,6 +1236,12 @@
             wp.editor.remove('hero-content');
             wp.editor.remove('hero-outro-content');
         }
+        
+        // Ensure sections panel is active
+        $('.aisb-panel-tab').removeClass('active');
+        $('#aisb-tab-sections').addClass('active');
+        $('.aisb-panel-content').removeClass('active');
+        $('#aisb-panel-sections').addClass('active');
         
         $('#aisb-edit-mode').hide();
         $('#aisb-edit-content').empty();

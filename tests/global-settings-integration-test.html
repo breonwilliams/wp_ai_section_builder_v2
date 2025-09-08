@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Settings Integration Test</title>
+    
+    <!-- WordPress Admin Styles -->
+    <link rel="stylesheet" href="/wp-includes/css/dashicons.min.css">
+    
+    <!-- Load our styles -->
+    <link rel="stylesheet" href="../assets/css/core/00-tokens.css">
+    <link rel="stylesheet" href="../assets/css/editor/editor-styles.css">
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #09111A;
+            color: #E8EAED;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2A3747;
+        }
+        
+        .test-header h1 {
+            margin: 0 0 10px;
+            color: #E8EAED;
+        }
+        
+        .test-status {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .test-success {
+            background: rgba(52, 211, 153, 0.1);
+            color: #34D399;
+            border: 1px solid #34D399;
+        }
+        
+        .test-error {
+            background: rgba(248, 113, 113, 0.1);
+            color: #F87171;
+            border: 1px solid #F87171;
+        }
+        
+        .test-panel {
+            width: 280px;
+            background: var(--aisb-editor-bg-surface);
+            border: 1px solid var(--aisb-editor-border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .test-results {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--aisb-editor-bg-panel);
+            border-radius: 4px;
+        }
+        
+        .test-results h3 {
+            margin-top: 0;
+            color: var(--aisb-editor-text-primary);
+        }
+        
+        .test-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: var(--aisb-editor-bg-surface);
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .test-item.pass {
+            border-left: 3px solid #34D399;
+        }
+        
+        .test-item.fail {
+            border-left: 3px solid #F87171;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🧪 Global Settings Integration Test</h1>
+            <p>Testing the integrated global settings panel in the left sidebar</p>
+        </div>
+        
+        <!-- Test Panel Structure -->
+        <div class="test-panel">
+            <!-- Tab Navigation -->
+            <div class="aisb-panel-tabs">
+                <button class="aisb-panel-tab active" data-panel="sections" id="aisb-tab-sections">
+                    <span class="dashicons dashicons-layout"></span>
+                    <span class="aisb-tab-label">Sections</span>
+                </button>
+                <button class="aisb-panel-tab" data-panel="settings" id="aisb-tab-settings">
+                    <span class="dashicons dashicons-admin-generic"></span>
+                    <span class="aisb-tab-label">Settings</span>
+                </button>
+            </div>
+            
+            <!-- Sections Panel -->
+            <div id="aisb-panel-sections" class="aisb-panel-content active">
+                <div class="aisb-editor-panel__header">
+                    <h2>Add Section</h2>
+                </div>
+                <div class="aisb-editor-panel__content">
+                    <p style="padding: 20px; text-align: center; color: var(--aisb-editor-text-secondary);">
+                        Section library would appear here
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Settings Panel -->
+            <div id="aisb-panel-settings" class="aisb-panel-content" style="display: none;">
+                <div class="aisb-editor-panel__header">
+                    <h2>Global Settings</h2>
+                </div>
+                <div class="aisb-editor-panel__content aisb-settings-content">
+                    <!-- Settings Sub-tabs -->
+                    <div class="aisb-settings-tabs">
+                        <button class="aisb-settings-tab active" data-tab="colors">Colors</button>
+                        <button class="aisb-settings-tab" data-tab="typography">Typography</button>
+                        <button class="aisb-settings-tab" data-tab="layout">Layout</button>
+                    </div>
+                    
+                    <!-- Settings Panels -->
+                    <div class="aisb-settings-panels">
+                        <!-- Colors Panel -->
+                        <div class="aisb-settings-panel active" data-panel="colors">
+                            <div class="aisb-settings-group">
+                                <h4 class="aisb-settings-group__title">Light Mode</h4>
+                                <div class="aisb-settings-field">
+                                    <label>Background</label>
+                                    <div class="aisb-color-input-wrapper">
+                                        <input type="color" value="#ffffff">
+                                        <input type="text" class="aisb-color-text" value="#ffffff">
+                                    </div>
+                                </div>
+                                <div class="aisb-settings-field">
+                                    <label>Primary</label>
+                                    <div class="aisb-color-input-wrapper">
+                                        <input type="color" value="#2563eb">
+                                        <input type="text" class="aisb-color-text" value="#2563eb">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Typography Panel -->
+                        <div class="aisb-settings-panel" data-panel="typography" style="display: none;">
+                            <div class="aisb-settings-group">
+                                <h4 class="aisb-settings-group__title">Font Settings</h4>
+                                <div class="aisb-settings-field">
+                                    <label>Base Size</label>
+                                    <input type="number" value="16" min="12" max="20">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Layout Panel -->
+                        <div class="aisb-settings-panel" data-panel="layout" style="display: none;">
+                            <div class="aisb-settings-group">
+                                <h4 class="aisb-settings-group__title">Container</h4>
+                                <div class="aisb-settings-field">
+                                    <label>Max Width</label>
+                                    <input type="number" value="1200" min="960" max="1920">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="aisb-settings-actions">
+                        <button class="aisb-editor-btn aisb-editor-btn-ghost" id="aisb-reset-global-settings">
+                            <span class="dashicons dashicons-image-rotate"></span>
+                            Reset
+                        </button>
+                        <button class="aisb-editor-btn aisb-editor-btn-primary" id="aisb-save-global-settings">
+                            <span class="dashicons dashicons-saved"></span>
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Results -->
+        <div class="test-results">
+            <h3>Test Results</h3>
+            <div id="test-output"></div>
+        </div>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            var testResults = [];
+            
+            // Test 1: Panel tab switching
+            function testPanelTabs() {
+                var result = { name: 'Panel Tab Switching', passed: true };
+                
+                // Test switching to settings
+                $('#aisb-tab-settings').click();
+                
+                if (!$('#aisb-tab-settings').hasClass('active')) {
+                    result.passed = false;
+                    result.error = 'Settings tab not marked active';
+                }
+                
+                if ($('#aisb-panel-settings').css('display') === 'none') {
+                    result.passed = false;
+                    result.error = 'Settings panel not shown';
+                }
+                
+                // Switch back to sections
+                $('#aisb-tab-sections').click();
+                
+                if (!$('#aisb-tab-sections').hasClass('active')) {
+                    result.passed = false;
+                    result.error = 'Sections tab not marked active';
+                }
+                
+                testResults.push(result);
+            }
+            
+            // Test 2: Settings sub-tab switching
+            function testSettingsTabs() {
+                var result = { name: 'Settings Sub-tab Switching', passed: true };
+                
+                // Switch to settings panel first
+                $('#aisb-tab-settings').click();
+                
+                // Test typography tab
+                $('.aisb-settings-tab[data-tab="typography"]').click();
+                
+                if (!$('.aisb-settings-tab[data-tab="typography"]').hasClass('active')) {
+                    result.passed = false;
+                    result.error = 'Typography tab not active';
+                }
+                
+                if ($('.aisb-settings-panel[data-panel="typography"]').css('display') === 'none') {
+                    result.passed = false;
+                    result.error = 'Typography panel not shown';
+                }
+                
+                testResults.push(result);
+            }
+            
+            // Test 3: Color input sync
+            function testColorInputs() {
+                var result = { name: 'Color Input Synchronization', passed: true };
+                
+                var $colorInput = $('.aisb-color-input-wrapper input[type="color"]').first();
+                var $textInput = $colorInput.siblings('.aisb-color-text');
+                
+                // Test color picker change
+                $colorInput.val('#ff0000').trigger('input');
+                
+                if ($textInput.val() !== '#ff0000') {
+                    result.passed = false;
+                    result.error = 'Text input not synced with color picker';
+                }
+                
+                // Test text input change
+                $textInput.val('#00ff00').trigger('input');
+                
+                if ($colorInput.val() !== '#00ff00') {
+                    result.passed = false;
+                    result.error = 'Color picker not synced with text input';
+                }
+                
+                testResults.push(result);
+            }
+            
+            // Test 4: CSS Variables
+            function testCSSVariables() {
+                var result = { name: 'CSS Variables Loaded', passed: true };
+                
+                var rootStyles = getComputedStyle(document.documentElement);
+                var editorBg = rootStyles.getPropertyValue('--aisb-editor-bg-surface').trim();
+                
+                if (!editorBg) {
+                    result.passed = false;
+                    result.error = 'Editor CSS variables not loaded';
+                }
+                
+                testResults.push(result);
+            }
+            
+            // Run all tests
+            testPanelTabs();
+            testSettingsTabs();
+            testColorInputs();
+            testCSSVariables();
+            
+            // Display results
+            var output = $('#test-output');
+            var allPassed = true;
+            
+            testResults.forEach(function(test) {
+                var status = test.passed ? 'pass' : 'fail';
+                var icon = test.passed ? '✅' : '❌';
+                var message = test.error ? ' - ' + test.error : '';
+                
+                output.append(
+                    '<div class="test-item ' + status + '">' +
+                    icon + ' ' + test.name + message +
+                    '</div>'
+                );
+                
+                if (!test.passed) allPassed = false;
+            });
+            
+            // Overall status
+            var statusDiv = $('<div class="test-status"></div>');
+            if (allPassed) {
+                statusDiv.addClass('test-success').text('✅ All tests passed! Global settings integration is working correctly.');
+            } else {
+                statusDiv.addClass('test-error').text('❌ Some tests failed. Check the results above.');
+            }
+            output.before(statusDiv);
+            
+            // Bind actual panel switching for manual testing
+            $('.aisb-panel-tab').on('click', function() {
+                var panel = $(this).data('panel');
+                
+                $('.aisb-panel-tab').removeClass('active');
+                $(this).addClass('active');
+                
+                $('.aisb-panel-content').hide().removeClass('active');
+                $('#aisb-panel-' + panel).show().addClass('active');
+            });
+            
+            $('.aisb-settings-tab').on('click', function() {
+                var tab = $(this).data('tab');
+                
+                $('.aisb-settings-tab').removeClass('active');
+                $(this).addClass('active');
+                
+                $('.aisb-settings-panel').hide().removeClass('active');
+                $('.aisb-settings-panel[data-panel="' + tab + '"]').show().addClass('active');
+            });
+            
+            // Color input sync
+            $('.aisb-color-input-wrapper input[type="color"]').on('input', function() {
+                $(this).siblings('.aisb-color-text').val($(this).val());
+            });
+            
+            $('.aisb-color-text').on('input', function() {
+                var value = $(this).val();
+                if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+                    $(this).siblings('input[type="color"]').val(value);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

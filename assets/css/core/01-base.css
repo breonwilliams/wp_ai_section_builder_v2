@@ -1,0 +1,259 @@
+/**
+ * AI Section Builder - Base Section Architecture
+ * Establishes inheritance pattern for all sections
+ * Provides context-aware variables that components use
+ * 
+ * @package AISB
+ * @version 2.0.0
+ */
+
+/* =========================================
+   Base Section Class
+   All sections inherit from this foundation
+   ========================================= */
+.aisb-section {
+    /* Context Variables - These change based on theme modifier */
+    /* Components use these instead of raw color values */
+    --section-bg: var(--aisb-surface-primary);
+    --section-text: var(--aisb-content-primary);
+    --section-text-secondary: var(--aisb-content-secondary);
+    --section-text-inverse: var(--aisb-content-inverse);
+    
+    /* Interactive Elements */
+    --section-link: var(--aisb-content-link);
+    --section-link-hover: var(--aisb-content-link-hover);
+    --section-link-visited: var(--aisb-content-link-visited);
+    --section-button-primary: var(--aisb-interactive-primary);
+    --section-button-primary-hover: var(--aisb-interactive-primary-hover);
+    --section-button-primary-text: var(--aisb-interactive-primary-text);
+    --section-button-secondary-border: var(--aisb-interactive-secondary);
+    --section-button-secondary-text: var(--aisb-interactive-secondary-text);
+    
+    /* Surfaces & Backgrounds */
+    --section-surface-secondary: var(--aisb-surface-secondary);
+    --section-surface-elevated: var(--aisb-surface-elevated);
+    --section-overlay: var(--aisb-surface-overlay);
+    
+    /* Borders & Dividers */
+    --section-border: var(--aisb-border-primary);
+    --section-border-secondary: var(--aisb-border-secondary);
+    --section-border-interactive: var(--aisb-border-interactive);
+    
+    /* Apply base styles */
+    position: relative;
+    background: var(--section-bg);
+    color: var(--section-text);
+    transition: background-color var(--aisb-transition-base), 
+                color var(--aisb-transition-base);
+}
+
+/* =========================================
+   Light Theme Modifier
+   Updates context variables for light mode
+   ========================================= */
+.aisb-section--light {
+    /* Content */
+    --section-bg: var(--aisb-color-base);
+    --section-text: var(--aisb-color-text);
+    --section-text-secondary: var(--aisb-color-muted);
+    --section-text-inverse: var(--aisb-color-base);
+    
+    /* Links */
+    --section-link: var(--aisb-color-primary);
+    --section-link-hover: var(--aisb-color-primary-hover);
+    --section-link-visited: var(--aisb-color-muted);
+    
+    /* Buttons - Primary */
+    --section-button-primary: var(--aisb-color-primary);
+    --section-button-primary-hover: var(--aisb-color-primary-hover);
+    --section-button-primary-text: #ffffff;
+    
+    /* Buttons - Secondary */
+    --section-button-secondary-border: var(--aisb-color-primary);
+    --section-button-secondary-text: var(--aisb-color-primary);
+    --section-button-secondary-hover-bg: var(--aisb-color-primary);
+    --section-button-secondary-hover-text: #ffffff;
+    
+    /* Buttons - Ghost */
+    --section-button-ghost-text: var(--aisb-color-muted);
+    --section-button-ghost-hover-bg: var(--aisb-color-secondary);
+    --section-button-ghost-hover-text: var(--aisb-color-text);
+    
+    /* Surfaces */
+    --section-surface-secondary: var(--aisb-color-secondary);
+    --section-surface-elevated: var(--aisb-color-base);
+    --section-overlay: rgba(0, 0, 0, 0.05);
+    
+    /* Borders */
+    --section-border: var(--aisb-color-border);
+    --section-border-secondary: var(--aisb-color-border);
+    --section-border-interactive: var(--aisb-color-primary);
+    
+    /* Focus States */
+    --section-focus-ring: var(--aisb-color-primary);
+}
+
+/* =========================================
+   Dark Theme Modifier
+   Updates context variables for dark mode
+   ========================================= */
+.aisb-section--dark {
+    /* Content */
+    --section-bg: var(--aisb-color-dark-base);
+    --section-text: var(--aisb-color-dark-text);
+    --section-text-secondary: var(--aisb-color-dark-muted);
+    --section-text-inverse: var(--aisb-color-dark-base);
+    
+    /* Links */
+    --section-link: var(--aisb-color-dark-primary);
+    --section-link-hover: var(--aisb-color-dark-primary-hover);
+    --section-link-visited: var(--aisb-color-dark-muted);
+    
+    /* Buttons - Primary */
+    --section-button-primary: var(--aisb-color-dark-primary);
+    --section-button-primary-hover: var(--aisb-color-dark-primary-hover);
+    --section-button-primary-text: var(--aisb-color-dark-base);
+    
+    /* Buttons - Secondary */
+    --section-button-secondary-border: var(--aisb-color-dark-primary);
+    --section-button-secondary-text: var(--aisb-color-dark-primary);
+    --section-button-secondary-hover-bg: var(--aisb-color-dark-primary);
+    --section-button-secondary-hover-text: var(--aisb-color-dark-base);
+    
+    /* Buttons - Ghost */
+    --section-button-ghost-text: var(--aisb-color-dark-muted);
+    --section-button-ghost-hover-bg: var(--aisb-color-dark-secondary);
+    --section-button-ghost-hover-text: var(--aisb-color-dark-text);
+    
+    /* Surfaces */
+    --section-surface-secondary: var(--aisb-color-dark-secondary);
+    --section-surface-elevated: var(--aisb-color-dark-secondary);
+    --section-overlay: rgba(255, 255, 255, 0.05);
+    
+    /* Borders */
+    --section-border: var(--aisb-color-dark-border);
+    --section-border-secondary: var(--aisb-color-dark-border);
+    --section-border-interactive: var(--aisb-color-dark-primary);
+    
+    /* Focus States */
+    --section-focus-ring: var(--aisb-color-dark-primary);
+}
+
+/* =========================================
+   Section Container
+   Consistent max-width and padding
+   ========================================= */
+.aisb-section__container {
+    max-width: var(--aisb-gs-container-width, 1200px);
+    margin: 0 auto;
+    padding: 0 var(--aisb-space-md);
+}
+
+/* Mobile padding adjustment */
+@media (max-width: 768px) {
+    .aisb-section__container {
+        padding: 0 var(--aisb-space-sm);
+    }
+}
+
+/* =========================================
+   Section Spacing Variants
+   Control vertical padding
+   ========================================= */
+.aisb-section--spacing-sm {
+    padding-top: var(--aisb-space-xl);
+    padding-bottom: var(--aisb-space-xl);
+}
+
+.aisb-section--spacing-md {
+    padding-top: var(--aisb-space-2xl);
+    padding-bottom: var(--aisb-space-2xl);
+}
+
+.aisb-section--spacing-lg {
+    padding-top: var(--aisb-space-3xl);
+    padding-bottom: var(--aisb-space-3xl);
+}
+
+/* Mobile spacing adjustments */
+@media (max-width: 768px) {
+    .aisb-section--spacing-sm {
+        padding-top: var(--aisb-space-lg);
+        padding-bottom: var(--aisb-space-lg);
+    }
+    
+    .aisb-section--spacing-md {
+        padding-top: var(--aisb-space-xl);
+        padding-bottom: var(--aisb-space-xl);
+    }
+    
+    .aisb-section--spacing-lg {
+        padding-top: var(--aisb-space-2xl);
+        padding-bottom: var(--aisb-space-2xl);
+    }
+}
+
+/* =========================================
+   Content Elements within Sections
+   These automatically adapt to theme
+   ========================================= */
+
+/* Headings use section text color */
+.aisb-section h1,
+.aisb-section h2,
+.aisb-section h3,
+.aisb-section h4,
+.aisb-section h5,
+.aisb-section h6 {
+    color: var(--section-text);
+}
+
+/* Paragraphs and lists */
+.aisb-section p,
+.aisb-section li {
+    color: var(--section-text);
+}
+
+/* Links automatically adapt */
+.aisb-section a {
+    color: var(--section-link);
+    transition: color var(--aisb-transition-fast);
+}
+
+.aisb-section a:hover {
+    color: var(--section-link-hover);
+}
+
+.aisb-section a:visited {
+    color: var(--section-link-visited);
+}
+
+/* Focus states for accessibility */
+.aisb-section a:focus-visible,
+.aisb-section button:focus-visible,
+.aisb-section [tabindex]:focus-visible {
+    outline: 2px solid var(--section-focus-ring);
+    outline-offset: 2px;
+    border-radius: var(--aisb-radius-sm);
+}
+
+/* =========================================
+   Utility: Force color inheritance
+   For components that need explicit inheritance
+   ========================================= */
+.aisb-inherit-theme {
+    color: inherit;
+    background-color: inherit;
+}
+
+.aisb-inherit-text {
+    color: var(--section-text);
+}
+
+.aisb-inherit-muted {
+    color: var(--section-text-secondary);
+}
+
+.aisb-inherit-link {
+    color: var(--section-link);
+}

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Consistency Verification Test</title>
+    
+    <!-- Load CSS exactly as the editor does now -->
+    <link rel="stylesheet" href="../assets/css/core/00-tokens.css">
+    <link rel="stylesheet" href="../assets/css/core/01-base.css">
+    <link rel="stylesheet" href="../assets/css/core/02-utilities.css">
+    <link rel="stylesheet" href="../assets/css/sections/hero.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .test-header {
+            background: #09111A;
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .test-header h1 {
+            margin: 0 0 10px;
+            font-size: 24px;
+        }
+        
+        .test-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .test-label {
+            background: #2A3747;
+            color: white;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .test-result {
+            padding: 8px 12px;
+            margin: 5px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: monospace;
+        }
+        
+        .pass {
+            background: rgba(52, 211, 153, 0.1);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+        
+        .fail {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+        
+        .summary {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        
+        .summary.success {
+            background: rgba(52, 211, 153, 0.1);
+            color: #10b981;
+            border: 2px solid #10b981;
+        }
+        
+        .summary.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+        
+        .test-content {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🔍 CSS Consistency Verification</h1>
+        <p style="margin: 0; opacity: 0.9;">Testing that all contexts use the same CSS architecture</p>
+    </div>
+    
+    <div class="test-container">
+        <!-- Test Sections -->
+        <div class="test-grid">
+            <!-- Light Theme Test -->
+            <div class="test-section">
+                <div class="test-label">Light Theme Section</div>
+                <section class="aisb-section aisb-hero aisb-section--light">
+                    <div class="aisb-hero__container">
+                        <div class="aisb-hero__content">
+                            <span class="aisb-hero__eyebrow">Light Mode</span>
+                            <h2 class="aisb-hero__heading">Testing Light Theme</h2>
+                            <div class="aisb-hero__body">
+                                <p>This is body text with a <a href="#test-light">test link</a> that should be blue (#2563eb).</p>
+                                <p>Another paragraph with <a href="#visited">visited link styling</a> to test.</p>
+                            </div>
+                            <div class="aisb-hero__buttons">
+                                <button class="aisb-btn aisb-btn-primary">Primary</button>
+                                <button class="aisb-btn aisb-btn-secondary">Secondary</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Dark Theme Test -->
+            <div class="test-section">
+                <div class="test-label">Dark Theme Section</div>
+                <section class="aisb-section aisb-hero aisb-section--dark">
+                    <div class="aisb-hero__container">
+                        <div class="aisb-hero__content">
+                            <span class="aisb-hero__eyebrow">Dark Mode</span>
+                            <h2 class="aisb-hero__heading">Testing Dark Theme</h2>
+                            <div class="aisb-hero__body">
+                                <p>This is body text with a <a href="#test-dark">test link</a> that should be light blue (#60a5fa).</p>
+                                <p>Another paragraph with <a href="#visited">visited link styling</a> to test.</p>
+                            </div>
+                            <div class="aisb-hero__buttons">
+                                <button class="aisb-btn aisb-btn-primary">Primary</button>
+                                <button class="aisb-btn aisb-btn-secondary">Secondary</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        
+        <!-- Test Results -->
+        <div class="test-section">
+            <div class="test-label">Test Results</div>
+            <div class="test-content">
+                <div id="test-results"></div>
+                <div id="test-summary"></div>
+            </div>
+        </div>
+        
+        <!-- Detailed Analysis -->
+        <div class="test-section">
+            <div class="test-label">CSS Variable Analysis</div>
+            <div class="test-content">
+                <div id="css-analysis"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Run comprehensive tests
+        function runTests() {
+            const results = [];
+            const analysis = {};
+            
+            // Get computed styles
+            const lightSection = document.querySelector('.aisb-section--light');
+            const darkSection = document.querySelector('.aisb-section--dark');
+            const lightStyles = getComputedStyle(lightSection);
+            const darkStyles = getComputedStyle(darkSection);
+            
+            // Test 1: Base architecture loaded
+            const baseLoaded = lightStyles.getPropertyValue('--section-bg').trim() !== '';
+            results.push({
+                name: 'Base architecture (01-base.css) loaded',
+                passed: baseLoaded,
+                details: baseLoaded ? 'Context variables present' : 'Missing context variables'
+            });
+            
+            // Test 2: Light section background
+            const lightBg = lightStyles.backgroundColor;
+            const lightBgCorrect = lightBg === 'rgb(255, 255, 255)' || lightBg === 'rgba(255, 255, 255, 1)';
+            results.push({
+                name: 'Light section background',
+                passed: lightBgCorrect,
+                details: `Expected: white, Got: ${lightBg}`
+            });
+            
+            // Test 3: Dark section background
+            const darkBg = darkStyles.backgroundColor;
+            const darkBgCorrect = darkBg === 'rgb(26, 26, 26)' || darkBg === 'rgba(26, 26, 26, 1)';
+            results.push({
+                name: 'Dark section background',
+                passed: darkBgCorrect,
+                details: `Expected: #1a1a1a, Got: ${darkBg}`
+            });
+            
+            // Test 4: Light theme links
+            const lightLink = document.querySelector('.aisb-section--light .aisb-hero__body a');
+            const lightLinkColor = getComputedStyle(lightLink).color;
+            const lightLinkCorrect = lightLinkColor === 'rgb(37, 99, 235)' || lightLinkColor === 'rgba(37, 99, 235, 1)';
+            results.push({
+                name: 'Light theme link color',
+                passed: lightLinkCorrect,
+                details: `Expected: #2563eb, Got: ${lightLinkColor}`
+            });
+            
+            // Test 5: Dark theme links
+            const darkLink = document.querySelector('.aisb-section--dark .aisb-hero__body a');
+            const darkLinkColor = getComputedStyle(darkLink).color;
+            const darkLinkCorrect = darkLinkColor === 'rgb(96, 165, 250)' || darkLinkColor === 'rgba(96, 165, 250, 1)';
+            results.push({
+                name: 'Dark theme link color',
+                passed: darkLinkCorrect,
+                details: `Expected: #60a5fa, Got: ${darkLinkColor}`
+            });
+            
+            // Test 6: Button adaptation
+            const lightBtn = document.querySelector('.aisb-section--light .aisb-btn-primary');
+            const darkBtn = document.querySelector('.aisb-section--dark .aisb-btn-primary');
+            const lightBtnBg = getComputedStyle(lightBtn).backgroundColor;
+            const darkBtnBg = getComputedStyle(darkBtn).backgroundColor;
+            const buttonsAdapt = lightBtnBg !== darkBtnBg;
+            results.push({
+                name: 'Buttons adapt to theme',
+                passed: buttonsAdapt,
+                details: buttonsAdapt ? 'Different colors for each theme' : 'Same color (not adapting)'
+            });
+            
+            // Test 7: No inline styles
+            const hasInlineOverrides = document.querySelector('style')?.textContent?.includes('!important') || false;
+            results.push({
+                name: 'No hardcoded inline overrides',
+                passed: !hasInlineOverrides,
+                details: hasInlineOverrides ? 'Found !important overrides' : 'Clean CSS cascade'
+            });
+            
+            // Collect CSS variable analysis
+            analysis.light = {
+                '--section-bg': lightStyles.getPropertyValue('--section-bg'),
+                '--section-text': lightStyles.getPropertyValue('--section-text'),
+                '--section-link': lightStyles.getPropertyValue('--section-link'),
+                '--section-button-primary': lightStyles.getPropertyValue('--section-button-primary')
+            };
+            
+            analysis.dark = {
+                '--section-bg': darkStyles.getPropertyValue('--section-bg'),
+                '--section-text': darkStyles.getPropertyValue('--section-text'),
+                '--section-link': darkStyles.getPropertyValue('--section-link'),
+                '--section-button-primary': darkStyles.getPropertyValue('--section-button-primary')
+            };
+            
+            // Display results
+            displayResults(results);
+            displayAnalysis(analysis);
+        }
+        
+        function displayResults(results) {
+            const container = document.getElementById('test-results');
+            const summary = document.getElementById('test-summary');
+            
+            let allPassed = true;
+            let html = '';
+            
+            results.forEach(test => {
+                const status = test.passed ? 'pass' : 'fail';
+                const icon = test.passed ? '✅' : '❌';
+                html += `<div class="test-result ${status}">${icon} ${test.name}: ${test.details}</div>`;
+                if (!test.passed) allPassed = false;
+            });
+            
+            container.innerHTML = html;
+            
+            // Summary
+            if (allPassed) {
+                summary.innerHTML = '<div class="summary success">🎉 All tests passed! CSS architecture is consistent.</div>';
+            } else {
+                const failed = results.filter(r => !r.passed).length;
+                summary.innerHTML = `<div class="summary error">⚠️ ${failed} test(s) failed. Check results above.</div>`;
+            }
+        }
+        
+        function displayAnalysis(analysis) {
+            const container = document.getElementById('css-analysis');
+            
+            let html = '<h4>Light Theme Variables:</h4>';
+            html += '<div style="font-family: monospace; font-size: 12px; background: #f5f5f5; padding: 10px; border-radius: 4px;">';
+            for (const [key, value] of Object.entries(analysis.light)) {
+                html += `<div>${key}: ${value || '(not set)'}</div>`;
+            }
+            html += '</div>';
+            
+            html += '<h4 style="margin-top: 20px;">Dark Theme Variables:</h4>';
+            html += '<div style="font-family: monospace; font-size: 12px; background: #f5f5f5; padding: 10px; border-radius: 4px;">';
+            for (const [key, value] of Object.entries(analysis.dark)) {
+                html += `<div>${key}: ${value || '(not set)'}</div>`;
+            }
+            html += '</div>';
+            
+            container.innerHTML = html;
+        }
+        
+        // Run tests on load
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>
