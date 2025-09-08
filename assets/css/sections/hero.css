@@ -16,14 +16,14 @@
 .aisb-hero {
     position: relative;
     padding: 48px 0; /* Mobile first */
-    background-color: #ffffff;
-    color: #1a1a1a;
+    background-color: var(--aisb-color-base, #ffffff);
+    color: var(--aisb-color-text, #1a1a1a);
     transition: background-color 200ms ease, color 200ms ease;
 }
 
 /* Container */
 .aisb-hero__container {
-    max-width: 1200px;
+    max-width: var(--aisb-gs-container-width, 1200px);
     margin: 0 auto;
     padding: 0 16px; /* Mobile first */
 }
@@ -49,7 +49,7 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     line-height: 1.2;
-    color: #2563eb;
+    color: var(--aisb-color-primary, #2563eb);
     margin-bottom: 12px; /* Smaller on mobile */
     transition: color 200ms ease;
 }
@@ -58,18 +58,18 @@
 .aisb-hero__heading {
     font-size: 36px; /* Mobile first */
     font-weight: 700;
-    line-height: 1.2;
-    color: #1a1a1a;
+    line-height: var(--aisb-gs-line-height-heading, 1.2);
+    color: var(--aisb-color-text, #1a1a1a);
     margin: 0 0 16px 0; /* Smaller margin on mobile */
     transition: color 200ms ease;
 }
 
 /* Body Text - Mobile First */
 .aisb-hero__body {
-    font-size: 16px; /* Mobile first */
-    line-height: 1.6;
-    color: #64748b;
-    margin-bottom: 24px; /* Smaller on mobile */
+    font-size: var(--aisb-gs-size-base, 16px);
+    line-height: var(--aisb-gs-line-height-body, 1.6);
+    color: var(--aisb-color-muted, #64748b);
+    margin-bottom: var(--aisb-gs-element-spacing, 24px);
     max-width: 100%; /* Full width on mobile */
     transition: color 200ms ease;
 }
@@ -86,10 +86,10 @@
 
 /* Outro Content - Mobile First */
 .aisb-hero__outro {
-    margin-top: 24px; /* Smaller on mobile */
+    margin-top: var(--aisb-gs-element-spacing, 24px);
     font-size: 14px; /* Smaller on mobile */
-    line-height: 1.6;
-    color: #64748b;
+    line-height: var(--aisb-gs-line-height-body, 1.6);
+    color: var(--aisb-color-muted, #64748b);
     transition: color 200ms ease;
 }
 
@@ -116,7 +116,7 @@
 /* Light mode - Visited state first (lower priority) */
 .aisb-section--light .aisb-hero__body a:visited,
 .aisb-section--light .aisb-hero__outro a:visited {
-    color: #2563eb !important; /* Primary blue for visited */
+    color: var(--aisb-color-muted, #64748b) !important; /* Muted for visited */
     text-decoration: underline !important;
     text-decoration-thickness: 1px !important;
     text-underline-offset: 2px !important;
@@ -127,7 +127,7 @@
 .aisb-section--light .aisb-hero__body a:link,
 .aisb-section--light .aisb-hero__outro a,
 .aisb-section--light .aisb-hero__outro a:link {
-    color: #2563eb !important; /* Primary blue */
+    color: var(--aisb-color-primary, #2563eb) !important;
     text-decoration: underline !important;
     text-decoration-thickness: 1px !important;
     text-underline-offset: 2px !important;
@@ -140,7 +140,7 @@
 /* Light mode - Hover state (highest priority for interaction) */
 .aisb-section--light .aisb-hero__body a:hover,
 .aisb-section--light .aisb-hero__outro a:hover {
-    color: #1d4ed8 !important; /* Darker blue on hover */
+    color: var(--aisb-color-primary-hover, #1d4ed8) !important;
     text-decoration-thickness: 2px !important;
     background: none !important;
     border: none !important;
@@ -149,7 +149,7 @@
 /* Light mode - Focus state for accessibility */
 .aisb-section--light .aisb-hero__body a:focus,
 .aisb-section--light .aisb-hero__outro a:focus {
-    outline: 2px solid #2563eb !important;
+    outline: 2px solid var(--aisb-color-primary, #2563eb) !important;
     outline-offset: 2px !important;
     border-radius: 2px;
 }
@@ -161,7 +161,7 @@
 /* Default - Visited state first */
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a:visited,
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a:visited {
-    color: #2563eb !important;
+    color: var(--aisb-color-muted, #64748b) !important;
     text-decoration: underline !important;
     text-decoration-thickness: 1px !important;
     text-underline-offset: 2px !important;
@@ -172,7 +172,7 @@
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a:link,
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a,
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a:link {
-    color: #2563eb !important;
+    color: var(--aisb-color-primary, #2563eb) !important;
     text-decoration: underline !important;
     text-decoration-thickness: 1px !important;
     text-underline-offset: 2px !important;
@@ -185,7 +185,7 @@
 /* Default - Hover state */
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a:hover,
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a:hover {
-    color: #1d4ed8 !important;
+    color: var(--aisb-color-primary-hover, #1d4ed8) !important;
     text-decoration-thickness: 2px !important;
     background: none !important;
     border: none !important;
@@ -194,7 +194,7 @@
 /* Default - Focus state */
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__body a:focus,
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-hero__outro a:focus {
-    outline: 2px solid #2563eb !important;
+    outline: 2px solid var(--aisb-color-primary, #2563eb) !important;
     outline-offset: 2px !important;
     border-radius: 2px;
 }
@@ -207,7 +207,7 @@
 }
 
 .aisb-hero__heading a:hover {
-    color: #2563eb;
+    color: var(--aisb-color-primary, #2563eb);
 }
 
 /* Buttons Container - Mobile First */
@@ -215,7 +215,7 @@
     display: flex;
     flex-direction: column; /* Stack on mobile */
     gap: 16px; /* Smaller gap on mobile */
-    margin-top: 24px; /* Smaller margin on mobile */
+    margin-top: var(--aisb-gs-element-spacing, 24px);
 }
 
 /* Media Column */
@@ -246,7 +246,7 @@
     aspect-ratio: 16 / 9;
     object-fit: cover;
     max-width: 100%;
-    background: #000;
+    background: var(--aisb-color-dark-base, #1a1a1a);
 }
 
 /* Media Placeholders */
@@ -254,15 +254,15 @@
 .aisb-media-placeholder {
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border: 2px dashed #cbd5e1;
+    background: linear-gradient(135deg, var(--aisb-color-secondary, #f1f5f9) 0%, var(--aisb-color-border, #e2e8f0) 100%);
+    border: 2px dashed var(--aisb-color-border, #e2e8f0);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 16px;
-    color: #64748b;
+    color: var(--aisb-color-muted, #64748b);
     font-size: 14px;
     transition: all 200ms ease;
     position: relative;
@@ -293,9 +293,9 @@
 
 /* Light mode placeholder - explicit light theme */
 .aisb-section--light .aisb-media-placeholder {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border: 2px dashed #cbd5e1;
-    color: #64748b;
+    background: linear-gradient(135deg, var(--aisb-color-secondary, #f1f5f9) 0%, var(--aisb-color-border, #e2e8f0) 100%);
+    border: 2px dashed var(--aisb-color-border, #e2e8f0);
+    color: var(--aisb-color-muted, #64748b);
 }
 
 .aisb-section--light .aisb-media-placeholder::before {
@@ -310,9 +310,9 @@
 
 /* Dark mode placeholder - explicit dark theme */
 .aisb-section--dark .aisb-media-placeholder {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%);
-    border: 2px dashed rgba(148, 163, 184, 0.2);
-    color: #94a3b8;
+    background: linear-gradient(135deg, var(--aisb-color-dark-secondary, #374151) 0%, rgba(26, 26, 26, 0.5) 100%);
+    border: 2px dashed var(--aisb-color-dark-border, #4b5563);
+    color: var(--aisb-color-dark-muted, #9ca3af);
 }
 
 .aisb-section--dark .aisb-media-placeholder::before {
@@ -327,9 +327,9 @@
 
 /* Default (no theme class) - same as light mode */
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-media-placeholder {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border: 2px dashed #cbd5e1;
-    color: #64748b;
+    background: linear-gradient(135deg, var(--aisb-color-secondary, #f1f5f9) 0%, var(--aisb-color-border, #e2e8f0) 100%);
+    border: 2px dashed var(--aisb-color-border, #e2e8f0);
+    color: var(--aisb-color-muted, #64748b);
 }
 
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-media-placeholder::before {
@@ -346,54 +346,54 @@
    Theme Variant: Light (Default)
    ========================================= */
 .aisb-section--light {
-    background-color: #ffffff;
-    color: #1a1a1a;
+    background-color: var(--aisb-color-base, #ffffff);
+    color: var(--aisb-color-text, #1a1a1a);
 }
 
 /* Apply background directly to hero element for proper cascade */
 .aisb-section--light .aisb-hero {
-    background-color: #ffffff;
-    color: #1a1a1a;
+    background-color: var(--aisb-color-base, #ffffff);
+    color: var(--aisb-color-text, #1a1a1a);
 }
 
 .aisb-section--light .aisb-hero__eyebrow {
-    color: #2563eb;
+    color: var(--aisb-color-primary, #2563eb);
 }
 
 .aisb-section--light .aisb-hero__heading {
-    color: #1a1a1a;
+    color: var(--aisb-color-text, #1a1a1a);
 }
 
 .aisb-section--light .aisb-hero__body,
 .aisb-section--light .aisb-hero__outro {
-    color: #64748b;
+    color: var(--aisb-color-muted, #64748b);
 }
 
 /* =========================================
    Theme Variant: Dark
    ========================================= */
 .aisb-section--dark {
-    background-color: #1a1a1a;
-    color: #fafafa;
+    background-color: var(--aisb-color-dark-base, #1a1a1a);
+    color: var(--aisb-color-dark-text, #fafafa);
 }
 
 /* Apply background directly to hero element for proper cascade */
 .aisb-section--dark .aisb-hero {
-    background-color: #1a1a1a;
-    color: #fafafa;
+    background-color: var(--aisb-color-dark-base, #1a1a1a);
+    color: var(--aisb-color-dark-text, #fafafa);
 }
 
 .aisb-section--dark .aisb-hero__eyebrow {
-    color: #60a5fa; /* Primary Alt for better contrast */
+    color: var(--aisb-color-dark-primary, #60a5fa); /* Primary Alt for better contrast - dark mode specific */
 }
 
 .aisb-section--dark .aisb-hero__heading {
-    color: #fafafa;
+    color: var(--aisb-color-dark-text, #fafafa);
 }
 
 .aisb-section--dark .aisb-hero__body,
 .aisb-section--dark .aisb-hero__outro {
-    color: #9ca3af; /* Muted light for dark backgrounds */
+    color: var(--aisb-color-muted, #64748b);
 }
 
 /* Dark mode link styles - Proper cascade order */
@@ -401,7 +401,7 @@
 /* Visited state first (lower priority) */
 .aisb-section--dark .aisb-hero__body a:visited,
 .aisb-section--dark .aisb-hero__outro a:visited {
-    color: #60a5fa !important; /* Keep primary light blue for visited - better UX */
+    color: var(--aisb-color-dark-muted, #9ca3af) !important; /* Muted for visited */
     text-decoration: underline !important;
     text-decoration-thickness: 1px !important;
     text-underline-offset: 2px !important;
@@ -412,7 +412,7 @@
 .aisb-section--dark .aisb-hero__body a:link,
 .aisb-section--dark .aisb-hero__outro a,
 .aisb-section--dark .aisb-hero__outro a:link {
-    color: #60a5fa !important; /* Light blue - always light blue */
+    color: var(--aisb-color-dark-primary, #60a5fa) !important; /* Light blue - always light blue */
     text-decoration: underline !important;
     text-decoration-thickness: 1px !important;
     text-underline-offset: 2px !important;
@@ -425,7 +425,7 @@
 /* Hover state (highest priority for interaction) */
 .aisb-section--dark .aisb-hero__body a:hover,
 .aisb-section--dark .aisb-hero__outro a:hover {
-    color: #3b82f6 !important; /* Darker blue on hover */
+    color: var(--aisb-color-dark-primary-hover, #3b82f6) !important; /* Darker blue on hover */
     text-decoration-thickness: 2px !important;
     background: none !important;
     border: none !important;
@@ -434,13 +434,13 @@
 /* Focus state for accessibility */
 .aisb-section--dark .aisb-hero__body a:focus,
 .aisb-section--dark .aisb-hero__outro a:focus {
-    outline: 2px solid #60a5fa !important;
+    outline: 2px solid var(--aisb-color-dark-primary, #60a5fa) !important;
     outline-offset: 2px !important;
     border-radius: 2px;
 }
 
 .aisb-section--dark .aisb-hero__heading a:hover {
-    color: #60a5fa !important;
+    color: var(--aisb-color-dark-primary, #60a5fa) !important;
 }
 
 /* =========================================
@@ -573,7 +573,7 @@
 /* Desktop - 1024px and up (2-column layouts activate) */
 @media (min-width: 1024px) {
     .aisb-hero {
-        padding: 80px 0;
+        padding: var(--aisb-gs-section-padding, 80px) 0;
     }
     
     .aisb-hero__container {

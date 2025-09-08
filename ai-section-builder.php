@@ -56,6 +56,9 @@ function aisb_init() {
 }
 
 function aisb_setup() {
+    // Load Global Settings class
+    require_once AISB_PLUGIN_DIR . 'includes/class-global-settings.php';
+    
     // Hook into WordPress
     add_action('init', 'aisb_register_post_type');
     add_action('admin_menu', 'aisb_add_admin_menu');
@@ -458,6 +461,15 @@ function aisb_render_editor_page() {
             </div>
             <div class="aisb-editor-toolbar__right">
                 <div class="aisb-toolbar-group">
+                    <button class="aisb-editor-btn aisb-editor-btn-ghost" 
+                            id="aisb-global-settings-btn"
+                            title="<?php _e('Global Settings (Cmd/Ctrl + ,)', 'ai-section-builder'); ?>"
+                            aria-label="<?php _e('Open global settings panel', 'ai-section-builder'); ?>">
+                        <span class="dashicons dashicons-admin-generic"></span>
+                        <span class="aisb-btn-label"><?php _e('Global Settings', 'ai-section-builder'); ?></span>
+                    </button>
+                </div>
+                <div class="aisb-toolbar-group">
                     <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-sidebar-toggle active" 
                             id="aisb-toggle-sidebars" 
                             title="<?php _e('Toggle Sidebars (Shift+S)', 'ai-section-builder'); ?>"
@@ -553,6 +565,287 @@ function aisb_render_editor_page() {
                     <!-- Screen reader instructions -->
                     <div id="aisb-reorder-instructions" class="screen-reader-text">
                         <?php _e('Use arrow keys to navigate sections. Press Enter to select, then use arrow keys to move sections up or down. Press Enter again to confirm position.', 'ai-section-builder'); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Global Settings Panel -->
+        <div class="aisb-global-settings-panel" id="aisb-global-settings-panel" style="display: none;">
+            <div class="aisb-global-settings-panel__overlay"></div>
+            <div class="aisb-global-settings-panel__content">
+                <!-- Panel Header -->
+                <div class="aisb-global-settings-panel__header">
+                    <h2 class="aisb-global-settings-panel__title">
+                        <span class="dashicons dashicons-admin-generic"></span>
+                        <?php _e('Global Settings', 'ai-section-builder'); ?>
+                    </h2>
+                    <button class="aisb-global-settings-panel__close" id="aisb-close-global-settings" aria-label="<?php _e('Close panel', 'ai-section-builder'); ?>">
+                        <span class="dashicons dashicons-no-alt"></span>
+                    </button>
+                </div>
+                
+                <!-- Panel Tabs -->
+                <div class="aisb-global-settings-panel__tabs">
+                    <button class="aisb-global-settings-tab active" data-tab="colors">
+                        <span class="dashicons dashicons-art"></span>
+                        <?php _e('Colors', 'ai-section-builder'); ?>
+                    </button>
+                    <button class="aisb-global-settings-tab" data-tab="typography">
+                        <span class="dashicons dashicons-editor-textcolor"></span>
+                        <?php _e('Typography', 'ai-section-builder'); ?>
+                    </button>
+                    <button class="aisb-global-settings-tab" data-tab="layout">
+                        <span class="dashicons dashicons-layout"></span>
+                        <?php _e('Layout', 'ai-section-builder'); ?>
+                    </button>
+                </div>
+                
+                <!-- Panel Body -->
+                <div class="aisb-global-settings-panel__body">
+                    <!-- Colors Tab -->
+                    <div class="aisb-global-settings-tab-content active" data-tab-content="colors">
+                        <div class="aisb-settings-group">
+                            <h3><?php _e('Light Mode Colors', 'ai-section-builder'); ?></h3>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-base"><?php _e('Background', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-base" name="colors[base]" value="#ffffff" />
+                                    <input type="text" class="aisb-color-text" value="#ffffff" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-text"><?php _e('Text', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-text" name="colors[text]" value="#1a1a1a" />
+                                    <input type="text" class="aisb-color-text" value="#1a1a1a" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-muted"><?php _e('Muted Text', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-muted" name="colors[muted]" value="#64748b" />
+                                    <input type="text" class="aisb-color-text" value="#64748b" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-primary"><?php _e('Primary', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-primary" name="colors[primary]" value="#2563eb" />
+                                    <input type="text" class="aisb-color-text" value="#2563eb" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-primary-hover"><?php _e('Primary Hover', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-primary-hover" name="colors[primary_hover]" value="#1d4ed8" />
+                                    <input type="text" class="aisb-color-text" value="#1d4ed8" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-secondary"><?php _e('Secondary', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-secondary" name="colors[secondary]" value="#f1f5f9" />
+                                    <input type="text" class="aisb-color-text" value="#f1f5f9" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-border"><?php _e('Border', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-border" name="colors[border]" value="#e2e8f0" />
+                                    <input type="text" class="aisb-color-text" value="#e2e8f0" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="aisb-settings-group">
+                            <h3><?php _e('Dark Mode Colors', 'ai-section-builder'); ?></h3>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-dark-base"><?php _e('Dark Background', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-dark-base" name="colors[dark_base]" value="#1a1a1a" />
+                                    <input type="text" class="aisb-color-text" value="#1a1a1a" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-dark-text"><?php _e('Dark Text', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-dark-text" name="colors[dark_text]" value="#fafafa" />
+                                    <input type="text" class="aisb-color-text" value="#fafafa" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-dark-muted"><?php _e('Dark Muted', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-dark-muted" name="colors[dark_muted]" value="#9ca3af" />
+                                    <input type="text" class="aisb-color-text" value="#9ca3af" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-dark-primary"><?php _e('Dark Primary', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-dark-primary" name="colors[dark_primary]" value="#60a5fa" />
+                                    <input type="text" class="aisb-color-text" value="#60a5fa" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-dark-primary-hover"><?php _e('Dark Primary Hover', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-dark-primary-hover" name="colors[dark_primary_hover]" value="#3b82f6" />
+                                    <input type="text" class="aisb-color-text" value="#3b82f6" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-dark-secondary"><?php _e('Dark Secondary', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-dark-secondary" name="colors[dark_secondary]" value="#374151" />
+                                    <input type="text" class="aisb-color-text" value="#374151" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-dark-border"><?php _e('Dark Border', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-dark-border" name="colors[dark_border]" value="#4b5563" />
+                                    <input type="text" class="aisb-color-text" value="#4b5563" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="aisb-settings-group">
+                            <h3><?php _e('Status Colors', 'ai-section-builder'); ?></h3>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-success"><?php _e('Success', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-success" name="colors[success]" value="#10b981" />
+                                    <input type="text" class="aisb-color-text" value="#10b981" />
+                                </div>
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-error"><?php _e('Error', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-error" name="colors[error]" value="#ef4444" />
+                                    <input type="text" class="aisb-color-text" value="#ef4444" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Typography Tab -->
+                    <div class="aisb-global-settings-tab-content" data-tab-content="typography">
+                        <div class="aisb-settings-group">
+                            <h3><?php _e('Font Families', 'ai-section-builder'); ?></h3>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-font-heading"><?php _e('Heading Font', 'ai-section-builder'); ?></label>
+                                <input type="text" id="aisb-gs-font-heading" name="typography[font_heading]" value="Inter" />
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-font-body"><?php _e('Body Font', 'ai-section-builder'); ?></label>
+                                <input type="text" id="aisb-gs-font-body" name="typography[font_body]" value="system-ui" />
+                            </div>
+                        </div>
+                        
+                        <div class="aisb-settings-group">
+                            <h3><?php _e('Font Sizes', 'ai-section-builder'); ?></h3>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-size-base">
+                                    <?php _e('Base Size', 'ai-section-builder'); ?>
+                                    <span class="aisb-field-hint">(12-20px)</span>
+                                </label>
+                                <input type="number" id="aisb-gs-size-base" name="typography[size_base]" value="16" min="12" max="20" />
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-scale-ratio">
+                                    <?php _e('Scale Ratio', 'ai-section-builder'); ?>
+                                    <span class="aisb-field-hint">(1.125-1.5)</span>
+                                </label>
+                                <input type="number" id="aisb-gs-scale-ratio" name="typography[scale_ratio]" value="1.25" min="1.125" max="1.5" step="0.025" />
+                            </div>
+                        </div>
+                        
+                        <div class="aisb-settings-group">
+                            <h3><?php _e('Line Heights', 'ai-section-builder'); ?></h3>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-line-height-body">
+                                    <?php _e('Body Line Height', 'ai-section-builder'); ?>
+                                    <span class="aisb-field-hint">(1.2-2.0)</span>
+                                </label>
+                                <input type="number" id="aisb-gs-line-height-body" name="typography[line_height_body]" value="1.6" min="1.2" max="2.0" step="0.1" />
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-line-height-heading">
+                                    <?php _e('Heading Line Height', 'ai-section-builder'); ?>
+                                    <span class="aisb-field-hint">(1.0-1.8)</span>
+                                </label>
+                                <input type="number" id="aisb-gs-line-height-heading" name="typography[line_height_heading]" value="1.2" min="1.0" max="1.8" step="0.1" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Layout Tab -->
+                    <div class="aisb-global-settings-tab-content" data-tab-content="layout">
+                        <div class="aisb-settings-group">
+                            <h3><?php _e('Container', 'ai-section-builder'); ?></h3>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-container-width">
+                                    <?php _e('Container Width', 'ai-section-builder'); ?>
+                                    <span class="aisb-field-hint">(960-1920px)</span>
+                                </label>
+                                <input type="number" id="aisb-gs-container-width" name="layout[container_width]" value="1200" min="960" max="1920" />
+                            </div>
+                        </div>
+                        
+                        <div class="aisb-settings-group">
+                            <h3><?php _e('Spacing', 'ai-section-builder'); ?></h3>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-section-padding">
+                                    <?php _e('Section Padding', 'ai-section-builder'); ?>
+                                    <span class="aisb-field-hint">(20-200px)</span>
+                                </label>
+                                <input type="number" id="aisb-gs-section-padding" name="layout[section_padding]" value="80" min="20" max="200" />
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-element-spacing">
+                                    <?php _e('Element Spacing', 'ai-section-builder'); ?>
+                                    <span class="aisb-field-hint">(8-80px)</span>
+                                </label>
+                                <input type="number" id="aisb-gs-element-spacing" name="layout[element_spacing]" value="24" min="8" max="80" />
+                            </div>
+                        </div>
+                        
+                        <div class="aisb-settings-group">
+                            <h3><?php _e('Breakpoints', 'ai-section-builder'); ?></h3>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-breakpoint-tablet">
+                                    <?php _e('Tablet Breakpoint', 'ai-section-builder'); ?>
+                                    <span class="aisb-field-hint">(640-1024px)</span>
+                                </label>
+                                <input type="number" id="aisb-gs-breakpoint-tablet" name="layout[breakpoint_tablet]" value="768" min="640" max="1024" />
+                            </div>
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-breakpoint-mobile">
+                                    <?php _e('Mobile Breakpoint', 'ai-section-builder'); ?>
+                                    <span class="aisb-field-hint">(320-640px)</span>
+                                </label>
+                                <input type="number" id="aisb-gs-breakpoint-mobile" name="layout[breakpoint_mobile]" value="480" min="320" max="640" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Panel Footer -->
+                <div class="aisb-global-settings-panel__footer">
+                    <button class="aisb-editor-btn aisb-editor-btn-ghost" id="aisb-reset-global-settings">
+                        <span class="dashicons dashicons-image-rotate"></span>
+                        <?php _e('Reset to Defaults', 'ai-section-builder'); ?>
+                    </button>
+                    <div class="aisb-global-settings-panel__actions">
+                        <button class="aisb-editor-btn aisb-editor-btn-secondary" id="aisb-cancel-global-settings">
+                            <?php _e('Cancel', 'ai-section-builder'); ?>
+                        </button>
+                        <button class="aisb-editor-btn aisb-editor-btn-primary" id="aisb-save-global-settings">
+                            <span class="dashicons dashicons-saved"></span>
+                            <?php _e('Save Changes', 'ai-section-builder'); ?>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1580,6 +1873,14 @@ function aisb_enqueue_admin_styles($hook) {
             AISB_VERSION
         );
         
+        // Load global settings panel styles
+        wp_enqueue_style(
+            'aisb-global-settings-panel',
+            AISB_PLUGIN_URL . 'assets/css/editor/global-settings-panel.css',
+            ['aisb-editor-styles'],
+            AISB_VERSION
+        );
+        
         // Enqueue Sortable.js from CDN with local fallback
         wp_enqueue_script(
             'sortablejs-cdn',
@@ -1625,9 +1926,19 @@ function aisb_enqueue_admin_styles($hook) {
             true
         );
         
+        // Enqueue global settings JavaScript
+        wp_enqueue_script(
+            'aisb-global-settings',
+            AISB_PLUGIN_URL . 'assets/js/editor/global-settings.js',
+            ['jquery', 'aisb-editor-script'],
+            AISB_VERSION,
+            true
+        );
+        
         // Localize script with settings for drag-drop functionality
         wp_localize_script('aisb-editor-script', 'aisbEditor', array(
             'nonce' => wp_create_nonce('aisb_editor_nonce'),
+            'aisbNonce' => wp_create_nonce('aisb_nonce'), // For global settings AJAX
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'restUrl' => rest_url('aisb/v1/'),
             'restNonce' => wp_create_nonce('wp_rest'),

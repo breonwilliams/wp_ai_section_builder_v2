@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AISB Design System Test - Single Source of Truth</title>
+    
+    <!-- Load the core design tokens -->
+    <link rel="stylesheet" href="../assets/css/core/00-tokens.css">
+    <link rel="stylesheet" href="../assets/css/sections/hero.css">
+    
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+        
+        .test-section h2 {
+            margin-top: 0;
+            color: #555;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .color-swatch {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .color-display {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .color-info {
+            padding: 10px;
+            background: #f9f9f9;
+            font-size: 12px;
+        }
+        
+        .color-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .color-value {
+            font-family: monospace;
+            color: #666;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .variable-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .variable-list code {
+            display: block;
+            margin: 5px 0;
+            padding: 5px 10px;
+            background: white;
+            border-left: 3px solid #007bff;
+            font-size: 13px;
+        }
+        
+        /* Test the actual variables */
+        .test-light {
+            background: var(--aisb-color-base);
+            color: var(--aisb-color-text);
+            padding: 20px;
+            margin: 10px 0;
+        }
+        
+        .test-dark {
+            background: var(--aisb-color-dark-base);
+            color: var(--aisb-color-dark-text);
+            padding: 20px;
+            margin: 10px 0;
+        }
+        
+        .test-link {
+            color: var(--aisb-color-primary);
+        }
+        
+        .test-link:hover {
+            color: var(--aisb-color-primary-hover);
+        }
+        
+        .test-muted {
+            color: var(--aisb-color-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔬 AISB Design System Test - Single Source of Truth</h1>
+        
+        <div class="test-section">
+            <h2>✅ System Status</h2>
+            <div id="status-checks"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎨 Light Mode Colors (--aisb-color-*)</h2>
+            <div class="color-grid" id="light-colors"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🌙 Dark Mode Colors (--aisb-color-dark-*)</h2>
+            <div class="color-grid" id="dark-colors"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📐 Typography Variables (--aisb-gs-*)</h2>
+            <div class="variable-list" id="typography-vars"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📏 Layout Variables (--aisb-gs-*)</h2>
+            <div class="variable-list" id="layout-vars"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🧪 Live Test Components</h2>
+            <div class="test-light">
+                <h3>Light Mode Test</h3>
+                <p>This is body text with <a href="#" class="test-link">a link</a> and <span class="test-muted">muted text</span>.</p>
+            </div>
+            <div class="test-dark">
+                <h3>Dark Mode Test</h3>
+                <p>This is body text with <a href="#" class="test-link" style="color: var(--aisb-color-dark-primary)">a link</a> and <span style="color: var(--aisb-color-dark-muted)">muted text</span>.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Test that all variables are properly defined
+        const rootStyles = getComputedStyle(document.documentElement);
+        
+        // Define expected variables
+        const lightColors = [
+            '--aisb-color-base',
+            '--aisb-color-text',
+            '--aisb-color-muted',
+            '--aisb-color-primary',
+            '--aisb-color-primary-hover',
+            '--aisb-color-secondary',
+            '--aisb-color-border',
+            '--aisb-color-success',
+            '--aisb-color-error'
+        ];
+        
+        const darkColors = [
+            '--aisb-color-dark-base',
+            '--aisb-color-dark-text',
+            '--aisb-color-dark-muted',
+            '--aisb-color-dark-primary',
+            '--aisb-color-dark-primary-hover',
+            '--aisb-color-dark-secondary',
+            '--aisb-color-dark-border'
+        ];
+        
+        const typographyVars = [
+            '--aisb-gs-font-heading',
+            '--aisb-gs-font-body',
+            '--aisb-gs-size-base',
+            '--aisb-gs-scale-ratio',
+            '--aisb-gs-line-height-body',
+            '--aisb-gs-line-height-heading'
+        ];
+        
+        const layoutVars = [
+            '--aisb-gs-container-width',
+            '--aisb-gs-section-padding',
+            '--aisb-gs-element-spacing',
+            '--aisb-gs-breakpoint-tablet',
+            '--aisb-gs-breakpoint-mobile'
+        ];
+        
+        // Check system status
+        const statusDiv = document.getElementById('status-checks');
+        let allPassed = true;
+        
+        // Check for wrong variables
+        const wrongVars = [
+            '--aisb-gs-primary',
+            '--aisb-gs-text-heading',
+            '--aisb-gs-bg-light',
+            '--aisb-gs-bg-dark'
+        ];
+        
+        wrongVars.forEach(varName => {
+            const value = rootStyles.getPropertyValue(varName).trim();
+            if (value) {
+                statusDiv.innerHTML += `<div class="test-result test-fail">❌ WRONG: ${varName} is still defined (value: ${value})</div>`;
+                allPassed = false;
+            }
+        });
+        
+        // Check correct variables exist
+        [...lightColors, ...darkColors].forEach(varName => {
+            const value = rootStyles.getPropertyValue(varName).trim();
+            if (!value) {
+                statusDiv.innerHTML += `<div class="test-result test-fail">❌ MISSING: ${varName} is not defined</div>`;
+                allPassed = false;
+            }
+        });
+        
+        // Special check for dark background color
+        const darkBase = rootStyles.getPropertyValue('--aisb-color-dark-base').trim();
+        if (darkBase === '#1a202c') {
+            statusDiv.innerHTML += `<div class="test-result test-fail">❌ WRONG COLOR: Dark background is #1a202c instead of #1a1a1a</div>`;
+            allPassed = false;
+        } else if (darkBase === '#1a1a1a') {
+            statusDiv.innerHTML += `<div class="test-result test-pass">✅ CORRECT: Dark background is #1a1a1a</div>`;
+        }
+        
+        if (allPassed) {
+            statusDiv.innerHTML = `<div class="test-result test-pass">✅ All systems operational - Single source of truth established!</div>` + statusDiv.innerHTML;
+        }
+        
+        // Display light colors
+        const lightDiv = document.getElementById('light-colors');
+        lightColors.forEach(varName => {
+            const value = rootStyles.getPropertyValue(varName).trim();
+            if (value) {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.innerHTML = `
+                    <div class="color-display" style="background: ${value}">${value}</div>
+                    <div class="color-info">
+                        <div class="color-name">${varName}</div>
+                        <div class="color-value">${value}</div>
+                    </div>
+                `;
+                lightDiv.appendChild(swatch);
+            }
+        });
+        
+        // Display dark colors
+        const darkDiv = document.getElementById('dark-colors');
+        darkColors.forEach(varName => {
+            const value = rootStyles.getPropertyValue(varName).trim();
+            if (value) {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.innerHTML = `
+                    <div class="color-display" style="background: ${value}">${value}</div>
+                    <div class="color-info">
+                        <div class="color-name">${varName}</div>
+                        <div class="color-value">${value}</div>
+                    </div>
+                `;
+                darkDiv.appendChild(swatch);
+            }
+        });
+        
+        // Display typography variables
+        const typoDiv = document.getElementById('typography-vars');
+        typographyVars.forEach(varName => {
+            const value = rootStyles.getPropertyValue(varName).trim();
+            if (value) {
+                typoDiv.innerHTML += `<code>${varName}: ${value}</code>`;
+            }
+        });
+        
+        // Display layout variables
+        const layoutDiv = document.getElementById('layout-vars');
+        layoutVars.forEach(varName => {
+            const value = rootStyles.getPropertyValue(varName).trim();
+            if (value) {
+                layoutDiv.innerHTML += `<code>${varName}: ${value}</code>`;
+            }
+        });
+    </script>
+</body>
+</html>
