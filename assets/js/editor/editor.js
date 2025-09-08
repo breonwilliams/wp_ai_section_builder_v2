@@ -1011,16 +1011,23 @@
                     
                     // Force re-render of sections to ensure immediate update
                     renderSections();
+                    
+                    // Close the modal after successful selection
+                    mediaFrame.close();
                 }
             });
             
-            // Fix aria-hidden focus warning when modal opens
-            mediaFrame.on('open', function() {
-                // Remove aria-hidden from modal elements to prevent focus warning
-                setTimeout(function() {
-                    $('.media-modal').removeAttr('aria-hidden');
-                    $('.media-modal-backdrop').removeAttr('aria-hidden');
-                }, 100);
+            // Fix aria-hidden focus warning when modal is ready
+            mediaFrame.on('ready', function() {
+                // Remove aria-hidden from uploader parent and modal elements to prevent focus warning
+                $('[id^="__wp-uploader-id-"]').removeAttr('aria-hidden');
+                $('.media-modal').removeAttr('aria-hidden');
+                $('.media-modal-backdrop').removeAttr('aria-hidden');
+                
+                debugLog('Media Modal Ready', {
+                    uploaderElements: $('[id^="__wp-uploader-id-"]').length,
+                    modalElements: $('.media-modal').length
+                });
             });
             
             // Finally, open the modal
