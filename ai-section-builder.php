@@ -551,21 +551,51 @@ function aisb_render_editor_page() {
                         <h2><?php _e('Global Settings', 'ai-section-builder'); ?></h2>
                     </div>
                     <div class="aisb-editor-panel__content aisb-settings-content">
-                        <!-- Primary Color Test Only -->
+                        <?php 
+                        // Get saved colors
+                        $color_settings = \AISB\Settings\Color_Settings::get_instance();
+                        $primary_color = $color_settings->get_primary_color();
+                        $text_light_color = $color_settings->get_text_light_color();
+                        $text_dark_color = $color_settings->get_text_dark_color();
+                        ?>
+                        
+                        <!-- Light Mode Colors -->
                         <div class="aisb-settings-group">
-                            <h4 class="aisb-settings-group__title"><?php _e('Color Settings (Test)', 'ai-section-builder'); ?></h4>
+                            <h4 class="aisb-settings-group__title"><?php _e('Light Mode Colors', 'ai-section-builder'); ?></h4>
+                            
+                            <!-- Primary Color -->
                             <div class="aisb-settings-field">
                                 <label for="aisb-gs-primary"><?php _e('Primary Color', 'ai-section-builder'); ?></label>
                                 <div class="aisb-color-input-wrapper">
-                                    <?php 
-                                    // Get saved primary color or default
-                                    $color_settings = \AISB\Settings\Color_Settings::get_instance();
-                                    $primary_color = $color_settings->get_primary_color();
-                                    ?>
                                     <input type="color" id="aisb-gs-primary" name="colors[primary]" value="<?php echo esc_attr($primary_color); ?>" />
                                     <input type="text" class="aisb-color-text" value="<?php echo esc_attr($primary_color); ?>" />
                                 </div>
-                                <p class="aisb-settings-help"><?php _e('This color will be used for buttons, links, and other interactive elements.', 'ai-section-builder'); ?></p>
+                                <p class="aisb-settings-help"><?php _e('Used for buttons, links, and interactive elements', 'ai-section-builder'); ?></p>
+                            </div>
+                            
+                            <!-- Text Color (Light) -->
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-text-light"><?php _e('Text Color', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-text-light" name="colors[text_light]" value="<?php echo esc_attr($text_light_color); ?>" />
+                                    <input type="text" class="aisb-color-text" value="<?php echo esc_attr($text_light_color); ?>" />
+                                </div>
+                                <p class="aisb-settings-help"><?php _e('Main text color for light sections', 'ai-section-builder'); ?></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Dark Mode Colors -->
+                        <div class="aisb-settings-group">
+                            <h4 class="aisb-settings-group__title"><?php _e('Dark Mode Colors', 'ai-section-builder'); ?></h4>
+                            
+                            <!-- Text Color (Dark) -->
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-text-dark"><?php _e('Text Color', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-text-dark" name="colors[text_dark]" value="<?php echo esc_attr($text_dark_color); ?>" />
+                                    <input type="text" class="aisb-color-text" value="<?php echo esc_attr($text_dark_color); ?>" />
+                                </div>
+                                <p class="aisb-settings-help"><?php _e('Main text color for dark sections', 'ai-section-builder'); ?></p>
                             </div>
                         </div>
                         

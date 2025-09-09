@@ -34,24 +34,57 @@
         }
         
         setupColorPickers() {
-            // Real-time preview on color picker input (as user drags/selects)
+            // Real-time preview on primary color picker
             $('#aisb-gs-primary').on('input', (e) => {
                 const color = $(e.target).val();
                 // Sync with text input
                 $(e.target).siblings('.aisb-color-text').val(color);
                 // Update preview immediately (debounced)
-                this.debounce(() => this.updatePreview(color), 150)();
+                this.debounce(() => this.updatePreview({primary: color}), 150)();
             });
             
-            // Handle text input changes with validation
+            // Real-time preview on text light color picker
+            $('#aisb-gs-text-light').on('input', (e) => {
+                const color = $(e.target).val();
+                // Sync with text input
+                $(e.target).siblings('.aisb-color-text').val(color);
+                // Update preview immediately (debounced)
+                this.debounce(() => this.updatePreview({textLight: color}), 150)();
+            });
+            
+            // Real-time preview on text dark color picker
+            $('#aisb-gs-text-dark').on('input', (e) => {
+                const color = $(e.target).val();
+                // Sync with text input
+                $(e.target).siblings('.aisb-color-text').val(color);
+                // Update preview immediately (debounced)
+                this.debounce(() => this.updatePreview({textDark: color}), 150)();
+            });
+            
+            // Handle text input changes with validation for all color fields
             $('.aisb-settings-field').find('.aisb-color-text').on('input', (e) => {
                 const value = $(e.target).val();
+                const $colorPicker = $(e.target).siblings('input[type="color"]');
+                
                 // Validate hex color format
                 if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
                     // Sync with color picker
-                    $(e.target).siblings('input[type="color"]').val(value);
+                    $colorPicker.val(value);
+                    
+                    // Determine which color was changed and update preview
+                    const pickerId = $colorPicker.attr('id');
+                    let updateData = {};
+                    
+                    if (pickerId === 'aisb-gs-primary') {
+                        updateData.primary = value;
+                    } else if (pickerId === 'aisb-gs-text-light') {
+                        updateData.textLight = value;
+                    } else if (pickerId === 'aisb-gs-text-dark') {
+                        updateData.textDark = value;
+                    }
+                    
                     // Update preview (debounced)
-                    this.debounce(() => this.updatePreview(value), 150)();
+                    this.debounce(() => this.updatePreview(updateData), 150)();
                 }
             });
         }
@@ -74,28 +107,37 @@
         
         savePrimaryColor() {
             const primaryColor = $('#aisb-gs-primary').val();
+            const textLightColor = $('#aisb-gs-text-light').val() || '#1a1a1a';  // Default if field doesn't exist
+            const textDarkColor = $('#aisb-gs-text-dark').val() || '#fafafa';    // Default if field doesn't exist
             
             // Show loading state
-            this.showMessage('Saving...', 'info');
+            this.showMessage('Saving colors...', 'info');
             
+            // Single unified save request
             $.ajax({
                 url: ajaxurl,
                 type: 'POST',
                 data: {
-                    action: 'aisb_save_primary_color',
+                    action: 'aisb_save_all_colors',
                     primary_color: primaryColor,
+                    text_light_color: textLightColor,
+                    text_dark_color: textDarkColor,
                     nonce: this.getNonce()
                 },
                 success: (response) => {
                     if (response.success) {
-                        this.showMessage(response.data.message, 'success');
+                        this.showMessage('All colors saved successfully', 'success');
                         // Update preview without indicator (already saved)
-                        this.updatePreview(response.data.color, false);
+                        this.updatePreview({
+                            primary: response.data.colors.primary,
+                            textLight: response.data.colors.text_light,
+                            textDark: response.data.colors.text_dark
+                        }, false);
                     } else {
-                        this.showMessage(response.data.message || 'Failed to save', 'error');
+                        this.showMessage(response.data?.message || 'Failed to save colors', 'error');
                     }
                 },
-                error: () => {
+                error: (jqXHR, textStatus, errorThrown) => {
                     this.showMessage('Network error. Please try again.', 'error');
                 }
             });
@@ -103,61 +145,110 @@
         
         resetPrimaryColor() {
             // Show loading state
-            this.showMessage('Resetting...', 'info');
+            this.showMessage('Resetting colors...', 'info');
             
-            $.ajax({
+            // Reset primary color
+            const resetPrimary = $.ajax({
                 url: ajaxurl,
                 type: 'POST',
                 data: {
                     action: 'aisb_reset_primary_color',
                     nonce: this.getNonce()
-                },
-                success: (response) => {
-                    if (response.success) {
-                        this.showMessage(response.data.message, 'success');
-                        // Update color picker to default
-                        $('#aisb-gs-primary').val(response.data.color);
-                        $('#aisb-gs-primary').siblings('.aisb-color-text').val(response.data.color);
-                        // Update preview without indicator (already saved)
-                        this.updatePreview(response.data.color, false);
-                    } else {
-                        this.showMessage(response.data.message || 'Failed to reset', 'error');
-                    }
-                },
-                error: () => {
-                    this.showMessage('Network error. Please try again.', 'error');
                 }
+            });
+            
+            // Reset text colors
+            const resetText = $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'aisb_reset_text_colors',
+                    nonce: this.getNonce()
+                }
+            });
+            
+            // Wait for all resets to complete
+            $.when(resetPrimary, resetText).done((primaryResponse, textResponse) => {
+                if (primaryResponse[0].success && textResponse[0].success) {
+                    this.showMessage('All colors reset to defaults', 'success');
+                    
+                    // Update color pickers to defaults
+                    $('#aisb-gs-primary').val(primaryResponse[0].data.color);
+                    $('#aisb-gs-primary').siblings('.aisb-color-text').val(primaryResponse[0].data.color);
+                    
+                    $('#aisb-gs-text-light').val(textResponse[0].data.text_light);
+                    $('#aisb-gs-text-light').siblings('.aisb-color-text').val(textResponse[0].data.text_light);
+                    
+                    $('#aisb-gs-text-dark').val(textResponse[0].data.text_dark);
+                    $('#aisb-gs-text-dark').siblings('.aisb-color-text').val(textResponse[0].data.text_dark);
+                    
+                    // Update preview without indicator (already saved)
+                    this.updatePreview({
+                        primary: primaryResponse[0].data.color,
+                        textLight: textResponse[0].data.text_light,
+                        textDark: textResponse[0].data.text_dark
+                    }, false);
+                } else {
+                    this.showMessage('Some colors failed to reset', 'error');
+                }
+            }).fail(() => {
+                this.showMessage('Network error. Please try again.', 'error');
             });
         }
         
-        updatePreview(color, showIndicator = true) {
+        updatePreview(colorsOrString, showIndicator = true) {
             // Update CSS variables in real-time in the current document
-            // Since we're in the same page (not iframe), update the style directly
             const $style = $('#aisb-color-settings');
             
             if ($style.length) {
-                // Calculate hover and dark variants
-                const hoverColor = this.darkenColor(color, 10);
-                const darkColor = this.lightenColor(color, 20);
-                const darkHoverColor = this.lightenColor(color, 30);
+                let currentCSS = $style.html();
+                let colors = {};
                 
-                // Update all primary color variables
-                const currentCSS = $style.html();
-                const updatedCSS = currentCSS
-                    .replace(/--aisb-color-primary:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-primary: ' + color)
-                    .replace(/--aisb-color-primary-hover:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-primary-hover: ' + hoverColor)
-                    .replace(/--aisb-color-dark-primary:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-dark-primary: ' + darkColor)
-                    .replace(/--aisb-color-dark-primary-hover:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-dark-primary-hover: ' + darkHoverColor)
-                    .replace(/--aisb-interactive-primary:\s*#[0-9a-fA-F]{6}/g, '--aisb-interactive-primary: ' + color)
-                    .replace(/--aisb-interactive-primary-hover:\s*#[0-9a-fA-F]{6}/g, '--aisb-interactive-primary-hover: ' + hoverColor)
-                    .replace(/--aisb-interactive-secondary:\s*#[0-9a-fA-F]{6}/g, '--aisb-interactive-secondary: ' + color)
-                    .replace(/--aisb-interactive-secondary-text:\s*#[0-9a-fA-F]{6}/g, '--aisb-interactive-secondary-text: ' + color)
-                    .replace(/--aisb-content-link:\s*#[0-9a-fA-F]{6}/g, '--aisb-content-link: ' + color)
-                    .replace(/--aisb-content-link-hover:\s*#[0-9a-fA-F]{6}/g, '--aisb-content-link-hover: ' + hoverColor)
-                    .replace(/--aisb-border-interactive:\s*#[0-9a-fA-F]{6}/g, '--aisb-border-interactive: ' + color)
-                    .replace(/--aisb-feedback-info:\s*#[0-9a-fA-F]{6}/g, '--aisb-feedback-info: ' + color);
+                // Handle both string (backward compatibility) and object (new format)
+                if (typeof colorsOrString === 'string') {
+                    // Old format: single color string for primary
+                    colors.primary = colorsOrString;
+                } else {
+                    // New format: object with multiple colors
+                    colors = colorsOrString;
+                }
                 
-                $style.html(updatedCSS);
+                // Update primary color if provided
+                if (colors.primary) {
+                    const color = colors.primary;
+                    const hoverColor = this.darkenColor(color, 10);
+                    const darkColor = this.lightenColor(color, 20);
+                    const darkHoverColor = this.lightenColor(color, 30);
+                    
+                    currentCSS = currentCSS
+                        .replace(/--aisb-color-primary:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-primary: ' + color)
+                        .replace(/--aisb-color-primary-hover:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-primary-hover: ' + hoverColor)
+                        .replace(/--aisb-color-dark-primary:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-dark-primary: ' + darkColor)
+                        .replace(/--aisb-color-dark-primary-hover:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-dark-primary-hover: ' + darkHoverColor)
+                        .replace(/--aisb-interactive-primary:\s*#[0-9a-fA-F]{6}/g, '--aisb-interactive-primary: ' + color)
+                        .replace(/--aisb-interactive-primary-hover:\s*#[0-9a-fA-F]{6}/g, '--aisb-interactive-primary-hover: ' + hoverColor)
+                        .replace(/--aisb-interactive-secondary:\s*#[0-9a-fA-F]{6}/g, '--aisb-interactive-secondary: ' + color)
+                        .replace(/--aisb-interactive-secondary-text:\s*#[0-9a-fA-F]{6}/g, '--aisb-interactive-secondary-text: ' + color)
+                        .replace(/--aisb-content-link:\s*#[0-9a-fA-F]{6}/g, '--aisb-content-link: ' + color)
+                        .replace(/--aisb-content-link-hover:\s*#[0-9a-fA-F]{6}/g, '--aisb-content-link-hover: ' + hoverColor)
+                        .replace(/--aisb-border-interactive:\s*#[0-9a-fA-F]{6}/g, '--aisb-border-interactive: ' + color)
+                        .replace(/--aisb-feedback-info:\s*#[0-9a-fA-F]{6}/g, '--aisb-feedback-info: ' + color);
+                }
+                
+                // Update text light color if provided
+                if (colors.textLight) {
+                    currentCSS = currentCSS
+                        .replace(/--aisb-color-text:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-text: ' + colors.textLight)
+                        .replace(/--aisb-content-primary:\s*#[0-9a-fA-F]{6}/g, '--aisb-content-primary: ' + colors.textLight);
+                }
+                
+                // Update text dark color if provided
+                if (colors.textDark) {
+                    currentCSS = currentCSS
+                        .replace(/--aisb-color-dark-text:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-dark-text: ' + colors.textDark);
+                }
+                
+                $style.html(currentCSS);
                 
                 // Show a subtle indicator that preview is active (not saved)
                 if (showIndicator) {
@@ -201,7 +292,7 @@
         }
         
         getNonce() {
-            // Try to get nonce from localized script or generate one
+            // Try to get nonce from localized script or hidden field
             return window.aisbColorSettings?.nonce || $('#aisb-color-nonce').val() || '';
         }
         
