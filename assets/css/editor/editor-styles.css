@@ -543,48 +543,87 @@ body.aisb-editor-active .aisb-editor-wrapper {
     line-height: 1;
 }
 
-/* Save status indicator */
-.aisb-save-status {
-    margin-left: var(--aisb-editor-space-md);
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--aisb-editor-text-muted);
-    opacity: 0;
-    transition: opacity var(--aisb-transition-fast);
+/* Modern Save Button States and Animations */
+
+/* Spinner animation for saving state */
+@keyframes aisb-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
-.aisb-save-status.saving,
-.aisb-save-status.saved,
-.aisb-save-status.error,
-.aisb-save-status.unsaved {
-    opacity: 1;
+/* Pulse animation for unsaved changes */
+@keyframes aisb-pulse {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
 }
 
-.aisb-save-status.saving {
-    color: var(--aisb-editor-text-secondary);
+/* Save button text spacing */
+.aisb-save-btn-text {
+    margin-left: 6px;
 }
 
-.aisb-save-status.saved {
-    color: var(--aisb-editor-success);
+/* Spinning icon during save */
+.dashicons.aisb-spin {
+    animation: aisb-spin 1s linear infinite;
+    display: inline-block;
 }
 
-.aisb-save-status.error {
-    color: var(--aisb-editor-danger);
+/* Save button states */
+#aisb-save-sections {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-.aisb-save-status.unsaved {
-    color: var(--aisb-editor-warning, #f39c12);
+/* Unsaved changes state - subtle pulse */
+#aisb-save-sections.has-changes {
+    animation: aisb-pulse 2s ease-in-out infinite;
+    background-color: var(--aisb-editor-accent);
+    border-color: var(--aisb-editor-accent);
 }
 
-/* Visual indicator on save button when there are unsaved changes */
-.aisb-editor-button.has-changes {
-    background-color: var(--aisb-editor-warning, #f39c12);
-    border-color: var(--aisb-editor-warning, #f39c12);
+#aisb-save-sections.has-changes:hover:not(:disabled) {
+    animation: none;
+    background-color: var(--aisb-editor-accent-hover);
+    border-color: var(--aisb-editor-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-.aisb-editor-button.has-changes:hover {
-    background-color: #e67e22;
-    border-color: #e67e22;
+/* Saving state */
+#aisb-save-sections.is-saving {
+    background-color: var(--aisb-editor-bg-secondary);
+    border-color: var(--aisb-editor-border);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Saved state - success green */
+#aisb-save-sections.is-saved {
+    background-color: var(--aisb-editor-success, #10b981);
+    border-color: var(--aisb-editor-success, #10b981);
+}
+
+#aisb-save-sections.is-saved:hover:not(:disabled) {
+    background-color: var(--aisb-editor-success, #10b981);
+    border-color: var(--aisb-editor-success, #10b981);
+}
+
+/* Ensure Primary button keeps its importance */
+.aisb-editor-btn-primary:not(.has-changes):not(.is-saving):not(.is-saved) {
+    background-color: var(--aisb-editor-accent);
+    border-color: var(--aisb-editor-accent);
+}
+
+.aisb-editor-btn-primary:not(.has-changes):not(.is-saving):not(.is-saved):hover:not(:disabled) {
+    background-color: var(--aisb-editor-accent-hover);
+    border-color: var(--aisb-editor-accent-hover);
 }
 
 /* =========================================
@@ -1133,19 +1172,6 @@ body.aisb-editor-active .aisb-editor-wrapper {
 .aisb-media-selector .aisb-editor-btn-with-icon {
     padding-left: 20px !important;
     padding-right: 20px !important;
-}
-
-/* =========================================
-   Responsive Preview Controls
-   ========================================= */
-.aisb-preview-toggle {
-    position: relative;
-}
-
-.aisb-preview-toggle[data-view="desktop"] .dashicons-desktop,
-.aisb-preview-toggle[data-view="tablet"] .dashicons-tablet,
-.aisb-preview-toggle[data-view="mobile"] .dashicons-smartphone {
-    color: var(--aisb-editor-accent);
 }
 
 /* =========================================

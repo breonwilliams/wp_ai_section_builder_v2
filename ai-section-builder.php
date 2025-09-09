@@ -462,15 +462,6 @@ function aisb_render_editor_page() {
             </div>
             <div class="aisb-editor-toolbar__right">
                 <div class="aisb-toolbar-group">
-                    <button class="aisb-editor-btn aisb-editor-btn-ghost" 
-                            id="aisb-global-settings-btn"
-                            title="<?php _e('Global Settings (Cmd/Ctrl + ,)', 'ai-section-builder'); ?>"
-                            aria-label="<?php _e('Open global settings panel', 'ai-section-builder'); ?>">
-                        <span class="dashicons dashicons-admin-generic"></span>
-                        <span class="aisb-btn-label"><?php _e('Global Settings', 'ai-section-builder'); ?></span>
-                    </button>
-                </div>
-                <div class="aisb-toolbar-group">
                     <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-sidebar-toggle active" 
                             id="aisb-toggle-sidebars" 
                             title="<?php _e('Toggle Sidebars (Shift+S)', 'ai-section-builder'); ?>"
@@ -478,17 +469,6 @@ function aisb_render_editor_page() {
                             aria-pressed="true">
                         <span class="dashicons dashicons-editor-contract"></span>
                         <span class="aisb-btn-label"><?php _e('Hide Panels', 'ai-section-builder'); ?></span>
-                    </button>
-                </div>
-                <div class="aisb-toolbar-group">
-                    <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-preview-toggle" data-view="desktop">
-                        <span class="dashicons dashicons-desktop"></span>
-                    </button>
-                    <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-preview-toggle" data-view="tablet">
-                        <span class="dashicons dashicons-tablet"></span>
-                    </button>
-                    <button class="aisb-editor-btn aisb-editor-btn-ghost aisb-preview-toggle" data-view="mobile">
-                        <span class="dashicons dashicons-smartphone"></span>
                     </button>
                 </div>
                 <button class="aisb-editor-btn aisb-editor-btn-primary" id="aisb-save-sections">

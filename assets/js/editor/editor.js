@@ -14,6 +14,7 @@
         sections: [],
         currentSection: null,
         isDirty: false,
+        isSaving: false, // Track save state for beforeunload
         reorderMode: {
             active: false,
             selectedIndex: null,
@@ -21,6 +22,8 @@
         },
         lastSaved: null,
         sortableInstance: null,
+        sortableInitializing: false, // Track initialization state
+        autoSaveTimer: null, // Auto-save timer reference
         debug: false // Debug mode - set to true to troubleshoot
     };
     
@@ -35,7 +38,9 @@
      * Initialize editor
      */
     function initEditor() {
-        // Initialize drag-drop capabilities (Phase 2)
+        console.log('AISB: Initializing editor');
+        
+        // Initialize drag-drop capabilities
         initDragDropCapabilities();
         
         // Load existing sections if any
@@ -46,6 +51,11 @@
         
         // Initialize sidebar toggle
         initSidebarToggle();
+        
+        // Initialize save protection
+        initSaveProtection();
+        
+        console.log('AISB: Editor initialization complete');
     }
     
     /**
@@ -53,26 +63,38 @@
      */
     function initDragDropCapabilities() {
         // Check if drag-drop should be enabled
-        var features = (window.aisbEditor && window.aisbEditor.features) || {};
+        var features = (window.aisbEditor && window.aisbEditor.features) || { dragDrop: true }; // Default to enabled
         
-        if (features.dragDrop) {
+        console.log('AISB: Features config:', features);
+        console.log('AISB: Sortable.js available:', typeof Sortable !== 'undefined');
+        
+        if (features.dragDrop !== false) { // Enable by default unless explicitly disabled
             // Check if Sortable.js is available
             if (typeof Sortable === 'undefined') {
-                console.warn('AISB: Sortable.js failed to load, falling back to keyboard-only mode');
-                showNotification('Drag-drop unavailable. Use Enter key on drag handles for keyboard reordering.', 'warning');
+                console.warn('AISB: Sortable.js not loaded, attempting fallback...');
+                // Give it one more chance after a delay
+                setTimeout(function() {
+                    if (typeof Sortable !== 'undefined') {
+                        console.log('AISB: Sortable.js loaded after delay');
+                        initSortableJS();
+                    } else {
+                        console.error('AISB: Sortable.js failed to load completely');
+                        showNotification('Drag-drop unavailable. Use keyboard navigation.', 'warning');
+                    }
+                }, 500);
                 return;
             }
             
             // Initialize Sortable.js with error boundary
             try {
+                console.log('AISB: Initializing Sortable.js drag-drop');
                 initSortableJS();
-                console.log('AISB: Sortable.js drag-drop initialized successfully');
             } catch (error) {
                 console.error('AISB: Sortable.js initialization failed:', error);
                 showNotification('Drag-drop initialization failed. Keyboard navigation available.', 'error');
             }
         } else {
-            console.log('AISB: Keyboard navigation mode (drag-drop disabled)');
+            console.log('AISB: Drag-drop explicitly disabled in features');
         }
     }
     
@@ -80,28 +102,47 @@
      * Initialize Sortable.js functionality
      */
     function initSortableJS() {
+        // Prevent multiple initialization attempts
+        if (editorState.sortableInitializing) {
+            console.log('AISB: Sortable initialization already in progress');
+            return;
+        }
+        
+        var retryCount = 0;
+        var maxRetries = 30; // 3 seconds max wait
+        
         // Wait for DOM to be ready and section list to exist
         function setupSortable() {
             var sectionList = document.getElementById('aisb-section-list');
+            
             if (!sectionList) {
-                console.warn('AISB: Section list not found, retrying...');
+                retryCount++;
+                if (retryCount > maxRetries) {
+                    console.error('AISB: Section list not found after ' + maxRetries + ' attempts');
+                    editorState.sortableInitializing = false;
+                    return;
+                }
+                console.warn('AISB: Section list not found, retry ' + retryCount + '/' + maxRetries);
                 setTimeout(setupSortable, 100);
                 return;
             }
             
-            // Initialize Sortable.js
-            var sortable = new Sortable(sectionList, {
-                // Basic Configuration
-                animation: 200, // Smooth animations
-                easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)', // Material Design easing
-                delay: 0, // No delay on desktop
-                delayOnTouchStart: true, // Delay on touch to prevent conflicts with scrolling
-                touchStartThreshold: 5, // px, how many pixels the point should move before cancelling
-                
-                // Drag Handle
-                handle: '.aisb-section-item__drag', // Only drag via handle
-                draggable: '.aisb-section-item', // Only drag section items
-                draggable: '.aisb-section-item', // What elements are draggable
+            // Mark as initializing
+            editorState.sortableInitializing = true;
+            
+            try {
+                // Initialize Sortable.js
+                var sortable = new Sortable(sectionList, {
+                    // Basic Configuration
+                    animation: 200, // Smooth animations
+                    easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)', // Material Design easing
+                    delay: 0, // No delay on desktop
+                    delayOnTouchStart: true, // Delay on touch to prevent conflicts with scrolling
+                    touchStartThreshold: 5, // px, how many pixels the point should move before cancelling
+                    
+                    // Drag Handle
+                    handle: '.aisb-section-item__drag', // Only drag via handle
+                    draggable: '.aisb-section-item', // What elements are draggable
                 
                 // Visual Feedback
                 ghostClass: 'aisb-sortable-ghost', // Class for the drop placeholder
@@ -129,17 +170,24 @@
                 onEnd: function(evt) {
                     handleDragEnd(evt);
                 }
-            });
-            
-            // Store sortable instance for cleanup
-            editorState.sortableInstance = sortable;
-            
-            // Debug: Log sortable configuration
-            console.log('AISB: Sortable initialized with options:', {
-                container: sectionList.id,
-                childCount: sectionList.children.length,
-                draggableSelector: '.aisb-section-item'
-            });
+                });
+                
+                // Store sortable instance for cleanup
+                editorState.sortableInstance = sortable;
+                editorState.sortableInitializing = false;
+                
+                // Debug: Log sortable configuration
+                console.log('AISB: Sortable initialized successfully:', {
+                    container: sectionList.id,
+                    childCount: sectionList.children.length,
+                    draggableSelector: '.aisb-section-item'
+                });
+                
+            } catch (error) {
+                console.error('AISB: Failed to initialize Sortable:', error);
+                editorState.sortableInitializing = false;
+                showNotification('Drag-drop initialization failed. Using keyboard navigation.', 'warning');
+            }
         }
         
         setupSortable();
@@ -151,6 +199,12 @@
     function handleDragStart(evt) {
         var draggedIndex = parseInt(evt.oldIndex);
         
+        // Validate index
+        if (isNaN(draggedIndex) || draggedIndex < 0) {
+            console.error('AISB: Invalid drag index:', evt.oldIndex);
+            return;
+        }
+        
         // Store drag state
         editorState.reorderMode.active = true;
         editorState.reorderMode.selectedIndex = draggedIndex;
@@ -158,10 +212,14 @@
         // Add visual feedback
         document.body.classList.add('aisb-dragging');
         
-        // Announce to screen readers
-        announceToScreenReader('Dragging section. Move to desired position and release.');
+        // Get section info for debugging
+        var section = editorState.sections[draggedIndex];
+        var sectionTitle = section ? (section.content.heading || 'Untitled') : 'Unknown';
         
-        console.log('AISB: Drag started for section', draggedIndex);
+        // Announce to screen readers
+        announceToScreenReader('Dragging section: ' + sectionTitle + '. Move to desired position and release.');
+        
+        console.log('AISB: Drag started for section', draggedIndex, '(' + sectionTitle + ')');
     }
     
     /**
@@ -179,6 +237,8 @@
     function handleDragEnd(evt) {
         var oldIndex = parseInt(evt.oldIndex);
         var newIndex = parseInt(evt.newIndex);
+        
+        console.log('AISB: Drag ended - oldIndex:', oldIndex, 'newIndex:', newIndex);
         
         // Clean up visual state
         document.body.classList.remove('aisb-dragging');
@@ -205,7 +265,11 @@
                 console.error('AISB: No section found at index', oldIndex);
                 return;
             }
+            
+            var sectionTitle = section.content.heading || 'Untitled Section';
             editorState.sections.splice(newIndex, 0, section);
+            
+            console.log('AISB: Moved section "' + sectionTitle + '" from position', oldIndex + 1, 'to', newIndex + 1);
             
             // Mark as dirty to show unsaved changes
             editorState.isDirty = true;
@@ -220,10 +284,11 @@
             updateSaveStatus('unsaved');
             
             // Announce success
-            var successMsg = (window.aisbEditor && window.aisbEditor.i18n.sectionMoved) || 'Section moved successfully';
+            var successMsg = 'Section "' + sectionTitle + '" moved to position ' + (newIndex + 1);
             announceToScreenReader(successMsg);
+            showNotification(successMsg, 'success');
             
-            console.log('AISB: Section moved from', oldIndex, 'to', newIndex);
+            console.log('AISB: Section reorder completed successfully');
         } else {
             console.log('AISB: Drag cancelled, no position change');
         }
@@ -233,24 +298,42 @@
      * Reinitialize Sortable.js after DOM changes
      */
     function reinitializeSortable() {
+        console.log('AISB: Reinitializing Sortable.js');
+        
         // Clean up existing instance safely
         if (editorState.sortableInstance) {
             try {
                 // Check if the instance and its element still exist
                 if (editorState.sortableInstance.el && editorState.sortableInstance.destroy) {
                     editorState.sortableInstance.destroy();
+                    console.log('AISB: Existing Sortable instance destroyed');
                 }
             } catch (error) {
-                // Silent fail - instance already destroyed or invalid
+                console.warn('AISB: Error destroying Sortable instance:', error);
             }
             editorState.sortableInstance = null;
         }
         
+        // Reset initialization flag
+        editorState.sortableInitializing = false;
+        
         // Reinitialize if drag-drop is enabled
         var features = (window.aisbEditor && window.aisbEditor.features) || {};
-        var sortableContainer = document.querySelector('.aisb-sections-list');
+        var sortableContainer = document.getElementById('aisb-section-list'); // Fixed selector
+        
         if (features.dragDrop && typeof Sortable !== 'undefined' && sortableContainer) {
-            setTimeout(initSortableJS, 10); // Small delay for DOM updates
+            console.log('AISB: Section list found, reinitializing drag-drop');
+            setTimeout(initSortableJS, 50); // Small delay for DOM updates
+        } else {
+            if (!features.dragDrop) {
+                console.log('AISB: Drag-drop disabled in features');
+            }
+            if (typeof Sortable === 'undefined') {
+                console.warn('AISB: Sortable.js not loaded');
+            }
+            if (!sortableContainer) {
+                console.warn('AISB: Section list container not found');
+            }
         }
     }
     
@@ -327,12 +410,6 @@
         // Save button
         $('#aisb-save-sections').on('click', function() {
             saveSections();
-        });
-        
-        // Responsive preview toggles
-        $('.aisb-preview-toggle').on('click', function() {
-            var view = $(this).data('view');
-            setPreviewMode(view);
         });
         
         // Back to library button
@@ -1606,21 +1683,22 @@
     }
     
     /**
-     * Update save status indicator
+     * Update save status indicator - Modernized version
      */
     function updateSaveStatus(status) {
         var $saveBtn = $('#aisb-save-sections');
-        var $statusIndicator = $('#aisb-save-status');
+        var $btnText = $saveBtn.find('.aisb-save-btn-text');
+        var $btnIcon = $saveBtn.find('.dashicons');
         
-        // Create status indicator if it doesn't exist
-        if (!$statusIndicator.length) {
-            $statusIndicator = $('<span id="aisb-save-status" class="aisb-save-status"></span>');
-            $saveBtn.after($statusIndicator);
+        // Create button inner elements if they don't exist
+        if (!$btnText.length) {
+            $saveBtn.html('<span class="dashicons dashicons-saved"></span><span class="aisb-save-btn-text">Save</span>');
+            $btnText = $saveBtn.find('.aisb-save-btn-text');
+            $btnIcon = $saveBtn.find('.dashicons');
         }
         
         // Reset classes
-        $statusIndicator.removeClass('saving saved error unsaved');
-        $saveBtn.removeClass('has-changes');
+        $saveBtn.removeClass('has-changes is-saving is-saved');
         
         // Ensure button is enabled for states that allow saving
         if (status !== 'saving') {
@@ -1630,33 +1708,64 @@
         switch (status) {
             case 'unsaved':
                 $saveBtn.addClass('has-changes');
-                $statusIndicator.addClass('unsaved').text('Unsaved changes');
+                $btnIcon.removeClass().addClass('dashicons dashicons-upload');
+                $btnText.text('Save Changes');
+                // Schedule auto-save
+                scheduleAutoSave();
                 break;
             case 'saving':
-                $saveBtn.prop('disabled', true);
-                $statusIndicator.addClass('saving').text('Saving...');
+                editorState.isSaving = true;
+                $saveBtn.prop('disabled', true).addClass('is-saving');
+                $btnIcon.removeClass().addClass('dashicons dashicons-update aisb-spin');
+                $btnText.text('Saving...');
                 break;
             case 'saved':
-                $statusIndicator.addClass('saved').text('Saved');
+                editorState.isSaving = false;
+                $saveBtn.addClass('is-saved');
+                $btnIcon.removeClass().addClass('dashicons dashicons-yes-alt');
+                $btnText.text('Saved');
+                // Revert to default state after 2 seconds
                 setTimeout(function() {
-                    $statusIndicator.text('');
-                }, 3000);
+                    if (!editorState.isDirty) {
+                        $btnIcon.removeClass().addClass('dashicons dashicons-saved');
+                        $btnText.text('Save');
+                        $saveBtn.removeClass('is-saved');
+                    }
+                }, 2000);
                 break;
             case 'error':
-                $statusIndicator.addClass('error').text('Save failed');
-                // Keep button enabled so user can retry
-                $saveBtn.prop('disabled', false);
+                editorState.isSaving = false;
+                $btnIcon.removeClass().addClass('dashicons dashicons-warning');
+                $btnText.text('Save Failed');
+                // Revert to unsaved state after 3 seconds
+                setTimeout(function() {
+                    if (editorState.isDirty) {
+                        updateSaveStatus('unsaved');
+                    }
+                }, 3000);
                 break;
             default:
-                $statusIndicator.text('');
+                $btnIcon.removeClass().addClass('dashicons dashicons-saved');
+                $btnText.text('Save');
         }
     }
     
     /**
-     * Save sections (manual save button)
+     * Save sections (manual save button or auto-save)
      */
-    function saveSections() {
-        // Perform manual save
+    function saveSections(isAutoSave) {
+        // Clear any pending auto-save
+        if (editorState.autoSaveTimer) {
+            clearTimeout(editorState.autoSaveTimer);
+            editorState.autoSaveTimer = null;
+        }
+        
+        // Don't save if already saving or no changes
+        if (editorState.isSaving || !editorState.isDirty) {
+            return;
+        }
+        
+        // Perform save
         updateSaveStatus('saving');
         
         saveSectionsToServer()
@@ -1664,12 +1773,67 @@
                 editorState.isDirty = false;
                 editorState.lastSaved = new Date();
                 updateSaveStatus('saved');
-                showNotification('Page saved successfully');
+                
+                // Different notification for auto-save vs manual
+                if (isAutoSave) {
+                    console.log('AISB: Auto-saved successfully');
+                } else {
+                    showNotification('Changes saved', 'success');
+                }
             })
             .catch(function(error) {
                 updateSaveStatus('error');
                 showNotification('Save failed: ' + error.message, 'error');
+                
+                // Re-schedule auto-save on failure
+                if (isAutoSave) {
+                    scheduleAutoSave();
+                }
             });
+    }
+    
+    /**
+     * Schedule auto-save after user stops making changes
+     */
+    function scheduleAutoSave() {
+        // Clear existing timer
+        if (editorState.autoSaveTimer) {
+            clearTimeout(editorState.autoSaveTimer);
+        }
+        
+        // Only schedule if there are unsaved changes
+        if (editorState.isDirty && !editorState.isSaving) {
+            editorState.autoSaveTimer = setTimeout(function() {
+                console.log('AISB: Auto-saving changes...');
+                saveSections(true); // Pass true to indicate auto-save
+            }, 5000); // 5 seconds after last change
+        }
+    }
+    
+    /**
+     * Initialize save protection and keyboard shortcuts
+     */
+    function initSaveProtection() {
+        // Beforeunload protection
+        window.addEventListener('beforeunload', function(e) {
+            if (editorState.isDirty && !editorState.isSaving) {
+                e.preventDefault();
+                e.returnValue = ''; // Chrome requires this
+                return 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        });
+        
+        // Keyboard shortcut for save (Ctrl/Cmd + S)
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                if (editorState.isDirty && !editorState.isSaving) {
+                    saveSections();
+                }
+            }
+        });
+        
+        console.log('AISB: Save protection initialized');
     }
     
     /**
@@ -1733,27 +1897,6 @@
     }
     
     /**
-     * Set preview mode
-     */
-    function setPreviewMode(mode) {
-        $('.aisb-preview-toggle').removeClass('active');
-        $('.aisb-preview-toggle[data-view="' + mode + '"]').addClass('active');
-        
-        var $canvas = $('.aisb-editor-canvas__inner');
-        
-        switch(mode) {
-            case 'tablet':
-                $canvas.css('max-width', '768px');
-                break;
-            case 'mobile':
-                $canvas.css('max-width', '375px');
-                break;
-            default:
-                $canvas.css('max-width', '1200px');
-        }
-    }
-    
-    /**
      * Update section list in right panel
      */
     function updateSectionList(skipSortableReinit) {
@@ -1773,7 +1916,7 @@
         $list.show();
         
         $.each(editorState.sections, function(index, section) {
-            var title = section.content.headline || 'Untitled Section';
+            var title = section.content.heading || section.content.headline || 'Untitled Section';
             var type = section.type.charAt(0).toUpperCase() + section.type.slice(1);
             var isActive = editorState.currentSection === index;
             var isReorderMode = editorState.reorderMode.active && editorState.reorderMode.selectedIndex === index;
@@ -1790,7 +1933,7 @@
                          tabindex="-1"
                          aria-label="Drag to reorder or use Enter to activate keyboard reordering"
                          title="Drag to reorder or use Enter to activate keyboard reordering">
-                        <span class="dashicons dashicons-sort" aria-hidden="true"></span>
+                        <span class="dashicons dashicons-menu" aria-hidden="true"></span>
                     </div>
                     <div class="aisb-section-item__icon" aria-hidden="true">
                         <span class="dashicons dashicons-megaphone"></span>
