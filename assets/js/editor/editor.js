@@ -274,6 +274,19 @@
      * Bind editor events
      */
     function bindEvents() {
+        // Panel tab switching (Sections vs Settings)
+        $('.aisb-panel-tab').on('click', function() {
+            var panelId = $(this).data('panel');
+            
+            // Update tab active states
+            $('.aisb-panel-tab').removeClass('active');
+            $(this).addClass('active');
+            
+            // Show corresponding panel
+            $('.aisb-panel-content').removeClass('active').hide();
+            $('#aisb-panel-' + panelId).addClass('active').show();
+        });
+        
         // Add section button - auto-add with defaults
         $('.aisb-section-type').on('click', function() {
             var sectionType = $(this).data('type');

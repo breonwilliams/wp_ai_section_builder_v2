@@ -9,29 +9,30 @@
 :root {
     /* =========================================
        SECTION Color System - FOR SECTIONS ONLY
-       8 colors that users can customize globally
-       NEVER mix with editor UI colors!
+       Colors are defined dynamically by PHP
+       These variables are USED by CSS but DEFINED in PHP
        ========================================= */
     
-    /* Light Mode Colors - FOR SECTIONS ONLY */
-    --aisb-color-base: #ffffff;        /* Background white */
-    --aisb-color-text: #1a1a1a;        /* Primary text black */
-    --aisb-color-muted: #64748b;       /* Secondary text, visited links - NOT PURPLE */
-    --aisb-color-primary: #2563eb;     /* Links, primary buttons */
-    --aisb-color-primary-hover: #1d4ed8; /* Hover states */
-    --aisb-color-secondary: #f1f5f9;   /* Secondary backgrounds */
-    --aisb-color-border: #e2e8f0;      /* Borders */
-    --aisb-color-success: #10b981;     /* Success states */
-    --aisb-color-error: #ef4444;       /* Error states */
-    
-    /* Dark Mode Colors - FOR SECTIONS ONLY */
-    --aisb-color-dark-base: #1a1a1a;   /* Background black */
-    --aisb-color-dark-text: #fafafa;   /* Primary text white */
-    --aisb-color-dark-muted: #9ca3af;  /* Secondary text, visited links - NOT PURPLE */
-    --aisb-color-dark-primary: #60a5fa; /* Links, primary buttons */
-    --aisb-color-dark-primary-hover: #3b82f6; /* Hover states */
-    --aisb-color-dark-secondary: #374151; /* Secondary backgrounds */
-    --aisb-color-dark-border: #4b5563; /* Borders */
+    /* Color variables will be injected by PHP at runtime:
+       --aisb-color-base
+       --aisb-color-text
+       --aisb-color-muted
+       --aisb-color-primary
+       --aisb-color-primary-hover
+       --aisb-color-secondary
+       --aisb-color-border
+       --aisb-color-success
+       --aisb-color-error
+       
+       Dark mode variables (future):
+       --aisb-color-dark-base
+       --aisb-color-dark-text
+       --aisb-color-dark-muted
+       --aisb-color-dark-primary
+       --aisb-color-dark-primary-hover
+       --aisb-color-dark-secondary
+       --aisb-color-dark-border
+    */
     
     /* =========================================
        Semantic Design Tokens
