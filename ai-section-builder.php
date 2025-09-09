@@ -89,6 +89,7 @@ function aisb_setup() {
     
     // AJAX handlers
     add_action('wp_ajax_aisb_activate_builder', 'aisb_ajax_activate_builder');
+    add_action('wp_ajax_aisb_deactivate_builder', 'aisb_ajax_deactivate_builder');
     add_action('wp_ajax_aisb_save_sections', 'aisb_ajax_save_sections');
 }
 
@@ -880,81 +881,53 @@ function aisb_meta_box_callback($post) {
                     return;
                 }
                 
-                // For deactivate, use the old save method
+                // For deactivate, use AJAX like activate
                 if (action === 'deactivate') {
-                    // Set hidden field values
-                    $('#aisb-action').val(action);
-                    $('#aisb-enabled').val('0');
-                    
-                    // Disable button and show loading state
-                    $button.prop('disabled', true);
+                    // Store original button text
                     var originalText = $button.text();
-                    $button.text('Processing...');
                     
-                    // Different approach for Gutenberg vs Classic editor
-                    // First try to find the correct form/button to trigger save
-                    var $updateButton = $('.editor-post-publish-button__button').filter(':visible'); // Gutenberg update button
-                    var $publishButton = $('#publish'); // Classic editor
-                    var $saveButton = $('#save-post'); // Classic editor draft
+                    // Confirm deactivation
+                    if (!confirm('Are you sure you want to deactivate AI Section Builder? Your sections will be preserved and can be restored if you reactivate.')) {
+                        return false;
+                    }
                     
-                    if ($updateButton.length) {
-                        console.log('AISB: Using Gutenberg update button');
-                        // For Gutenberg, we need to trigger the update button
-                        // But first ensure our hidden fields are in a form that will be submitted
-                        
-                        // Force save by triggering the Gutenberg save
-                        wp.data.dispatch('core/editor').savePost();
-                        
-                    } else if ($publishButton.length || $saveButton.length) {
-                        console.log('AISB: Using Classic editor buttons');
-                        // Classic editor - find and submit the form
-                        var $form = $('#post');
-                        if ($form.length) {
-                            $form.submit();
-                        } else {
-                            // Fallback
-                            if ($publishButton.length) {
-                                $publishButton.click();
-                            } else if ($saveButton.length) {
-                                $saveButton.click();
+                    // Show loading state
+                    $button.prop('disabled', true).text('Deactivating...');
+                    
+                    // Make AJAX request to deactivate
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'aisb_deactivate_builder',
+                            post_id: postId,
+                            nonce: $('[name="aisb_nonce"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Show success message
+                                console.log('AISB: Builder deactivated successfully');
+                                
+                                // Update button text temporarily to show success
+                                $button.text('Deactivated!');
+                                
+                                // Reload the page after a short delay to update the meta box
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 1000);
+                            } else {
+                                alert('Error deactivating builder: ' + response.data);
+                                $button.prop('disabled', false).text(originalText);
                             }
+                        },
+                        error: function() {
+                            alert('Error deactivating builder. Please try again.');
+                            $button.prop('disabled', false).text(originalText);
                         }
-                } else {
-                    console.log('AISB: No suitable save button found, using wp.data');
-                    // Last resort - use WordPress data API if available
-                    if (typeof wp !== 'undefined' && wp.data) {
-                        wp.data.dispatch('core/editor').savePost();
-                    }
+                    });
+                    
+                    return;
                 }
-                
-                // Add listener for save completion to refresh the meta box
-                var saveCompleteTimer = setInterval(function() {
-                    // Check if save is complete by looking for success notices or changes
-                    if (wp.data && wp.data.select('core/editor')) {
-                        var isSaving = wp.data.select('core/editor').isSavingPost();
-                        var isAutosaving = wp.data.select('core/editor').isAutosavingPost();
-                        
-                        if (!isSaving && !isAutosaving) {
-                            clearInterval(saveCompleteTimer);
-                            
-                            // Reload the meta box to show updated state
-                            console.log('AISB: Save complete, reloading meta box');
-                            
-                            // Reload the entire page to ensure meta box updates
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 1000);
-                        }
-                    }
-                }, 500);
-                
-                // Timeout fallback - reload after 3 seconds if save detection fails
-                setTimeout(function() {
-                    clearInterval(saveCompleteTimer);
-                    window.location.reload();
-                }, 3000);
-                
-                } // End of deactivate block
             });
             
             $('.aisb-edit-builder').on('click', function() {
@@ -1037,21 +1010,21 @@ function aisb_save_meta_box($post_id) {
             break;
             
         case 'deactivate':
-            // Deactivate AI Section Builder
-            error_log("AISB: Before deactivate - sections: " . print_r(get_post_meta($post_id, '_aisb_sections', true), true));
+            // Deactivate AI Section Builder but PRESERVE sections
+            error_log("AISB: Deactivating for post $post_id - preserving sections");
             
             update_post_meta($post_id, '_aisb_enabled', 0);
-            delete_post_meta($post_id, '_aisb_sections');
+            
+            // Important: We do NOT delete _aisb_sections anymore
+            // This preserves the user's work for potential reactivation
             
             // Clear cache for this post
-            wp_cache_delete('aisb_sections_' . $post_id, 'aisb');
             wp_cache_delete('aisb_enabled_' . $post_id, 'aisb');
             
             // Add admin notice for successful deactivation
             set_transient('aisb_deactivated_' . $post_id, true, 60);
             
-            error_log("AISB: After deactivate - sections: " . print_r(get_post_meta($post_id, '_aisb_sections', true), true));
-            error_log("AISB: Deactivated for post $post_id");
+            error_log("AISB: Deactivated for post $post_id - sections preserved");
             break;
     }
 }
@@ -1140,6 +1113,39 @@ function aisb_ajax_activate_builder() {
     }
     
     wp_send_json_success(['message' => 'Builder activated']);
+}
+
+/**
+ * AJAX handler for deactivating the builder
+ */
+function aisb_ajax_deactivate_builder() {
+    // Check nonce - must match the action used in wp_nonce_field
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'aisb_meta_box_action')) {
+        wp_send_json_error('Security check failed');
+    }
+    
+    $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+    
+    if (!$post_id || !current_user_can('edit_post', $post_id)) {
+        wp_send_json_error('Permission denied');
+    }
+    
+    // Deactivate the builder but PRESERVE sections data
+    update_post_meta($post_id, '_aisb_enabled', '0');
+    
+    // Important: We do NOT delete _aisb_sections here
+    // This preserves the user's work for potential reactivation
+    
+    // Clear cache for this post
+    wp_cache_delete('aisb_enabled_' . $post_id, 'aisb');
+    
+    // Log for debugging
+    error_log("AISB: Deactivated via AJAX for post $post_id - sections preserved");
+    
+    wp_send_json_success([
+        'message' => 'Builder deactivated. Your sections have been preserved and will be available if you reactivate.',
+        'redirect' => false // No redirect needed, we'll reload the meta box
+    ]);
 }
 
 /**
@@ -1917,7 +1923,7 @@ function aisb_admin_notices() {
             <div class="aisb-notice aisb-notice-success">
                 <p>
                     <strong><?php _e('AI Section Builder:', 'ai-section-builder'); ?></strong>
-                    <?php _e('Page builder has been deactivated. All sections have been removed.', 'ai-section-builder'); ?>
+                    <?php _e('Page builder has been deactivated. Your sections have been preserved and will be restored if you reactivate.', 'ai-section-builder'); ?>
                 </p>
             </div>
             <?php
