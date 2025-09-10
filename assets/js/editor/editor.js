@@ -510,16 +510,21 @@
         }, 100);
         
         // Initialize global blocks repeater for sections that support it
-        if (sectionType === 'hero' || sectionType === 'features') {
+        if (sectionType === 'hero') {
             // Use sectionContent if editing, otherwise use defaults
-            var content = sectionContent || (sectionType === 'hero' ? heroDefaults : featuresDefaults);
-            // Migrate old structure if needed (only applies to hero for now)
-            if (sectionType === 'hero') {
-                content = migrateOldFieldNames(content);
-            }
+            var content = sectionContent || heroDefaults;
+            // Migrate old structure if needed
+            content = migrateOldFieldNames(content);
             // Small delay to ensure DOM is ready
             setTimeout(function() {
                 initGlobalBlocksRepeater(content, sectionType);
+            }, 50);
+        } else if (sectionType === 'features') {
+            // Use sectionContent if editing, otherwise use defaults
+            var content = sectionContent || featuresDefaults;
+            // Initialize components repeater for features
+            setTimeout(function() {
+                initComponentsRepeater(content);
             }, 50);
         }
     }
@@ -685,7 +690,10 @@
         featured_image: '',
         video_url: '',
         
-        // Global blocks for buttons (empty by default for features)
+        // Unified components array for cards and buttons
+        components: [], // Will hold both cards and buttons
+        
+        // Keep global_blocks for backward compatibility (will migrate to components)
         global_blocks: [],
         
         // Variant fields
@@ -901,10 +909,10 @@
                 
                 <div class="aisb-editor-form-group">
                     <label class="aisb-editor-form-label">
-                        Global Blocks
+                        Components (Cards & Buttons)
                     </label>
-                    <div id="features-global-blocks" class="aisb-repeater-container">
-                        <!-- Global blocks repeater will be initialized here -->
+                    <div id="features-components" class="aisb-repeater-container">
+                        <!-- Unified components repeater will be initialized here -->
                     </div>
                 </div>
                 
@@ -1110,6 +1118,169 @@
                 </div>
             </div>
         `;
+    }
+    
+    /**
+     * Render Feature Components (cards and buttons)
+     */
+    function renderFeatureComponents(components) {
+        if (!components || !Array.isArray(components) || components.length === 0) {
+            // Show placeholder cards if no components
+            return `
+                <div class="aisb-features__grid">
+                    <div class="aisb-features__item">
+                        <h3 class="aisb-features__item-title">Feature One</h3>
+                        <p class="aisb-features__item-description">Description of your amazing feature goes here.</p>
+                    </div>
+                    <div class="aisb-features__item">
+                        <h3 class="aisb-features__item-title">Feature Two</h3>
+                        <p class="aisb-features__item-description">Another great feature that sets you apart.</p>
+                    </div>
+                    <div class="aisb-features__item">
+                        <h3 class="aisb-features__item-title">Feature Three</h3>
+                        <p class="aisb-features__item-description">Yet another benefit your users will love.</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        var cardsHtml = '';
+        var buttonsHtml = '';
+        
+        components.forEach(function(component) {
+            if (component.type === 'button') {
+                // Render as button using actual data
+                var buttonText = escapeHtml(component.text || 'Click Me');
+                var buttonUrl = escapeHtml(component.url || '#');
+                buttonsHtml += `<a href="${buttonUrl}" class="aisb-btn aisb-btn-primary">${buttonText}</a>`;
+            } else {
+                // Default to card using actual data
+                var cardTitle = escapeHtml(component.title || 'Feature Title');
+                var cardDescription = escapeHtml(component.description || 'Feature description goes here.');
+                cardsHtml += `
+                    <div class="aisb-features__item">
+                        <h3 class="aisb-features__item-title">${cardTitle}</h3>
+                        <p class="aisb-features__item-description">${cardDescription}</p>
+                    </div>
+                `;
+            }
+        });
+        
+        var html = '';
+        
+        // Add cards grid if there are cards
+        if (cardsHtml) {
+            html += `<div class="aisb-features__grid">${cardsHtml}</div>`;
+        }
+        
+        // Add buttons container if there are buttons  
+        if (buttonsHtml) {
+            html += `<div class="aisb-features__buttons">${buttonsHtml}</div>`;
+        }
+        
+        return html;
+    }
+    
+    /**
+     * Initialize components repeater for Features sections - UNIFIED APPROACH
+     */
+    function initComponentsRepeater(content) {
+        var $container = $('#features-components');
+        if (!$container.length) {
+            return; // Container not found
+        }
+        
+        // Get components from content or empty array
+        var components = content.components || [];
+        
+        // Simple repeater with just type display
+        // Handle component type changes
+        $container.on('change', '.component-type-selector', function() {
+            var $item = $(this).closest('.aisb-repeater-item');
+            var itemId = $item.data('item-id');
+            var newType = $(this).val();
+            
+            // Update the type and re-render
+            var repeater = $container.data('aisbRepeater');
+            if (repeater) {
+                repeater.updateItem(itemId, 'type', newType);
+                // Force re-render to show correct fields
+                repeater.render();
+            }
+        });
+        
+        var componentsRepeater = $container.aisbRepeaterField({
+            fieldName: 'components',
+            items: components,
+            defaultItem: { 
+                type: 'card', // Default to card type
+                id: 'comp_' + Date.now()
+            },
+            maxItems: 10,
+            minItems: 0,
+            itemLabel: 'Component',
+            addButtonText: 'Add Component',
+            template: function(item, index) {
+                var typeOptions = [
+                    { value: 'card', label: 'Card' },
+                    { value: 'button', label: 'Button' }
+                ];
+                
+                var selectHtml = '<select class="aisb-repeater-field component-type-selector" data-field="type">';
+                typeOptions.forEach(function(option) {
+                    var selected = (item.type === option.value) ? 'selected' : '';
+                    selectHtml += '<option value="' + option.value + '" ' + selected + '>' + option.label + '</option>';
+                });
+                selectHtml += '</select>';
+                
+                var fieldsHtml = '<div class="aisb-repeater-fields">' +
+                                '<div class="aisb-repeater-field-group">' +
+                                '<label>Component Type:</label> ' + selectHtml +
+                                '</div>';
+                
+                if (item.type === 'button') {
+                    // Button fields
+                    fieldsHtml += '<div class="aisb-repeater-field-group">' +
+                                 '<label>Button Text:</label>' +
+                                 '<input type="text" class="aisb-repeater-field" data-field="text" value="' + (item.text || '') + '" placeholder="Click Me">' +
+                                 '</div>' +
+                                 '<div class="aisb-repeater-field-group">' +
+                                 '<label>Button URL:</label>' +
+                                 '<input type="text" class="aisb-repeater-field" data-field="url" value="' + (item.url || '') + '" placeholder="https://example.com">' +
+                                 '</div>';
+                } else {
+                    // Card fields (default)
+                    fieldsHtml += '<div class="aisb-repeater-field-group">' +
+                                 '<label>Card Title:</label>' +
+                                 '<input type="text" class="aisb-repeater-field" data-field="title" value="' + (item.title || '') + '" placeholder="Feature Title">' +
+                                 '</div>' +
+                                 '<div class="aisb-repeater-field-group">' +
+                                 '<label>Card Description:</label>' +
+                                 '<textarea class="aisb-repeater-field" data-field="description" placeholder="Feature description...">' + (item.description || '') + '</textarea>' +
+                                 '</div>';
+                }
+                
+                fieldsHtml += '</div>';
+                
+                return fieldsHtml;
+            },
+            onUpdate: function(items) {
+                // Update ONLY components array
+                if (editorState.currentSection !== null && editorState.sections[editorState.currentSection]) {
+                    editorState.sections[editorState.currentSection].content.components = items;
+                    editorState.isDirty = true;
+                    
+                    // Re-render current section
+                    var section = editorState.sections[editorState.currentSection];
+                    var sectionHtml = renderSection(section, editorState.currentSection);
+                    $('.aisb-section[data-index="' + editorState.currentSection + '"]').replaceWith(sectionHtml);
+                    
+                    updateSaveStatus('unsaved');
+                }
+            }
+        });
+        
+        return componentsRepeater;
     }
     
     /**
@@ -1951,21 +2122,8 @@
                             ${renderMediaPreview(content, 'features')}
                         </div>
                         
-                        <!-- Feature items grid below the main content -->
-                        <div class="aisb-features__grid">
-                            <div class="aisb-features__item">
-                                <h3 class="aisb-features__item-title">Feature One</h3>
-                                <p class="aisb-features__item-description">Description of your amazing feature goes here.</p>
-                            </div>
-                            <div class="aisb-features__item">
-                                <h3 class="aisb-features__item-title">Feature Two</h3>
-                                <p class="aisb-features__item-description">Another great feature that sets you apart.</p>
-                            </div>
-                            <div class="aisb-features__item">
-                                <h3 class="aisb-features__item-title">Feature Three</h3>
-                                <p class="aisb-features__item-description">Yet another benefit your users will love.</p>
-                            </div>
-                        </div>
+                        <!-- Components (cards and buttons) -->
+                        ${renderFeatureComponents(content.components)}
                         
                         ${renderGlobalBlocks(content.global_blocks, 'features')}
                         ${content.outro_content ? `<div class="aisb-features__outro">${content.outro_content}</div>` : ''}
