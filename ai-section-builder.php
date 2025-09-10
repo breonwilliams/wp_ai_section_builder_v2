@@ -1662,8 +1662,16 @@ function aisb_render_features_section($section) {
                                 <?php endif; ?>
                                 
                                 <?php if (!empty($card['link'])): ?>
-                                    <a href="<?php echo esc_url($card['link']); ?>" class="aisb-features__item-link">
-                                        Learn More →
+                                    <?php
+                                    $link_text = !empty($card['link_text']) ? esc_html($card['link_text']) : 'Learn More';
+                                    $link_target = !empty($card['link_target']) && $card['link_target'] === '_blank' ? '_blank' : '_self';
+                                    $link_rel = $link_target === '_blank' ? 'noopener noreferrer' : '';
+                                    ?>
+                                    <a href="<?php echo esc_url($card['link']); ?>" 
+                                       class="aisb-features__item-link"
+                                       target="<?php echo esc_attr($link_target); ?>"
+                                       <?php if ($link_rel): ?>rel="<?php echo esc_attr($link_rel); ?>"<?php endif; ?>>
+                                        <?php echo $link_text; ?> →
                                     </a>
                                 <?php endif; ?>
                             </div>

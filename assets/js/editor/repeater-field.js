@@ -198,7 +198,14 @@
                 var $item = $(this).closest('.aisb-repeater-item');
                 var itemId = $item.data('item-id');
                 var field = $(this).data('field');
-                var value = $(this).val();
+                var value;
+                
+                // Handle checkboxes differently
+                if ($(this).attr('type') === 'checkbox') {
+                    value = $(this).is(':checked') ? $(this).val() : '';
+                } else {
+                    value = $(this).val();
+                }
                 
                 self.updateItem(itemId, field, value);
             });

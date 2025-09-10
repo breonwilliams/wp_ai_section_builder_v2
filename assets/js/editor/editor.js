@@ -1142,7 +1142,15 @@
         var cardsHtml = cards.map(function(card) {
             var cardHeading = escapeHtml(card.heading || 'Feature Title');
             var cardContent = escapeHtml(card.content || '');
-            var cardLink = card.link ? `<a href="${escapeHtml(card.link)}" class="aisb-features__item-link">Learn More →</a>` : '';
+            
+            // Build link with custom text and target
+            var cardLink = '';
+            if (card.link) {
+                var linkText = escapeHtml(card.link_text || 'Learn More');
+                var linkUrl = escapeHtml(card.link);
+                var linkTarget = card.link_target === '_blank' ? ' target="_blank" rel="noopener noreferrer"' : '';
+                cardLink = `<a href="${linkUrl}" class="aisb-features__item-link"${linkTarget}>${linkText} →</a>`;
+            }
             
             // Image with wrapper for aspect ratio
             var cardImage = '';
@@ -1233,10 +1241,24 @@
                                       placeholder="Feature description...">${escapeHtml(item.content || '')}</textarea>
                         </div>
                         <div class="aisb-repeater-field-group">
+                            <label>Link Text</label>
+                            <input type="text" class="aisb-repeater-field" data-field="link_text" 
+                                   value="${escapeHtml(item.link_text || '')}" 
+                                   placeholder="Learn More">
+                        </div>
+                        <div class="aisb-repeater-field-group">
                             <label>Link URL</label>
-                            <input type="text" class="aisb-repeater-field" data-field="link" 
+                            <input type="text" class="aisb-repeater-field aisb-url-autocomplete" data-field="link" 
                                    value="${escapeHtml(item.link || '')}" 
-                                   placeholder="https://example.com/learn-more">
+                                   placeholder="Start typing page name or enter URL">
+                            <label class="aisb-checkbox-label" style="margin-top: 8px;">
+                                <input type="checkbox" 
+                                       class="aisb-repeater-field" 
+                                       data-field="link_target" 
+                                       value="_blank"
+                                       ${item.link_target === '_blank' ? 'checked' : ''}>
+                                <span>Open in new tab</span>
+                            </label>
                         </div>
                     </div>
                 `;
@@ -1255,8 +1277,18 @@
                     // Update save status
                     updateSaveStatus('unsaved');
                 }
+                
+                // Re-initialize autocomplete on URL fields after render
+                setTimeout(function() {
+                    initializeUrlAutocomplete();
+                }, 150);
             }
         });
+        
+        // Initialize autocomplete on any existing URL fields after repeater renders
+        setTimeout(function() {
+            initializeUrlAutocomplete();
+        }, 250);
         
         return cardsRepeater;
     }
