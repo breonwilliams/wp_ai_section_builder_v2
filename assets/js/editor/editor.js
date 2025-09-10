@@ -378,10 +378,21 @@
         $('.aisb-section-type').on('click', function() {
             var sectionType = $(this).data('type');
             
+            // Get appropriate defaults based on section type
+            var sectionDefaults;
+            if (sectionType === 'hero') {
+                sectionDefaults = heroDefaults;
+            } else if (sectionType === 'features') {
+                sectionDefaults = featuresDefaults;
+            } else {
+                // Fallback to hero defaults for unknown types
+                sectionDefaults = heroDefaults;
+            }
+            
             // Auto-add section with defaults
             var section = {
                 type: sectionType,
-                content: Object.assign({}, heroDefaults)
+                content: Object.assign({}, sectionDefaults)
             };
             
             // Add to state and render immediately
@@ -471,6 +482,8 @@
         
         if (sectionType === 'hero') {
             formHtml = generateHeroForm(sectionContent);
+        } else if (sectionType === 'features') {
+            formHtml = generateFeaturesForm(sectionContent);
         }
         
         // Switch to edit mode in left panel
@@ -489,18 +502,24 @@
         
         // Initialize WYSIWYG editors with small delay for DOM
         setTimeout(function() {
-            initWysiwygEditors();
+            if (sectionType === 'hero') {
+                initWysiwygEditors();
+            } else if (sectionType === 'features') {
+                initFeaturesWysiwygEditors();
+            }
         }, 100);
         
-        // Initialize global blocks repeater if it's a hero section
-        if (sectionType === 'hero') {
+        // Initialize global blocks repeater for sections that support it
+        if (sectionType === 'hero' || sectionType === 'features') {
             // Use sectionContent if editing, otherwise use defaults
-            var content = sectionContent || heroDefaults;
-            // Migrate old structure if needed
-            content = migrateOldFieldNames(content);
+            var content = sectionContent || (sectionType === 'hero' ? heroDefaults : featuresDefaults);
+            // Migrate old structure if needed (only applies to hero for now)
+            if (sectionType === 'hero') {
+                content = migrateOldFieldNames(content);
+            }
             // Small delay to ensure DOM is ready
             setTimeout(function() {
-                initGlobalBlocksRepeater(content);
+                initGlobalBlocksRepeater(content, sectionType);
             }, 50);
         }
     }
@@ -652,6 +671,35 @@
     };
     
     /**
+     * Features section field defaults - Same structure as Hero for consistency
+     */
+    var featuresDefaults = {
+        // Standard content fields (SAME field names as Hero for AI consistency)
+        eyebrow_heading: '',
+        heading: 'Our Features',
+        content: '<p>Discover what makes us different</p>',
+        outro_content: '',
+        
+        // Media fields (for future use, keeping structure consistent)
+        media_type: 'none',
+        featured_image: '',
+        video_url: '',
+        
+        // Global blocks for buttons (empty by default for features)
+        global_blocks: [],
+        
+        // Variant fields
+        theme_variant: 'light',  // Default to light to alternate with Hero's dark
+        layout_variant: 'content-left',  // Will change to grid layouts later
+        
+        // CTA fields (for future use)
+        primary_cta_label: '',
+        primary_cta_url: '',
+        secondary_cta_label: '',
+        secondary_cta_url: ''
+    };
+    
+    /**
      * Generate Hero section form - Standardized fields
      */
     function generateHeroForm(content) {
@@ -765,6 +813,116 @@
     }
     
     /**
+     * Generate Features section form - With UNIQUE IDs to avoid conflicts
+     */
+    function generateFeaturesForm(content) {
+        // Use existing content or defaults
+        content = content || featuresDefaults;
+        
+        return `
+            <form id="aisb-section-form">
+                <!-- Variant Controls -->
+                <div class="aisb-editor-form-group aisb-variant-controls">
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Theme</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'light' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="light">
+                                <span class="dashicons dashicons-sun"></span> Light
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'dark' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="dark">
+                                <span class="dashicons dashicons-moon"></span> Dark
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Layout</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-left' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-left">
+                                <span class="dashicons dashicons-align-left"></span> Left
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-right' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-right">
+                                <span class="dashicons dashicons-align-right"></span> Right
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'center' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="center">
+                                <span class="dashicons dashicons-align-center"></span> Center
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content Fields with UNIQUE IDs -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="features-eyebrow-heading">
+                        Eyebrow Heading
+                    </label>
+                    <input type="text" 
+                           id="features-eyebrow-heading" 
+                           name="eyebrow_heading" 
+                           class="aisb-editor-input" 
+                           value="${escapeHtml(content.eyebrow_heading || '')}"
+                           placeholder="Optional text above heading">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="features-heading">
+                        Heading
+                    </label>
+                    <input type="text" 
+                           id="features-heading" 
+                           name="heading" 
+                           class="aisb-editor-input" 
+                           value="${escapeHtml(content.heading || '')}"
+                           placeholder="Section heading">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="features-content">
+                        Content
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="features-content" 
+                                  name="content" 
+                                  class="aisb-editor-wysiwyg">${content.content || ''}</textarea>
+                    </div>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Featured Image
+                    </label>
+                    ${generateMediaField(content)}
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Global Blocks
+                    </label>
+                    <div id="features-global-blocks" class="aisb-repeater-container">
+                        <!-- Global blocks repeater will be initialized here -->
+                    </div>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="features-outro-content">
+                        Outro Content (Optional)
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="features-outro-content" 
+                                  name="outro_content" 
+                                  class="aisb-editor-wysiwyg">${content.outro_content || ''}</textarea>
+                    </div>
+                </div>
+            </form>
+        `;
+    }
+    
+    /**
      * Generate media field with support for images and videos
      */
     function generateMediaField(content) {
@@ -833,11 +991,15 @@
     /**
      * Initialize global blocks repeater (universal component system)
      */
-    function initGlobalBlocksRepeater(content) {
-        // Ensure container exists before initialization
-        var $container = $('#hero-global-blocks');
+    function initGlobalBlocksRepeater(content, sectionType) {
+        // Default to hero if not specified for backward compatibility
+        sectionType = sectionType || 'hero';
+        
+        // Get the appropriate container based on section type
+        var containerId = sectionType + '-global-blocks';
+        var $container = $('#' + containerId);
         if (!$container.length) {
-            console.error('AISB: Global blocks container not found');
+            console.error('AISB: Global blocks container not found for ' + sectionType);
             return;
         }
         
@@ -1012,6 +1174,71 @@
             });
         } else {
             console.warn('WordPress editor not available, falling back to textarea');
+        }
+    }
+    
+    /**
+     * Initialize WYSIWYG editors for Features section
+     */
+    function initFeaturesWysiwygEditors() {
+        // Destroy existing instances first (if any)
+        if (typeof wp !== 'undefined' && wp.editor) {
+            wp.editor.remove('features-content');
+            wp.editor.remove('features-outro-content');
+        }
+        
+        // Initialize TinyMCE for content fields
+        if (typeof wp !== 'undefined' && wp.editor && wp.editor.initialize) {
+            // Main content editor
+            wp.editor.initialize('features-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink',
+                    toolbar2: '',
+                    format_tags: 'p;h2;h3;h4',
+                    paste_as_text: false,
+                    paste_remove_styles: true,
+                    paste_remove_styles_if_webkit: true,
+                    paste_strip_class_attributes: 'all',
+                    height: 200,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save(); // Save to textarea
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: {
+                    buttons: 'strong,em,link,ul,ol,li'
+                },
+                mediaButtons: false // No media button, we have our own
+            });
+            
+            // Outro content editor (simpler)
+            wp.editor.initialize('features-outro-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'bold,italic,link,unlink',
+                    toolbar2: '',
+                    paste_as_text: false,
+                    paste_remove_styles: true,
+                    height: 150,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save(); // Save to textarea
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: {
+                    buttons: 'strong,em,link'
+                },
+                mediaButtons: false
+            });
+        } else {
+            console.warn('WordPress editor not available for Features section, falling back to textarea');
         }
     }
     
@@ -1520,6 +1747,8 @@
         }
         if (section.type === 'hero') {
             return renderHeroSection(section, index);
+        } else if (section.type === 'features') {
+            return renderFeaturesSection(section, index);
         }
         return '';
     }
@@ -1527,15 +1756,19 @@
     /**
      * Render media preview based on type and content
      */
-    function renderMediaPreview(content) {
+    function renderMediaPreview(content, sectionType) {
         var mediaType = content.media_type || 'none';
         var imageUrl = content.featured_image || '';
         var videoUrl = content.video_url || '';
+        
+        // Determine media class based on section type (default to hero for backward compatibility)
+        var mediaClass = sectionType === 'features' ? 'aisb-features__media' : 'aisb-hero__media';
         
         debugLog('renderMediaPreview Called', {
             mediaType: mediaType,
             imageUrl: imageUrl,
             videoUrl: videoUrl,
+            sectionType: sectionType,
             fullContent: content
         });
         
@@ -1550,7 +1783,7 @@
             if (imageUrl) {
                 debugLog('renderMediaPreview - Rendering Image', imageUrl);
                 return `
-                    <div class="aisb-hero__media">
+                    <div class="${mediaClass}">
                         <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(content.heading || '')}" />
                     </div>
                 `;
@@ -1558,7 +1791,7 @@
                 debugLog('renderMediaPreview - Showing Image Placeholder', 'No image URL');
                 // Show placeholder with SVG
                 return `
-                    <div class="aisb-hero__media">
+                    <div class="${mediaClass}">
                         <div class="aisb-media-placeholder aisb-media-placeholder--image">
                             <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <rect x="8" y="12" width="48" height="40" rx="4" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
@@ -1580,9 +1813,10 @@
                 var youtubeMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
                 if (youtubeMatch && youtubeMatch[1]) {
                     debugLog('renderMediaPreview - YouTube Video Detected', youtubeMatch[1]);
+                    var videoClass = sectionType === 'features' ? 'aisb-features__video' : 'aisb-hero__video';
                     return `
-                        <div class="aisb-hero__media">
-                            <iframe class="aisb-hero__video" 
+                        <div class="${mediaClass}">
+                            <iframe class="${videoClass}" 
                                     src="https://www.youtube-nocookie.com/embed/${youtubeMatch[1]}" 
                                     frameborder="0" 
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -1592,9 +1826,10 @@
                     `;
                 } else {
                     // Self-hosted video
+                    var videoClass = sectionType === 'features' ? 'aisb-features__video' : 'aisb-hero__video';
                     return `
-                        <div class="aisb-hero__media">
-                            <video class="aisb-hero__video" controls>
+                        <div class="${mediaClass}">
+                            <video class="${videoClass}" controls>
                                 <source src="${escapeHtml(videoUrl)}" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
@@ -1604,7 +1839,7 @@
             } else {
                 // Show placeholder with SVG
                 return `
-                    <div class="aisb-hero__media">
+                    <div class="${mediaClass}">
                         <div class="aisb-media-placeholder aisb-media-placeholder--video">
                             <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <rect x="8" y="16" width="48" height="32" rx="4" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
@@ -1625,7 +1860,7 @@
     /**
      * Render global blocks (buttons, cards, etc.)
      */
-    function renderGlobalBlocks(blocks) {
+    function renderGlobalBlocks(blocks, sectionType = 'hero') {
         if (!blocks || !blocks.length) return '';
         
         var html = '';
@@ -1642,7 +1877,10 @@
             }).join('');
             
             if (buttonHtml) {
-                html += `<div class="aisb-hero__buttons">${buttonHtml}</div>`;
+                // Use correct container class based on section type
+                const containerClass = sectionType === 'features' ? 
+                    'aisb-features__buttons' : 'aisb-hero__buttons';
+                html += `<div class="${containerClass}">${buttonHtml}</div>`;
             }
         }
         
@@ -1675,14 +1913,64 @@
                                 ${content.eyebrow_heading ? `<div class="aisb-hero__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
                                 <h1 class="aisb-hero__heading">${escapeHtml(content.heading || 'Your Headline Here')}</h1>
                                 <div class="aisb-hero__body">${content.content || '<p>Your compelling message goes here</p>'}</div>
-                                ${renderGlobalBlocks(content.global_blocks)}
+                                ${renderGlobalBlocks(content.global_blocks, 'hero')}
                                 ${content.outro_content ? `<div class="aisb-hero__outro">${content.outro_content}</div>` : ''}
                             </div>
-                            ${renderMediaPreview(content)}
+                            ${renderMediaPreview(content, 'hero')}
                         </div>
                     </div>
                 </section>
             </div>
+        `;
+    }
+    
+    /**
+     * Render Features section preview
+     */
+    function renderFeaturesSection(section, index) {
+        var content = section.content || section;
+        
+        // Build class list based on variants - must match PHP structure EXACTLY
+        var sectionClasses = [
+            'aisb-section',
+            'aisb-features',  // CRITICAL: Must be combined with aisb-section
+            'aisb-section--' + (content.theme_variant || 'light'),
+            'aisb-section--' + (content.layout_variant || 'content-left')
+        ].join(' ');
+        
+        return `
+            <section class="${sectionClasses}" data-index="${index}">
+                <div class="aisb-features__container">
+                        <!-- Top section with content and optional media (like Hero) -->
+                        <div class="aisb-features__top">
+                            <div class="aisb-features__content">
+                                ${content.eyebrow_heading ? `<div class="aisb-features__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
+                                <h2 class="aisb-features__heading">${escapeHtml(content.heading || 'Our Features')}</h2>
+                                <div class="aisb-features__intro">${content.content || '<p>Discover what makes us different</p>'}</div>
+                            </div>
+                            ${renderMediaPreview(content, 'features')}
+                        </div>
+                        
+                        <!-- Feature items grid below the main content -->
+                        <div class="aisb-features__grid">
+                            <div class="aisb-features__item">
+                                <h3 class="aisb-features__item-title">Feature One</h3>
+                                <p class="aisb-features__item-description">Description of your amazing feature goes here.</p>
+                            </div>
+                            <div class="aisb-features__item">
+                                <h3 class="aisb-features__item-title">Feature Two</h3>
+                                <p class="aisb-features__item-description">Another great feature that sets you apart.</p>
+                            </div>
+                            <div class="aisb-features__item">
+                                <h3 class="aisb-features__item-title">Feature Three</h3>
+                                <p class="aisb-features__item-description">Yet another benefit your users will love.</p>
+                            </div>
+                        </div>
+                        
+                        ${renderGlobalBlocks(content.global_blocks, 'features')}
+                        ${content.outro_content ? `<div class="aisb-features__outro">${content.outro_content}</div>` : ''}
+                    </div>
+            </section>
         `;
     }
     
@@ -2029,7 +2317,7 @@
                         <span class="dashicons dashicons-menu" aria-hidden="true"></span>
                     </div>
                     <div class="aisb-section-item__icon" aria-hidden="true">
-                        <span class="dashicons dashicons-megaphone"></span>
+                        <span class="dashicons ${section.type === 'features' ? 'dashicons-screenoptions' : 'dashicons-megaphone'}"></span>
                     </div>
                     <div class="aisb-section-item__content">
                         <div class="aisb-section-item__title">${title}</div>

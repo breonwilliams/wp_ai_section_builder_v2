@@ -509,6 +509,13 @@ function aisb_render_editor_page() {
                                 <div class="aisb-section-type__label">Hero Section</div>
                                 <div class="aisb-section-type__description">Eye-catching opener with headline and CTA</div>
                             </button>
+                            <button class="aisb-section-type" data-type="features">
+                                <div class="aisb-section-type__icon">
+                                    <span class="dashicons dashicons-screenoptions"></span>
+                                </div>
+                                <div class="aisb-section-type__label">Features Section</div>
+                                <div class="aisb-section-type__description">Showcase key features with icons and descriptions</div>
+                            </button>
                         </div>
                     </div>
                     
@@ -1289,12 +1296,14 @@ $sections = aisb_get_sections($post_id);
     </style>
     
     <?php
-    // Phase 2A: Enable section rendering for Hero sections
+    // Phase 2A: Enable section rendering for Hero and Features sections
     if (!empty($sections) && is_array($sections)) {
         foreach ($sections as $section) {
             // Render section based on type
             if ($section['type'] === 'hero') {
                 echo aisb_render_hero_section($section);
+            } elseif ($section['type'] === 'features') {
+                echo aisb_render_features_section($section);
             }
         }
     } else {
@@ -1533,6 +1542,155 @@ function aisb_render_hero_section($section) {
 }
 
 /**
+ * Render Features section on frontend
+ */
+function aisb_render_features_section($section) {
+    // Handle both old and new section structure
+    $content = isset($section['content']) ? $section['content'] : $section;
+    
+    // Debug: Log what we're getting
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('AISB Features Section Content: ' . print_r($content, true));
+    }
+    
+    // Extract standardized fields
+    $eyebrow_heading = esc_html($content['eyebrow_heading'] ?? '');
+    $heading = esc_html($content['heading'] ?? 'Our Features');
+    $content_text = wp_kses_post($content['content'] ?? '<p>Discover what makes us different</p>');
+    $outro_content = wp_kses_post($content['outro_content'] ?? '');
+    
+    // Get variants
+    $theme_variant = sanitize_text_field($content['theme_variant'] ?? 'light');
+    $layout_variant = sanitize_text_field($content['layout_variant'] ?? 'content-left');
+    
+    // Get global blocks (buttons for now)
+    $global_blocks = isset($content['global_blocks']) ? $content['global_blocks'] : array();
+    
+    // Build section classes based on variants - matching Hero structure
+    $section_classes = array(
+        'aisb-section',  // Base class required for theme inheritance
+        'aisb-features', // Section type class - MUST be combined with aisb-section
+        'aisb-section--' . $theme_variant,
+        'aisb-section--' . $layout_variant
+    );
+    
+    // Get media fields
+    $featured_image = esc_url($content['featured_image'] ?? '');
+    $media_type = sanitize_text_field($content['media_type'] ?? 'none');
+    $video_url = esc_url($content['video_url'] ?? '');
+    
+    ob_start();
+    ?>
+    <section class="<?php echo esc_attr(implode(' ', $section_classes)); ?>">
+        <div class="aisb-features__container">
+            <!-- Top section with content and optional media (like Hero) -->
+            <div class="aisb-features__top">
+                <div class="aisb-features__content">
+                    <?php if ($eyebrow_heading): ?>
+                        <div class="aisb-features__eyebrow"><?php echo $eyebrow_heading; ?></div>
+                    <?php endif; ?>
+                    
+                    <?php if ($heading): ?>
+                        <h2 class="aisb-features__heading"><?php echo $heading; ?></h2>
+                    <?php endif; ?>
+                    
+                    <?php if ($content_text): ?>
+                        <div class="aisb-features__intro"><?php echo $content_text; ?></div>
+                    <?php endif; ?>
+                </div>
+                
+                <?php 
+                // Render media based on type (matching Hero structure)
+                if ($media_type === 'image' && $featured_image): ?>
+                    <div class="aisb-features__media">
+                        <img src="<?php echo $featured_image; ?>" 
+                             alt="<?php echo esc_attr($heading); ?>" 
+                             class="aisb-features__image">
+                    </div>
+                <?php elseif ($media_type === 'video' && $video_url): ?>
+                    <div class="aisb-features__media">
+                        <?php 
+                        // Check if it's a YouTube URL
+                        if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) {
+                            // Extract YouTube ID
+                            preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/', $video_url, $matches);
+                            $youtube_id = isset($matches[1]) ? $matches[1] : '';
+                            
+                            if ($youtube_id): ?>
+                                <iframe class="aisb-features__video" 
+                                        src="https://www.youtube.com/embed/<?php echo esc_attr($youtube_id); ?>" 
+                                        frameborder="0" 
+                                        allowfullscreen></iframe>
+                            <?php endif;
+                        } else {
+                            // Direct video file
+                            ?>
+                            <video class="aisb-features__video" controls>
+                                <source src="<?php echo $video_url; ?>" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        <?php } ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+            
+            <!-- Feature items grid below the main content -->
+            <div class="aisb-features__grid">
+                <!-- Placeholder feature items for now - will be dynamic later -->
+                <div class="aisb-features__item">
+                    <h3 class="aisb-features__item-title">Premium Quality</h3>
+                    <p class="aisb-features__item-description">Built with attention to detail and the highest standards of excellence.</p>
+                </div>
+                
+                <div class="aisb-features__item">
+                    <h3 class="aisb-features__item-title">Secure & Reliable</h3>
+                    <p class="aisb-features__item-description">Your data is protected with enterprise-grade security measures.</p>
+                </div>
+                
+                <div class="aisb-features__item">
+                    <h3 class="aisb-features__item-title">Lightning Fast</h3>
+                    <p class="aisb-features__item-description">Optimized for speed and performance at every level.</p>
+                </div>
+            </div>
+            
+            <?php 
+            // Render global blocks (buttons for now)
+            $buttons = array_filter($global_blocks, function($block) {
+                return isset($block['type']) && $block['type'] === 'button';
+            });
+            
+            if (!empty($buttons)): ?>
+                <div class="aisb-features__buttons">
+                    <?php foreach ($buttons as $button): ?>
+                        <?php if (!empty($button['text'])): ?>
+                            <?php 
+                            $btn_text = esc_html($button['text']);
+                            $btn_url = esc_url($button['url'] ?? '#');
+                            $btn_style = esc_attr($button['style'] ?? 'primary');
+                            $btn_target = isset($button['target']) && $button['target'] === '_blank' ? '_blank' : '_self';
+                            $btn_rel = $btn_target === '_blank' ? 'noopener noreferrer' : '';
+                            ?>
+                            <a href="<?php echo $btn_url; ?>" 
+                               class="aisb-btn aisb-btn-<?php echo $btn_style; ?>"
+                               target="<?php echo esc_attr($btn_target); ?>"
+                               <?php if ($btn_rel): ?>rel="<?php echo esc_attr($btn_rel); ?>"<?php endif; ?>>
+                                <?php echo $btn_text; ?>
+                            </a>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+            
+            <?php if ($outro_content): ?>
+                <div class="aisb-features__outro"><?php echo $outro_content; ?></div>
+            <?php endif; ?>
+        </div>
+    </section>
+    <?php
+    return ob_get_clean();
+}
+
+/**
  * Enqueue frontend styles
  */
 function aisb_enqueue_styles() {
@@ -1569,6 +1727,14 @@ function aisb_enqueue_styles() {
     wp_enqueue_style(
         'aisb-section-hero',
         AISB_PLUGIN_URL . 'assets/css/sections/hero.css',
+        array('aisb-utilities'),
+        AISB_VERSION
+    );
+    
+    // Load features section styles
+    wp_enqueue_style(
+        'aisb-section-features',
+        AISB_PLUGIN_URL . 'assets/css/sections/features.css',
         array('aisb-utilities'),
         AISB_VERSION
     );
@@ -1624,11 +1790,18 @@ function aisb_enqueue_admin_styles($hook) {
             AISB_VERSION
         );
         
+        wp_enqueue_style(
+            'aisb-section-features',
+            AISB_PLUGIN_URL . 'assets/css/sections/features.css',
+            ['aisb-utilities'],
+            AISB_VERSION
+        );
+        
         // Then load editor UI styles (toolbar, panels, etc. - NOT section styles)
         wp_enqueue_style(
             'aisb-editor-styles',
             AISB_PLUGIN_URL . 'assets/css/editor/editor-styles.css',
-            ['aisb-section-hero'], // Depends on section styles
+            ['aisb-section-hero', 'aisb-section-features'], // Depends on section styles
             AISB_VERSION
         );
         // Enqueue Sortable.js from CDN with local fallback
