@@ -12,15 +12,54 @@
     class AISBColorSettings {
         constructor() {
             this.debounceTimer = null;
+            this.hasUnsavedChanges = false;
+            this.originalValues = {};
             this.init();
         }
         
         init() {
             // Wait for DOM ready
             $(document).ready(() => {
+                this.storeOriginalValues();
                 this.setupColorPickers();
                 this.bindEvents();
+                
+                // Expose this instance globally for integration with main save
+                window.aisbGlobalSettings = this;
             });
+        }
+        
+        storeOriginalValues() {
+            this.originalValues = {
+                primary: $('#aisb-gs-primary').val() || '',
+                textLight: $('#aisb-gs-text-light').val() || '',
+                textDark: $('#aisb-gs-text-dark').val() || ''
+            };
+        }
+        
+        markAsChanged() {
+            this.hasUnsavedChanges = true;
+            
+            // If main editor exists, mark it as dirty too
+            if (window.editorState) {
+                window.editorState.isDirty = true;
+                window.editorState.globalSettingsDirty = true;
+                
+                // Update main save button status
+                if (typeof window.updateSaveStatus === 'function') {
+                    window.updateSaveStatus('unsaved');
+                }
+            }
+        }
+        
+        markAsSaved() {
+            this.hasUnsavedChanges = false;
+            this.storeOriginalValues(); // Update original values after save
+            
+            // Update main editor state
+            if (window.editorState) {
+                window.editorState.globalSettingsDirty = false;
+            }
         }
         
         /**
@@ -39,6 +78,8 @@
                 const color = $(e.target).val();
                 // Sync with text input
                 $(e.target).siblings('.aisb-color-text').val(color);
+                // Mark as changed
+                this.markAsChanged();
                 // Update preview immediately (debounced)
                 this.debounce(() => this.updatePreview({primary: color}), 150)();
             });
@@ -48,6 +89,8 @@
                 const color = $(e.target).val();
                 // Sync with text input
                 $(e.target).siblings('.aisb-color-text').val(color);
+                // Mark as changed
+                this.markAsChanged();
                 // Update preview immediately (debounced)
                 this.debounce(() => this.updatePreview({textLight: color}), 150)();
             });
@@ -57,6 +100,8 @@
                 const color = $(e.target).val();
                 // Sync with text input
                 $(e.target).siblings('.aisb-color-text').val(color);
+                // Mark as changed
+                this.markAsChanged();
                 // Update preview immediately (debounced)
                 this.debounce(() => this.updatePreview({textDark: color}), 150)();
             });
@@ -70,6 +115,9 @@
                 if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
                     // Sync with color picker
                     $colorPicker.val(value);
+                    
+                    // Mark as changed
+                    this.markAsChanged();
                     
                     // Determine which color was changed and update preview
                     const pickerId = $colorPicker.attr('id');
@@ -127,6 +175,8 @@
                 success: (response) => {
                     if (response.success) {
                         this.showMessage('All colors saved successfully', 'success');
+                        // Mark as saved
+                        this.markAsSaved();
                         // Update preview without indicator (already saved)
                         this.updatePreview({
                             primary: response.data.colors.primary,

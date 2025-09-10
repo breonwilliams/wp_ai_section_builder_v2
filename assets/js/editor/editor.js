@@ -15,6 +15,7 @@
         currentSection: null,
         isDirty: false,
         isSaving: false, // Track save state for beforeunload
+        globalSettingsDirty: false, // Track global settings changes
         reorderMode: {
             active: false,
             selectedIndex: null,
@@ -26,6 +27,9 @@
         autoSaveTimer: null, // Auto-save timer reference
         debug: false // Debug mode - set to true to troubleshoot
     };
+    
+    // Expose editorState globally for integration
+    window.editorState = editorState;
     
     // Debug helper
     function debugLog(context, data) {
@@ -1687,12 +1691,20 @@
      */
     function updateSaveStatus(status) {
         var $saveBtn = $('#aisb-save-sections');
+        
+        // Only proceed if this is the main sections save button
+        if (!$saveBtn.length || $saveBtn.attr('id') !== 'aisb-save-sections') {
+            return;
+        }
+        
         var $btnText = $saveBtn.find('.aisb-save-btn-text');
         var $btnIcon = $saveBtn.find('.dashicons');
         
-        // Create button inner elements if they don't exist
-        if (!$btnText.length) {
-            $saveBtn.html('<span class="dashicons dashicons-saved"></span><span class="aisb-save-btn-text">Save</span>');
+        // Create button inner elements if they don't exist - only for our button
+        if (!$btnText.length && $saveBtn.attr('id') === 'aisb-save-sections') {
+            // Preserve the original text if it exists
+            var originalText = $saveBtn.text().trim();
+            $saveBtn.html('<span class="dashicons dashicons-saved"></span><span class="aisb-save-btn-text">' + (originalText || 'Save') + '</span>');
             $btnText = $saveBtn.find('.aisb-save-btn-text');
             $btnIcon = $saveBtn.find('.dashicons');
         }
@@ -1709,7 +1721,12 @@
             case 'unsaved':
                 $saveBtn.addClass('has-changes');
                 $btnIcon.removeClass().addClass('dashicons dashicons-upload');
-                $btnText.text('Save Changes');
+                // Check if global settings are also dirty
+                if (editorState.globalSettingsDirty) {
+                    $btnText.text('Save All Changes');
+                } else {
+                    $btnText.text('Save Changes');
+                }
                 // Schedule auto-save
                 scheduleAutoSave();
                 break;
@@ -1750,6 +1767,9 @@
         }
     }
     
+    // Expose updateSaveStatus globally for integration
+    window.updateSaveStatus = updateSaveStatus;
+    
     /**
      * Save sections (manual save button or auto-save)
      */
@@ -1760,17 +1780,36 @@
             editorState.autoSaveTimer = null;
         }
         
+        // Check what needs saving
+        var needsSectionSave = editorState.isDirty;
+        var needsGlobalSave = editorState.globalSettingsDirty && window.aisbGlobalSettings && window.aisbGlobalSettings.hasUnsavedChanges;
+        
         // Don't save if already saving or no changes
-        if (editorState.isSaving || !editorState.isDirty) {
+        if (editorState.isSaving || (!needsSectionSave && !needsGlobalSave)) {
             return;
         }
         
         // Perform save
         updateSaveStatus('saving');
         
-        saveSectionsToServer()
+        // Prepare promises for all saves needed
+        var savePromises = [];
+        
+        // Save sections if needed
+        if (needsSectionSave) {
+            savePromises.push(saveSectionsToServer());
+        }
+        
+        // Save global settings if needed
+        if (needsGlobalSave && window.aisbGlobalSettings) {
+            savePromises.push(saveGlobalSettingsFromMain());
+        }
+        
+        // Execute all saves
+        Promise.all(savePromises)
             .then(function() {
                 editorState.isDirty = false;
+                editorState.globalSettingsDirty = false;
                 editorState.lastSaved = new Date();
                 updateSaveStatus('saved');
                 
@@ -1778,7 +1817,8 @@
                 if (isAutoSave) {
                     console.log('AISB: Auto-saved successfully');
                 } else {
-                    showNotification('Changes saved', 'success');
+                    var message = needsGlobalSave && needsSectionSave ? 'All changes saved' : 'Changes saved';
+                    showNotification(message, 'success');
                 }
             })
             .catch(function(error) {
@@ -1793,6 +1833,50 @@
     }
     
     /**
+     * Save global settings from main save button
+     */
+    function saveGlobalSettingsFromMain() {
+        return new Promise(function(resolve, reject) {
+            if (!window.aisbGlobalSettings || !window.aisbGlobalSettings.savePrimaryColor) {
+                resolve(); // No global settings to save
+                return;
+            }
+            
+            // Get color values
+            var primaryColor = $('#aisb-gs-primary').val();
+            var textLightColor = $('#aisb-gs-text-light').val() || '#1a1a1a';
+            var textDarkColor = $('#aisb-gs-text-dark').val() || '#fafafa';
+            
+            // Save via AJAX
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'aisb_save_all_colors',
+                    primary_color: primaryColor,
+                    text_light_color: textLightColor,
+                    text_dark_color: textDarkColor,
+                    nonce: window.aisbColorSettings?.nonce || $('#aisb-color-nonce').val() || ''
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Mark global settings as saved
+                        if (window.aisbGlobalSettings) {
+                            window.aisbGlobalSettings.markAsSaved();
+                        }
+                        resolve();
+                    } else {
+                        reject(new Error(response.data?.message || 'Failed to save global settings'));
+                    }
+                },
+                error: function() {
+                    reject(new Error('Network error saving global settings'));
+                }
+            });
+        });
+    }
+    
+    /**
      * Schedule auto-save after user stops making changes
      */
     function scheduleAutoSave() {
@@ -1801,8 +1885,12 @@
             clearTimeout(editorState.autoSaveTimer);
         }
         
+        // Check if there are any unsaved changes (sections or global settings)
+        var hasUnsavedChanges = editorState.isDirty || 
+                                (editorState.globalSettingsDirty && window.aisbGlobalSettings && window.aisbGlobalSettings.hasUnsavedChanges);
+        
         // Only schedule if there are unsaved changes
-        if (editorState.isDirty && !editorState.isSaving) {
+        if (hasUnsavedChanges && !editorState.isSaving) {
             editorState.autoSaveTimer = setTimeout(function() {
                 console.log('AISB: Auto-saving changes...');
                 saveSections(true); // Pass true to indicate auto-save
@@ -1816,7 +1904,10 @@
     function initSaveProtection() {
         // Beforeunload protection
         window.addEventListener('beforeunload', function(e) {
-            if (editorState.isDirty && !editorState.isSaving) {
+            // Check for any unsaved changes (sections or global settings)
+            var hasUnsavedChanges = (editorState.isDirty || editorState.globalSettingsDirty) && !editorState.isSaving;
+            
+            if (hasUnsavedChanges) {
                 e.preventDefault();
                 e.returnValue = ''; // Chrome requires this
                 return 'You have unsaved changes. Are you sure you want to leave?';
@@ -1827,7 +1918,9 @@
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
-                if (editorState.isDirty && !editorState.isSaving) {
+                // Check for any unsaved changes
+                var hasUnsavedChanges = editorState.isDirty || editorState.globalSettingsDirty;
+                if (hasUnsavedChanges && !editorState.isSaving) {
                     saveSections();
                 }
             }
