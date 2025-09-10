@@ -1645,24 +1645,28 @@ function aisb_render_features_section($section) {
                     <?php foreach ($cards as $card): ?>
                         <div class="aisb-features__item">
                             <?php if (!empty($card['image'])): ?>
-                                <img src="<?php echo esc_url($card['image']); ?>" 
-                                     alt="<?php echo esc_attr($card['heading'] ?? ''); ?>" 
-                                     class="aisb-features__item-image">
+                                <div class="aisb-features__item-image-wrapper">
+                                    <img src="<?php echo esc_url($card['image']); ?>" 
+                                         alt="<?php echo esc_attr($card['heading'] ?? ''); ?>" 
+                                         class="aisb-features__item-image">
+                                </div>
                             <?php endif; ?>
                             
-                            <?php if (!empty($card['heading'])): ?>
-                                <h3 class="aisb-features__item-title"><?php echo esc_html($card['heading']); ?></h3>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($card['content'])): ?>
-                                <p class="aisb-features__item-description"><?php echo esc_html($card['content']); ?></p>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($card['link'])): ?>
-                                <a href="<?php echo esc_url($card['link']); ?>" class="aisb-features__item-link">
-                                    Learn More →
-                                </a>
-                            <?php endif; ?>
+                            <div class="aisb-features__item-content">
+                                <?php if (!empty($card['heading'])): ?>
+                                    <h3 class="aisb-features__item-title"><?php echo esc_html($card['heading']); ?></h3>
+                                <?php endif; ?>
+                                
+                                <?php if (!empty($card['content'])): ?>
+                                    <p class="aisb-features__item-description"><?php echo esc_html($card['content']); ?></p>
+                                <?php endif; ?>
+                                
+                                <?php if (!empty($card['link'])): ?>
+                                    <a href="<?php echo esc_url($card['link']); ?>" class="aisb-features__item-link">
+                                        Learn More →
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>

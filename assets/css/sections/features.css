@@ -88,11 +88,37 @@
 /* Feature Item - Mobile First */
 .aisb-features__item {
     text-align: center;
-    padding: 32px 24px; /* Mobile padding */
+    padding: 0; /* Remove padding when image is present */
     border-radius: 8px;
     border: 1px solid var(--section-border, var(--aisb-color-border));
     background: var(--section-surface-secondary, var(--aisb-color-secondary));
     transition: background-color 200ms ease, border-color 200ms ease;
+    overflow: hidden; /* Ensure image respects border radius */
+}
+
+/* Card image wrapper - enforces 16:9 aspect ratio */
+.aisb-features__item-image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    overflow: hidden;
+    background: var(--section-border, var(--aisb-color-border)); /* Placeholder color */
+}
+
+/* Card image styling */
+.aisb-features__item-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Prevents distortion, crops if needed */
+    display: block;
+}
+
+/* Card content area - padding for text content */
+.aisb-features__item-content {
+    padding: 24px 20px; /* Mobile padding */
 }
 
 /* Media Column */
@@ -135,8 +161,23 @@
     font-size: 15px; /* Mobile size */
     line-height: var(--aisb-gs-line-height-body, 1.6);
     color: var(--section-text-secondary, var(--aisb-color-muted));
-    margin: 0;
+    margin: 0 0 16px 0;
     transition: color 200ms ease;
+}
+
+/* Feature Link */
+.aisb-features__item-link {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--section-link, var(--aisb-color-primary));
+    text-decoration: none;
+    transition: color 200ms ease;
+}
+
+.aisb-features__item-link:hover {
+    color: var(--section-link-hover, var(--aisb-color-primary-hover));
+    text-decoration: underline;
 }
 
 
@@ -365,8 +406,8 @@
         margin-bottom: 48px;
     }
     
-    .aisb-features__item {
-        padding: 40px 32px;
+    .aisb-features__item-content {
+        padding: 32px 28px; /* Desktop padding */
     }
     
     .aisb-features__outro {

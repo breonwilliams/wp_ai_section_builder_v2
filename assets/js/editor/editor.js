@@ -1140,17 +1140,28 @@
         }
         
         var cardsHtml = cards.map(function(card) {
-            var cardImage = card.image ? `<img src="${escapeHtml(card.image)}" alt="${escapeHtml(card.heading || '')}" class="aisb-features__item-image">` : '';
             var cardHeading = escapeHtml(card.heading || 'Feature Title');
             var cardContent = escapeHtml(card.content || '');
             var cardLink = card.link ? `<a href="${escapeHtml(card.link)}" class="aisb-features__item-link">Learn More →</a>` : '';
             
+            // Image with wrapper for aspect ratio
+            var cardImage = '';
+            if (card.image) {
+                cardImage = `
+                    <div class="aisb-features__item-image-wrapper">
+                        <img src="${escapeHtml(card.image)}" alt="${escapeHtml(card.heading || '')}" class="aisb-features__item-image">
+                    </div>
+                `;
+            }
+            
             return `
                 <div class="aisb-features__item">
                     ${cardImage}
-                    <h3 class="aisb-features__item-title">${cardHeading}</h3>
-                    <p class="aisb-features__item-description">${cardContent}</p>
-                    ${cardLink}
+                    <div class="aisb-features__item-content">
+                        <h3 class="aisb-features__item-title">${cardHeading}</h3>
+                        <p class="aisb-features__item-description">${cardContent}</p>
+                        ${cardLink}
+                    </div>
                 </div>
             `;
         }).join('');
@@ -1185,13 +1196,30 @@
             itemLabel: 'Card',
             addButtonText: 'Add Card',
             template: function(item, index) {
+                var imageUrl = item.image || '';
+                var hasImage = imageUrl ? true : false;
+                
                 return `
                     <div class="aisb-repeater-fields">
                         <div class="aisb-repeater-field-group">
-                            <label>Image URL</label>
-                            <input type="text" class="aisb-repeater-field" data-field="image" 
-                                   value="${escapeHtml(item.image || '')}" 
-                                   placeholder="https://example.com/image.jpg">
+                            <label>Image</label>
+                            <div class="aisb-card-media-selector">
+                                ${hasImage ? `
+                                    <div class="aisb-card-media-preview">
+                                        <img src="${escapeHtml(imageUrl)}" alt="Card image">
+                                        <button type="button" class="aisb-card-media-remove" data-card-id="${item.id || ''}">
+                                            <span class="dashicons dashicons-no-alt"></span> Remove
+                                        </button>
+                                    </div>
+                                ` : ''}
+                                <button type="button" class="aisb-editor-btn aisb-editor-btn-ghost aisb-editor-btn-with-icon select-card-image" 
+                                        data-card-id="${item.id || ''}">
+                                    <span class="dashicons dashicons-format-image"></span>
+                                    <span>${hasImage ? 'Change Image' : 'Select Image'}</span>
+                                </button>
+                                <input type="hidden" class="aisb-repeater-field" data-field="image" 
+                                       value="${escapeHtml(imageUrl)}">
+                            </div>
                         </div>
                         <div class="aisb-repeater-field-group">
                             <label>Heading</label>
@@ -1556,6 +1584,78 @@
                 
                 updatePreview();
             }
+        });
+        
+        // Card image selection
+        $(document).on('click', '.select-card-image', function(e) {
+            e.preventDefault();
+            
+            var $button = $(this);
+            var cardId = $button.data('card-id');
+            var $cardItem = $button.closest('.aisb-repeater-item');
+            
+            // Create a new media frame for cards
+            var cardMediaFrame = wp.media({
+                title: 'Select Card Image',
+                button: {
+                    text: 'Use This Image'
+                },
+                multiple: false,
+                library: {
+                    type: 'image'
+                }
+            });
+            
+            // When an image is selected
+            cardMediaFrame.on('select', function() {
+                var attachment = cardMediaFrame.state().get('selection').first().toJSON();
+                
+                // Update the hidden input value
+                $cardItem.find('input[data-field="image"]').val(attachment.url).trigger('change');
+                
+                // Update the preview
+                var $mediaSelector = $button.closest('.aisb-card-media-selector');
+                var $preview = $mediaSelector.find('.aisb-card-media-preview');
+                
+                if ($preview.length) {
+                    // Update existing preview
+                    $preview.find('img').attr('src', attachment.url);
+                } else {
+                    // Create new preview
+                    var previewHtml = `
+                        <div class="aisb-card-media-preview">
+                            <img src="${attachment.url}" alt="Card image">
+                            <button type="button" class="aisb-card-media-remove" data-card-id="${cardId}">
+                                <span class="dashicons dashicons-no-alt"></span> Remove
+                            </button>
+                        </div>
+                    `;
+                    $button.before(previewHtml);
+                }
+                
+                // Update button text
+                $button.find('span:last').text('Change Image');
+            });
+            
+            // Open the media frame
+            cardMediaFrame.open();
+        });
+        
+        // Card image removal
+        $(document).on('click', '.aisb-card-media-remove', function(e) {
+            e.preventDefault();
+            
+            var $button = $(this);
+            var $cardItem = $button.closest('.aisb-repeater-item');
+            
+            // Clear the image value
+            $cardItem.find('input[data-field="image"]').val('').trigger('change');
+            
+            // Remove the preview
+            $button.closest('.aisb-card-media-preview').remove();
+            
+            // Update button text
+            $cardItem.find('.select-card-image span:last').text('Select Image');
         });
     }
     
