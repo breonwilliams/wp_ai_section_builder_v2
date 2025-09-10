@@ -522,9 +522,10 @@
         } else if (sectionType === 'features') {
             // Use sectionContent if editing, otherwise use defaults
             var content = sectionContent || featuresDefaults;
-            // Initialize components repeater for features
+            // Initialize both repeaters for features
             setTimeout(function() {
-                initComponentsRepeater(content);
+                initCardsRepeater(content);
+                initGlobalBlocksRepeater(content, 'features');
             }, 50);
         }
     }
@@ -690,10 +691,10 @@
         featured_image: '',
         video_url: '',
         
-        // Unified components array for cards and buttons
-        components: [], // Will hold both cards and buttons
+        // Cards array for feature cards
+        cards: [],
         
-        // Keep global_blocks for backward compatibility (will migrate to components)
+        // Global blocks for buttons (matching Hero structure)
         global_blocks: [],
         
         // Variant fields
@@ -909,10 +910,19 @@
                 
                 <div class="aisb-editor-form-group">
                     <label class="aisb-editor-form-label">
-                        Components (Cards & Buttons)
+                        Feature Cards
                     </label>
-                    <div id="features-components" class="aisb-repeater-container">
-                        <!-- Unified components repeater will be initialized here -->
+                    <div id="features-cards" class="aisb-repeater-container">
+                        <!-- Cards repeater will be initialized here -->
+                    </div>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Buttons
+                    </label>
+                    <div id="features-global-blocks" class="aisb-repeater-container">
+                        <!-- Global blocks repeater will be initialized here -->
                     </div>
                 </div>
                 
@@ -1121,166 +1131,106 @@
     }
     
     /**
-     * Render Feature Components (cards and buttons)
+     * Render Feature Cards
      */
-    function renderFeatureComponents(components) {
-        if (!components || !Array.isArray(components) || components.length === 0) {
-            // Show placeholder cards if no components
+    function renderFeatureCards(cards) {
+        if (!cards || !Array.isArray(cards) || cards.length === 0) {
+            // Return empty - no placeholder cards
+            return '';
+        }
+        
+        var cardsHtml = cards.map(function(card) {
+            var cardImage = card.image ? `<img src="${escapeHtml(card.image)}" alt="${escapeHtml(card.heading || '')}" class="aisb-features__item-image">` : '';
+            var cardHeading = escapeHtml(card.heading || 'Feature Title');
+            var cardContent = escapeHtml(card.content || '');
+            var cardLink = card.link ? `<a href="${escapeHtml(card.link)}" class="aisb-features__item-link">Learn More →</a>` : '';
+            
             return `
-                <div class="aisb-features__grid">
-                    <div class="aisb-features__item">
-                        <h3 class="aisb-features__item-title">Feature One</h3>
-                        <p class="aisb-features__item-description">Description of your amazing feature goes here.</p>
-                    </div>
-                    <div class="aisb-features__item">
-                        <h3 class="aisb-features__item-title">Feature Two</h3>
-                        <p class="aisb-features__item-description">Another great feature that sets you apart.</p>
-                    </div>
-                    <div class="aisb-features__item">
-                        <h3 class="aisb-features__item-title">Feature Three</h3>
-                        <p class="aisb-features__item-description">Yet another benefit your users will love.</p>
-                    </div>
+                <div class="aisb-features__item">
+                    ${cardImage}
+                    <h3 class="aisb-features__item-title">${cardHeading}</h3>
+                    <p class="aisb-features__item-description">${cardContent}</p>
+                    ${cardLink}
                 </div>
             `;
-        }
+        }).join('');
         
-        var cardsHtml = '';
-        var buttonsHtml = '';
-        
-        components.forEach(function(component) {
-            if (component.type === 'button') {
-                // Render as button using actual data
-                var buttonText = escapeHtml(component.text || 'Click Me');
-                var buttonUrl = escapeHtml(component.url || '#');
-                buttonsHtml += `<a href="${buttonUrl}" class="aisb-btn aisb-btn-primary">${buttonText}</a>`;
-            } else {
-                // Default to card using actual data
-                var cardTitle = escapeHtml(component.title || 'Feature Title');
-                var cardDescription = escapeHtml(component.description || 'Feature description goes here.');
-                cardsHtml += `
-                    <div class="aisb-features__item">
-                        <h3 class="aisb-features__item-title">${cardTitle}</h3>
-                        <p class="aisb-features__item-description">${cardDescription}</p>
-                    </div>
-                `;
-            }
-        });
-        
-        var html = '';
-        
-        // Add cards grid if there are cards
-        if (cardsHtml) {
-            html += `<div class="aisb-features__grid">${cardsHtml}</div>`;
-        }
-        
-        // Add buttons container if there are buttons  
-        if (buttonsHtml) {
-            html += `<div class="aisb-features__buttons">${buttonsHtml}</div>`;
-        }
-        
-        return html;
+        return `<div class="aisb-features__grid">${cardsHtml}</div>`;
     }
     
     /**
-     * Initialize components repeater for Features sections - UNIFIED APPROACH
+     * Initialize cards repeater for Features sections
      */
-    function initComponentsRepeater(content) {
-        var $container = $('#features-components');
+    function initCardsRepeater(content) {
+        var $container = $('#features-cards');
         if (!$container.length) {
             return; // Container not found
         }
         
-        // Get components from content or empty array
-        var components = content.components || [];
+        // Get cards from content or empty array
+        var cards = content.cards || [];
         
-        // Simple repeater with just type display
-        // Handle component type changes
-        $container.on('change', '.component-type-selector', function() {
-            var $item = $(this).closest('.aisb-repeater-item');
-            var itemId = $item.data('item-id');
-            var newType = $(this).val();
-            
-            // Update the type and re-render
-            var repeater = $container.data('aisbRepeater');
-            if (repeater) {
-                repeater.updateItem(itemId, 'type', newType);
-                // Force re-render to show correct fields
-                repeater.render();
-            }
-        });
-        
-        var componentsRepeater = $container.aisbRepeaterField({
-            fieldName: 'components',
-            items: components,
-            defaultItem: { 
-                type: 'card', // Default to card type
-                id: 'comp_' + Date.now()
+        // Initialize repeater field
+        var cardsRepeater = $container.aisbRepeaterField({
+            fieldName: 'cards',
+            items: cards,
+            defaultItem: {
+                image: '',
+                heading: 'Feature Title',
+                content: 'Feature description goes here.',
+                link: ''
             },
-            maxItems: 10,
+            maxItems: 9,
             minItems: 0,
-            itemLabel: 'Component',
-            addButtonText: 'Add Component',
+            itemLabel: 'Card',
+            addButtonText: 'Add Card',
             template: function(item, index) {
-                var typeOptions = [
-                    { value: 'card', label: 'Card' },
-                    { value: 'button', label: 'Button' }
-                ];
-                
-                var selectHtml = '<select class="aisb-repeater-field component-type-selector" data-field="type">';
-                typeOptions.forEach(function(option) {
-                    var selected = (item.type === option.value) ? 'selected' : '';
-                    selectHtml += '<option value="' + option.value + '" ' + selected + '>' + option.label + '</option>';
-                });
-                selectHtml += '</select>';
-                
-                var fieldsHtml = '<div class="aisb-repeater-fields">' +
-                                '<div class="aisb-repeater-field-group">' +
-                                '<label>Component Type:</label> ' + selectHtml +
-                                '</div>';
-                
-                if (item.type === 'button') {
-                    // Button fields
-                    fieldsHtml += '<div class="aisb-repeater-field-group">' +
-                                 '<label>Button Text:</label>' +
-                                 '<input type="text" class="aisb-repeater-field" data-field="text" value="' + (item.text || '') + '" placeholder="Click Me">' +
-                                 '</div>' +
-                                 '<div class="aisb-repeater-field-group">' +
-                                 '<label>Button URL:</label>' +
-                                 '<input type="text" class="aisb-repeater-field" data-field="url" value="' + (item.url || '') + '" placeholder="https://example.com">' +
-                                 '</div>';
-                } else {
-                    // Card fields (default)
-                    fieldsHtml += '<div class="aisb-repeater-field-group">' +
-                                 '<label>Card Title:</label>' +
-                                 '<input type="text" class="aisb-repeater-field" data-field="title" value="' + (item.title || '') + '" placeholder="Feature Title">' +
-                                 '</div>' +
-                                 '<div class="aisb-repeater-field-group">' +
-                                 '<label>Card Description:</label>' +
-                                 '<textarea class="aisb-repeater-field" data-field="description" placeholder="Feature description...">' + (item.description || '') + '</textarea>' +
-                                 '</div>';
-                }
-                
-                fieldsHtml += '</div>';
-                
-                return fieldsHtml;
+                return `
+                    <div class="aisb-repeater-fields">
+                        <div class="aisb-repeater-field-group">
+                            <label>Image URL</label>
+                            <input type="text" class="aisb-repeater-field" data-field="image" 
+                                   value="${escapeHtml(item.image || '')}" 
+                                   placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div class="aisb-repeater-field-group">
+                            <label>Heading</label>
+                            <input type="text" class="aisb-repeater-field" data-field="heading" 
+                                   value="${escapeHtml(item.heading || '')}" 
+                                   placeholder="Feature Title">
+                        </div>
+                        <div class="aisb-repeater-field-group">
+                            <label>Content</label>
+                            <textarea class="aisb-repeater-field" data-field="content" 
+                                      placeholder="Feature description...">${escapeHtml(item.content || '')}</textarea>
+                        </div>
+                        <div class="aisb-repeater-field-group">
+                            <label>Link URL</label>
+                            <input type="text" class="aisb-repeater-field" data-field="link" 
+                                   value="${escapeHtml(item.link || '')}" 
+                                   placeholder="https://example.com/learn-more">
+                        </div>
+                    </div>
+                `;
             },
             onUpdate: function(items) {
-                // Update ONLY components array
+                // Update the section content with cards data
                 if (editorState.currentSection !== null && editorState.sections[editorState.currentSection]) {
-                    editorState.sections[editorState.currentSection].content.components = items;
+                    editorState.sections[editorState.currentSection].content.cards = items;
                     editorState.isDirty = true;
                     
-                    // Re-render current section
+                    // Re-render the preview section
                     var section = editorState.sections[editorState.currentSection];
                     var sectionHtml = renderSection(section, editorState.currentSection);
                     $('.aisb-section[data-index="' + editorState.currentSection + '"]').replaceWith(sectionHtml);
                     
+                    // Update save status
                     updateSaveStatus('unsaved');
                 }
             }
         });
         
-        return componentsRepeater;
+        return cardsRepeater;
     }
     
     /**
@@ -2122,9 +2072,10 @@
                             ${renderMediaPreview(content, 'features')}
                         </div>
                         
-                        <!-- Components (cards and buttons) -->
-                        ${renderFeatureComponents(content.components)}
+                        <!-- Feature Cards -->
+                        ${renderFeatureCards(content.cards)}
                         
+                        <!-- Buttons -->
                         ${renderGlobalBlocks(content.global_blocks, 'features')}
                         ${content.outro_content ? `<div class="aisb-features__outro">${content.outro_content}</div>` : ''}
                     </div>
