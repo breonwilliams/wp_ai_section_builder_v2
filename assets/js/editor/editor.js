@@ -1737,6 +1737,11 @@
                 content.global_blocks = currentSection.content.global_blocks;
             }
             
+            // Preserve cards managed by repeater
+            if (currentSection.content.cards) {
+                content.cards = currentSection.content.cards;
+            }
+            
             // Preserve variant data managed by toggle buttons
             if (currentSection.content.theme_variant) {
                 content.theme_variant = currentSection.content.theme_variant;

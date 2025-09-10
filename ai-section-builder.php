@@ -1636,24 +1636,37 @@ function aisb_render_features_section($section) {
                 <?php endif; ?>
             </div>
             
-            <!-- Feature items grid below the main content -->
-            <div class="aisb-features__grid">
-                <!-- Placeholder feature items for now - will be dynamic later -->
-                <div class="aisb-features__item">
-                    <h3 class="aisb-features__item-title">Premium Quality</h3>
-                    <p class="aisb-features__item-description">Built with attention to detail and the highest standards of excellence.</p>
+            <!-- Feature cards grid -->
+            <?php 
+            $cards = isset($content['cards']) ? $content['cards'] : array();
+            if (!empty($cards)): 
+            ?>
+                <div class="aisb-features__grid">
+                    <?php foreach ($cards as $card): ?>
+                        <div class="aisb-features__item">
+                            <?php if (!empty($card['image'])): ?>
+                                <img src="<?php echo esc_url($card['image']); ?>" 
+                                     alt="<?php echo esc_attr($card['heading'] ?? ''); ?>" 
+                                     class="aisb-features__item-image">
+                            <?php endif; ?>
+                            
+                            <?php if (!empty($card['heading'])): ?>
+                                <h3 class="aisb-features__item-title"><?php echo esc_html($card['heading']); ?></h3>
+                            <?php endif; ?>
+                            
+                            <?php if (!empty($card['content'])): ?>
+                                <p class="aisb-features__item-description"><?php echo esc_html($card['content']); ?></p>
+                            <?php endif; ?>
+                            
+                            <?php if (!empty($card['link'])): ?>
+                                <a href="<?php echo esc_url($card['link']); ?>" class="aisb-features__item-link">
+                                    Learn More →
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-                
-                <div class="aisb-features__item">
-                    <h3 class="aisb-features__item-title">Secure & Reliable</h3>
-                    <p class="aisb-features__item-description">Your data is protected with enterprise-grade security measures.</p>
-                </div>
-                
-                <div class="aisb-features__item">
-                    <h3 class="aisb-features__item-title">Lightning Fast</h3>
-                    <p class="aisb-features__item-description">Optimized for speed and performance at every level.</p>
-                </div>
-            </div>
+            <?php endif; ?>
             
             <?php 
             // Render global blocks (buttons for now)
