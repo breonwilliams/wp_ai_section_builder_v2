@@ -1421,8 +1421,10 @@ function aisb_render_hero_section($section) {
     // Migrate old field names to new structure
     $content = aisb_migrate_field_names($content);
     
-    // Debug: Log what we're getting (always log for troubleshooting)
-    error_log('AISB Hero Section Content: ' . print_r($content, true));
+    // Debug: Log what we're getting (only in debug mode)
+    if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+        error_log('AISB Hero Section Content: ' . print_r($content, true));
+    }
     
     // Extract standardized fields
     $eyebrow_heading = esc_html($content['eyebrow_heading'] ?? '');
@@ -1548,8 +1550,8 @@ function aisb_render_features_section($section) {
     // Handle both old and new section structure
     $content = isset($section['content']) ? $section['content'] : $section;
     
-    // Debug: Log what we're getting
-    if (defined('WP_DEBUG') && WP_DEBUG) {
+    // Debug: Log what we're getting (only in debug mode)
+    if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
         error_log('AISB Features Section Content: ' . print_r($content, true));
     }
     

@@ -42,7 +42,7 @@
      * Initialize editor
      */
     function initEditor() {
-        console.log('AISB: Initializing editor');
+        debugLog('Initialization', 'Initializing editor');
         
         // Initialize drag-drop capabilities
         initDragDropCapabilities();
@@ -59,7 +59,7 @@
         // Initialize save protection
         initSaveProtection();
         
-        console.log('AISB: Editor initialization complete');
+        debugLog('Editor initialization complete');
     }
     
     /**
@@ -69,8 +69,8 @@
         // Check if drag-drop should be enabled
         var features = (window.aisbEditor && window.aisbEditor.features) || { dragDrop: true }; // Default to enabled
         
-        console.log('AISB: Features config:', features);
-        console.log('AISB: Sortable.js available:', typeof Sortable !== 'undefined');
+        debugLog('Features config:', features);
+        debugLog('Sortable.js available:', typeof Sortable !== 'undefined');
         
         if (features.dragDrop !== false) { // Enable by default unless explicitly disabled
             // Check if Sortable.js is available
@@ -79,7 +79,7 @@
                 // Give it one more chance after a delay
                 setTimeout(function() {
                     if (typeof Sortable !== 'undefined') {
-                        console.log('AISB: Sortable.js loaded after delay');
+                        debugLog('Sortable.js loaded after delay');
                         initSortableJS();
                     } else {
                         console.error('AISB: Sortable.js failed to load completely');
@@ -91,14 +91,14 @@
             
             // Initialize Sortable.js with error boundary
             try {
-                console.log('AISB: Initializing Sortable.js drag-drop');
+                debugLog('Initializing Sortable.js drag-drop');
                 initSortableJS();
             } catch (error) {
                 console.error('AISB: Sortable.js initialization failed:', error);
                 showNotification('Drag-drop initialization failed. Keyboard navigation available.', 'error');
             }
         } else {
-            console.log('AISB: Drag-drop explicitly disabled in features');
+            debugLog('Drag-drop explicitly disabled in features');
         }
     }
     
@@ -108,7 +108,7 @@
     function initSortableJS() {
         // Prevent multiple initialization attempts
         if (editorState.sortableInitializing) {
-            console.log('AISB: Sortable initialization already in progress');
+            debugLog('Sortable initialization already in progress');
             return;
         }
         
@@ -181,7 +181,7 @@
                 editorState.sortableInitializing = false;
                 
                 // Debug: Log sortable configuration
-                console.log('AISB: Sortable initialized successfully:', {
+                debugLog('Sortable initialized successfully:', {
                     container: sectionList.id,
                     childCount: sectionList.children.length,
                     draggableSelector: '.aisb-section-item'
@@ -223,7 +223,7 @@
         // Announce to screen readers
         announceToScreenReader('Dragging section: ' + sectionTitle + '. Move to desired position and release.');
         
-        console.log('AISB: Drag started for section', draggedIndex, '(' + sectionTitle + ')');
+        debugLog('Drag started for section', draggedIndex, '(' + sectionTitle + ')');
     }
     
     /**
@@ -242,7 +242,7 @@
         var oldIndex = parseInt(evt.oldIndex);
         var newIndex = parseInt(evt.newIndex);
         
-        console.log('AISB: Drag ended - oldIndex:', oldIndex, 'newIndex:', newIndex);
+        debugLog('Drag ended - oldIndex:', oldIndex, 'newIndex:', newIndex);
         
         // Clean up visual state
         document.body.classList.remove('aisb-dragging');
@@ -273,7 +273,7 @@
             var sectionTitle = section.content.heading || 'Untitled Section';
             editorState.sections.splice(newIndex, 0, section);
             
-            console.log('AISB: Moved section "' + sectionTitle + '" from position', oldIndex + 1, 'to', newIndex + 1);
+            debugLog('Moved section "' + sectionTitle + '" from position', oldIndex + 1, 'to', newIndex + 1);
             
             // Mark as dirty to show unsaved changes
             editorState.isDirty = true;
@@ -292,9 +292,9 @@
             announceToScreenReader(successMsg);
             showNotification(successMsg, 'success');
             
-            console.log('AISB: Section reorder completed successfully');
+            debugLog('Section reorder completed successfully');
         } else {
-            console.log('AISB: Drag cancelled, no position change');
+            debugLog('Drag cancelled, no position change');
         }
     }
     
@@ -302,7 +302,7 @@
      * Reinitialize Sortable.js after DOM changes
      */
     function reinitializeSortable() {
-        console.log('AISB: Reinitializing Sortable.js');
+        debugLog('Reinitializing Sortable.js');
         
         // Clean up existing instance safely
         if (editorState.sortableInstance) {
@@ -310,7 +310,7 @@
                 // Check if the instance and its element still exist
                 if (editorState.sortableInstance.el && editorState.sortableInstance.destroy) {
                     editorState.sortableInstance.destroy();
-                    console.log('AISB: Existing Sortable instance destroyed');
+                    debugLog('Existing Sortable instance destroyed');
                 }
             } catch (error) {
                 console.warn('AISB: Error destroying Sortable instance:', error);
@@ -326,11 +326,11 @@
         var sortableContainer = document.getElementById('aisb-section-list'); // Fixed selector
         
         if (features.dragDrop && typeof Sortable !== 'undefined' && sortableContainer) {
-            console.log('AISB: Section list found, reinitializing drag-drop');
+            debugLog('Section list found, reinitializing drag-drop');
             setTimeout(initSortableJS, 50); // Small delay for DOM updates
         } else {
             if (!features.dragDrop) {
-                console.log('AISB: Drag-drop disabled in features');
+                debugLog('Drag-drop disabled in features');
             }
             if (typeof Sortable === 'undefined') {
                 console.warn('AISB: Sortable.js not loaded');
@@ -2103,7 +2103,7 @@
                 
                 // Different notification for auto-save vs manual
                 if (isAutoSave) {
-                    console.log('AISB: Auto-saved successfully');
+                    debugLog('Auto-saved successfully');
                 } else {
                     var message = needsGlobalSave && needsSectionSave ? 'All changes saved' : 'Changes saved';
                     showNotification(message, 'success');
@@ -2180,7 +2180,7 @@
         // Only schedule if there are unsaved changes
         if (hasUnsavedChanges && !editorState.isSaving) {
             editorState.autoSaveTimer = setTimeout(function() {
-                console.log('AISB: Auto-saving changes...');
+                debugLog('Auto-saving changes...');
                 saveSections(true); // Pass true to indicate auto-save
             }, 5000); // 5 seconds after last change
         }
@@ -2214,7 +2214,7 @@
             }
         });
         
-        console.log('AISB: Save protection initialized');
+        debugLog('Save protection initialized');
     }
     
     /**
@@ -2507,7 +2507,7 @@
         announceToScreenReader(message);
         
         // Also log to console for debugging
-        console.log('AISB Notification (' + type + '):', message);
+        debugLog('Notification', type + ': ' + message);
     }
     
     /**
@@ -2656,14 +2656,14 @@
     // Initialize on document ready
     $(document).ready(function() {
         if ($('.aisb-editor-wrapper').length) {
-            console.log('AISB: Initializing editor...');
+            debugLog('Initializing editor...');
             console.log('Debug mode enabled. Use window.debugMediaSystem() in console to check media state.');
             initEditor();
             
             // Initialize autocomplete on any existing URL fields
             setTimeout(initializeUrlAutocomplete, 500);
             
-            console.log('AISB: Editor initialization complete');
+            debugLog('Editor initialization complete');
         }
     });
     
