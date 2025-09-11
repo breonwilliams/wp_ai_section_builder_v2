@@ -700,6 +700,7 @@
         // Variant fields
         theme_variant: 'light',  // Default to light to alternate with Hero's dark
         layout_variant: 'content-left',  // Will change to grid layouts later
+        card_alignment: 'left',  // Card content alignment: 'left' | 'center'
         
         // CTA fields (for future use)
         primary_cta_label: '',
@@ -822,11 +823,31 @@
     }
     
     /**
+     * Apply Features section defaults to ensure all required fields are present
+     */
+    function applyFeaturesDefaults(content) {
+        if (!content) return featuresDefaults;
+        
+        // Start with defaults and merge content on top to preserve all fields
+        var migrated = $.extend({}, featuresDefaults, content);
+        
+        // Ensure card_alignment has a default value for existing sections
+        if (!migrated.card_alignment) {
+            migrated.card_alignment = 'left';
+        }
+        
+        return migrated;
+    }
+    
+    /**
      * Generate Features section form - With UNIQUE IDs to avoid conflicts
      */
     function generateFeaturesForm(content) {
         // Use existing content or defaults
         content = content || featuresDefaults;
+        
+        // Apply migration to ensure all required fields are present
+        content = applyFeaturesDefaults(content);
         
         return `
             <form id="aisb-section-form">
@@ -860,6 +881,20 @@
                             <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'center' ? 'active' : ''}" 
                                     data-variant-type="layout" data-variant-value="center">
                                 <span class="dashicons dashicons-align-center"></span> Center
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Card Alignment</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.card_alignment === 'left' ? 'active' : ''}" 
+                                    data-variant-type="card_alignment" data-variant-value="left">
+                                <span class="dashicons dashicons-editor-alignleft"></span> Left
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.card_alignment === 'center' ? 'active' : ''}" 
+                                    data-variant-type="card_alignment" data-variant-value="center">
+                                <span class="dashicons dashicons-editor-aligncenter"></span> Center
                             </button>
                         </div>
                     </div>
@@ -1450,6 +1485,8 @@
                     content.theme_variant = variantValue;
                 } else if (variantType === 'layout') {
                     content.layout_variant = variantValue;
+                } else if (variantType === 'card_alignment') {
+                    content.card_alignment = variantValue;
                 }
                 updatePreview();
             }
@@ -1881,6 +1918,9 @@
             if (currentSection.content.layout_variant) {
                 content.layout_variant = currentSection.content.layout_variant;
             }
+            if (currentSection.content.card_alignment) {
+                content.card_alignment = currentSection.content.card_alignment;
+            }
             
             // ALWAYS preserve media fields - they are managed outside the form
             // The form doesn't serialize hidden inputs properly
@@ -2193,7 +2233,8 @@
             'aisb-section',
             'aisb-features',  // CRITICAL: Must be combined with aisb-section
             'aisb-section--' + (content.theme_variant || 'light'),
-            'aisb-section--' + (content.layout_variant || 'content-left')
+            'aisb-section--' + (content.layout_variant || 'content-left'),
+            'aisb-features--cards-' + (content.card_alignment || 'left')
         ].join(' ');
         
         return `

@@ -1564,6 +1564,7 @@ function aisb_render_features_section($section) {
     // Get variants
     $theme_variant = sanitize_text_field($content['theme_variant'] ?? 'light');
     $layout_variant = sanitize_text_field($content['layout_variant'] ?? 'content-left');
+    $card_alignment = sanitize_text_field($content['card_alignment'] ?? 'left');
     
     // Get global blocks (buttons for now)
     $global_blocks = isset($content['global_blocks']) ? $content['global_blocks'] : array();
@@ -1573,7 +1574,8 @@ function aisb_render_features_section($section) {
         'aisb-section',  // Base class required for theme inheritance
         'aisb-features', // Section type class - MUST be combined with aisb-section
         'aisb-section--' . $theme_variant,
-        'aisb-section--' . $layout_variant
+        'aisb-section--' . $layout_variant,
+        'aisb-features--cards-' . $card_alignment // Card alignment class
     );
     
     // Get media fields

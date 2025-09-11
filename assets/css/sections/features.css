@@ -89,7 +89,7 @@
 .aisb-features__item {
     display: flex;
     flex-direction: column;
-    text-align: center;
+    text-align: left; /* Default to left alignment */
     padding: 0; /* Remove padding when image is present */
     border-radius: 8px;
     border: 1px solid var(--section-border, var(--aisb-color-border));
@@ -181,7 +181,7 @@
     text-decoration: none;
     transition: color 200ms ease;
     margin-top: auto; /* Push to bottom of flex container */
-    align-self: center; /* Center align the link */
+    align-self: flex-start; /* Default to left alignment */
 }
 
 .aisb-features__item-link:hover {
@@ -454,6 +454,46 @@
     .aisb-features__container {
         padding: 0 48px; /* Match Hero XL screens */
     }
+}
+
+/* =========================================
+   Card Content Alignment Options
+   ========================================= */
+
+/* Left alignment for card content (default) */
+.aisb-features--cards-left .aisb-features__item {
+    text-align: left;
+}
+
+.aisb-features--cards-left .aisb-features__item-content {
+    text-align: left;
+}
+
+.aisb-features--cards-left .aisb-features__item-title,
+.aisb-features--cards-left .aisb-features__item-description {
+    text-align: left;
+}
+
+.aisb-features--cards-left .aisb-features__item-link {
+    align-self: flex-start; /* Align link to left */
+}
+
+/* Center alignment for card content */
+.aisb-features--cards-center .aisb-features__item {
+    text-align: center;
+}
+
+.aisb-features--cards-center .aisb-features__item-content {
+    text-align: center;
+}
+
+.aisb-features--cards-center .aisb-features__item-title,
+.aisb-features--cards-center .aisb-features__item-description {
+    text-align: center;
+}
+
+.aisb-features--cards-center .aisb-features__item-link {
+    align-self: center; /* Center align the link */
 }
 
 /* Button styles are inherited from core/02-utilities.css for consistency */
