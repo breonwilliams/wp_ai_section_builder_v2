@@ -874,13 +874,13 @@
                                     data-variant-type="layout" data-variant-value="content-left">
                                 <span class="dashicons dashicons-align-left"></span> Left
                             </button>
-                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-right' ? 'active' : ''}" 
-                                    data-variant-type="layout" data-variant-value="content-right">
-                                <span class="dashicons dashicons-align-right"></span> Right
-                            </button>
                             <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'center' ? 'active' : ''}" 
                                     data-variant-type="layout" data-variant-value="center">
                                 <span class="dashicons dashicons-align-center"></span> Center
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-right' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-right">
+                                <span class="dashicons dashicons-align-right"></span> Right
                             </button>
                         </div>
                     </div>
@@ -1348,6 +1348,11 @@
                     toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink',
                     toolbar2: '',
                     format_tags: 'p;h2;h3;h4',
+                    forced_root_block: 'p',  // Forces Enter to create <p> tags
+                    force_br_newlines: false, // Enter creates paragraphs, not <br>
+                    force_p_newlines: true,   // Forces paragraph tags
+                    remove_linebreaks: false, // Don't strip line breaks
+                    convert_newlines_to_brs: false, // Don't convert to <br> tags
                     paste_as_text: false,
                     paste_remove_styles: true,
                     paste_remove_styles_if_webkit: true,
@@ -1356,6 +1361,11 @@
                     setup: function(editor) {
                         editor.on('change keyup', function() {
                             editor.save(); // Save to textarea
+                            console.log('[DEBUG] TinyMCE content saved:', {
+                                editorId: editor.id,
+                                content: editor.getContent(),
+                                hasP: editor.getContent().includes('<p>')
+                            });
                             updatePreview();
                         });
                     }
@@ -1371,14 +1381,25 @@
                 tinymce: {
                     wpautop: true,
                     plugins: 'lists,link,wordpress,wplink,paste',
-                    toolbar1: 'bold,italic,link,unlink',
+                    toolbar1: 'formatselect,bold,italic,link,unlink',
                     toolbar2: '',
+                    format_tags: 'p',  // Only allow paragraph tags for outro
+                    forced_root_block: 'p',  // Forces Enter to create <p> tags
+                    force_br_newlines: false, // Enter creates paragraphs, not <br>
+                    force_p_newlines: true,   // Forces paragraph tags
+                    remove_linebreaks: false, // Don't strip line breaks
+                    convert_newlines_to_brs: false, // Don't convert to <br> tags
                     paste_as_text: false,
                     paste_remove_styles: true,
                     height: 150,
                     setup: function(editor) {
                         editor.on('change keyup', function() {
                             editor.save(); // Save to textarea
+                            console.log('[DEBUG] TinyMCE content saved:', {
+                                editorId: editor.id,
+                                content: editor.getContent(),
+                                hasP: editor.getContent().includes('<p>')
+                            });
                             updatePreview();
                         });
                     }
@@ -1413,6 +1434,11 @@
                     toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink',
                     toolbar2: '',
                     format_tags: 'p;h2;h3;h4',
+                    forced_root_block: 'p',  // Forces Enter to create <p> tags
+                    force_br_newlines: false, // Enter creates paragraphs, not <br>
+                    force_p_newlines: true,   // Forces paragraph tags
+                    remove_linebreaks: false, // Don't strip line breaks
+                    convert_newlines_to_brs: false, // Don't convert to <br> tags
                     paste_as_text: false,
                     paste_remove_styles: true,
                     paste_remove_styles_if_webkit: true,
@@ -1421,6 +1447,11 @@
                     setup: function(editor) {
                         editor.on('change keyup', function() {
                             editor.save(); // Save to textarea
+                            console.log('[DEBUG] TinyMCE content saved:', {
+                                editorId: editor.id,
+                                content: editor.getContent(),
+                                hasP: editor.getContent().includes('<p>')
+                            });
                             updatePreview();
                         });
                     }
@@ -1436,14 +1467,25 @@
                 tinymce: {
                     wpautop: true,
                     plugins: 'lists,link,wordpress,wplink,paste',
-                    toolbar1: 'bold,italic,link,unlink',
+                    toolbar1: 'formatselect,bold,italic,link,unlink',
                     toolbar2: '',
+                    format_tags: 'p',  // Only allow paragraph tags for outro
+                    forced_root_block: 'p',  // Forces Enter to create <p> tags
+                    force_br_newlines: false, // Enter creates paragraphs, not <br>
+                    force_p_newlines: true,   // Forces paragraph tags
+                    remove_linebreaks: false, // Don't strip line breaks
+                    convert_newlines_to_brs: false, // Don't convert to <br> tags
                     paste_as_text: false,
                     paste_remove_styles: true,
                     height: 150,
                     setup: function(editor) {
                         editor.on('change keyup', function() {
                             editor.save(); // Save to textarea
+                            console.log('[DEBUG] TinyMCE content saved:', {
+                                editorId: editor.id,
+                                content: editor.getContent(),
+                                hasP: editor.getContent().includes('<p>')
+                            });
                             updatePreview();
                         });
                     }
@@ -1892,14 +1934,45 @@
         
         // Convert form data to object
         $.each(formData, function(i, field) {
-            // Content fields are now handled by TinyMCE - preserve HTML
             content[field.name] = field.value;
+        });
+        
+        // Get the current section first
+        var currentSection = editorState.sections[editorState.currentSection];
+        
+        // Get TinyMCE content directly if editors exist
+        // This ensures we get the HTML content, not the raw textarea value
+        if (currentSection && currentSection.type) {
+            var sectionType = currentSection.type;
+            if (sectionType === 'hero') {
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('hero-content')) {
+                    content.content = tinyMCE.get('hero-content').getContent();
+                }
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('hero-outro-content')) {
+                    content.outro_content = tinyMCE.get('hero-outro-content').getContent();
+                }
+            } else if (sectionType === 'features') {
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('features-content')) {
+                    content.content = tinyMCE.get('features-content').getContent();
+                }
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('features-outro-content')) {
+                    content.outro_content = tinyMCE.get('features-outro-content').getContent();
+                }
+            }
+        }
+        
+        // Debug content fields specifically
+        console.log('[DEBUG] updatePreview - Content fields:', {
+            'content': content.content,
+            'outro_content': content.outro_content,
+            'hasContentP': content.content ? content.content.includes('<p>') : false,
+            'hasOutroP': content.outro_content ? content.outro_content.includes('<p>') : false
         });
         
         debugLog('updatePreview - Content from Form', content);
         
         // IMPORTANT: Preserve complex data that's managed outside the form
-        var currentSection = editorState.sections[editorState.currentSection];
+        // Note: currentSection is already defined above
         if (currentSection && currentSection.content) {
             // Preserve global blocks managed by repeater
             if (currentSection.content.global_blocks) {
@@ -2227,6 +2300,13 @@
      */
     function renderFeaturesSection(section, index) {
         var content = section.content || section;
+        
+        // Debug: Log the raw content to see what we're getting
+        console.log('[DEBUG] Features content field:', {
+            raw: content.content,
+            hasHtmlTags: content.content ? content.content.includes('<p>') : false,
+            length: content.content ? content.content.length : 0
+        });
         
         // Build class list based on variants - must match PHP structure EXACTLY
         var sectionClasses = [
