@@ -545,6 +545,11 @@ function aisb_render_editor_page() {
                         $primary_color = $color_settings->get_primary_color();
                         $text_light_color = $color_settings->get_text_light_color();
                         $text_dark_color = $color_settings->get_text_dark_color();
+                        $secondary_light_color = $color_settings->get_secondary_light_color();
+                        $secondary_dark_color = $color_settings->get_secondary_dark_color();
+                        $border_light_color = $color_settings->get_border_light_color();
+                        $border_dark_color = $color_settings->get_border_dark_color();
+                        
                         ?>
                         
                         <!-- Light Mode Colors -->
@@ -570,6 +575,26 @@ function aisb_render_editor_page() {
                                 </div>
                                 <p class="aisb-settings-help"><?php _e('Main text color for light sections', 'ai-section-builder'); ?></p>
                             </div>
+                            
+                            <!-- Secondary Background (Light) -->
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-secondary-light"><?php _e('Secondary Background', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-secondary-light" name="colors[secondary_light]" value="<?php echo esc_attr($secondary_light_color); ?>" />
+                                    <input type="text" class="aisb-color-text" value="<?php echo esc_attr($secondary_light_color); ?>" />
+                                </div>
+                                <p class="aisb-settings-help"><?php _e('Background color for cards and alternate sections', 'ai-section-builder'); ?></p>
+                            </div>
+                            
+                            <!-- Border Color (Light) -->
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-border-light"><?php _e('Border Color', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-border-light" name="colors[border_light]" value="<?php echo esc_attr($border_light_color); ?>" />
+                                    <input type="text" class="aisb-color-text" value="<?php echo esc_attr($border_light_color); ?>" />
+                                </div>
+                                <p class="aisb-settings-help"><?php _e('Border color for cards and dividers', 'ai-section-builder'); ?></p>
+                            </div>
                         </div>
                         
                         <!-- Dark Mode Colors -->
@@ -585,18 +610,37 @@ function aisb_render_editor_page() {
                                 </div>
                                 <p class="aisb-settings-help"><?php _e('Main text color for dark sections', 'ai-section-builder'); ?></p>
                             </div>
+                            
+                            <!-- Secondary Background (Dark) -->
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-secondary-dark"><?php _e('Secondary Background', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-secondary-dark" name="colors[secondary_dark]" value="<?php echo esc_attr($secondary_dark_color); ?>" />
+                                    <input type="text" class="aisb-color-text" value="<?php echo esc_attr($secondary_dark_color); ?>" />
+                                </div>
+                                <p class="aisb-settings-help"><?php _e('Background color for cards in dark mode', 'ai-section-builder'); ?></p>
+                            </div>
+                            
+                            <!-- Border Color (Dark) -->
+                            <div class="aisb-settings-field">
+                                <label for="aisb-gs-border-dark"><?php _e('Border Color', 'ai-section-builder'); ?></label>
+                                <div class="aisb-color-input-wrapper">
+                                    <input type="color" id="aisb-gs-border-dark" name="colors[border_dark]" value="<?php echo esc_attr($border_dark_color); ?>" />
+                                    <input type="text" class="aisb-color-text" value="<?php echo esc_attr($border_dark_color); ?>" />
+                                </div>
+                                <p class="aisb-settings-help"><?php _e('Border color for cards in dark mode', 'ai-section-builder'); ?></p>
+                            </div>
                         </div>
                         
                         <!-- Settings Actions -->
-                        <div class="aisb-settings-actions">
+                        <div class="aisb-settings-actions" style="display: flex; flex-direction: column; gap: 12px;">
                             <button class="aisb-editor-btn aisb-editor-btn-ghost" id="aisb-reset-global-settings">
                                 <span class="dashicons dashicons-image-rotate"></span>
                                 <?php _e('Reset to Default', 'ai-section-builder'); ?>
                             </button>
-                            <button class="aisb-editor-btn aisb-editor-btn-primary" id="aisb-save-global-settings">
-                                <span class="dashicons dashicons-saved"></span>
-                                <?php _e('Save Color', 'ai-section-builder'); ?>
-                            </button>
+                            <p class="aisb-settings-help" style="text-align: center; margin: 0; font-size: 13px; color: #9CA3AF;">
+                                <?php _e('Use the main Save button above to save all changes', 'ai-section-builder'); ?>
+                            </p>
                         </div>
                     </div>
                 </div>

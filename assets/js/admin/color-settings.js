@@ -33,7 +33,11 @@
             this.originalValues = {
                 primary: $('#aisb-gs-primary').val() || '',
                 textLight: $('#aisb-gs-text-light').val() || '',
-                textDark: $('#aisb-gs-text-dark').val() || ''
+                textDark: $('#aisb-gs-text-dark').val() || '',
+                secondaryLight: $('#aisb-gs-secondary-light').val() || '',
+                secondaryDark: $('#aisb-gs-secondary-dark').val() || '',
+                borderLight: $('#aisb-gs-border-light').val() || '',
+                borderDark: $('#aisb-gs-border-dark').val() || ''
             };
         }
         
@@ -106,6 +110,50 @@
                 this.debounce(() => this.updatePreview({textDark: color}), 150)();
             });
             
+            // Real-time preview on secondary light color picker
+            $('#aisb-gs-secondary-light').on('input', (e) => {
+                const color = $(e.target).val();
+                // Sync with text input
+                $(e.target).siblings('.aisb-color-text').val(color);
+                // Mark as changed
+                this.markAsChanged();
+                // Update preview immediately (debounced)
+                this.debounce(() => this.updatePreview({secondaryLight: color}), 150)();
+            });
+            
+            // Real-time preview on secondary dark color picker
+            $('#aisb-gs-secondary-dark').on('input', (e) => {
+                const color = $(e.target).val();
+                // Sync with text input
+                $(e.target).siblings('.aisb-color-text').val(color);
+                // Mark as changed
+                this.markAsChanged();
+                // Update preview immediately (debounced)
+                this.debounce(() => this.updatePreview({secondaryDark: color}), 150)();
+            });
+            
+            // Real-time preview on border light color picker
+            $('#aisb-gs-border-light').on('input', (e) => {
+                const color = $(e.target).val();
+                // Sync with text input
+                $(e.target).siblings('.aisb-color-text').val(color);
+                // Mark as changed
+                this.markAsChanged();
+                // Update preview immediately (debounced)
+                this.debounce(() => this.updatePreview({borderLight: color}), 150)();
+            });
+            
+            // Real-time preview on border dark color picker
+            $('#aisb-gs-border-dark').on('input', (e) => {
+                const color = $(e.target).val();
+                // Sync with text input
+                $(e.target).siblings('.aisb-color-text').val(color);
+                // Mark as changed
+                this.markAsChanged();
+                // Update preview immediately (debounced)
+                this.debounce(() => this.updatePreview({borderDark: color}), 150)();
+            });
+            
             // Handle text input changes with validation for all color fields
             $('.aisb-settings-field').find('.aisb-color-text').on('input', (e) => {
                 const value = $(e.target).val();
@@ -129,6 +177,14 @@
                         updateData.textLight = value;
                     } else if (pickerId === 'aisb-gs-text-dark') {
                         updateData.textDark = value;
+                    } else if (pickerId === 'aisb-gs-secondary-light') {
+                        updateData.secondaryLight = value;
+                    } else if (pickerId === 'aisb-gs-secondary-dark') {
+                        updateData.secondaryDark = value;
+                    } else if (pickerId === 'aisb-gs-border-light') {
+                        updateData.borderLight = value;
+                    } else if (pickerId === 'aisb-gs-border-dark') {
+                        updateData.borderDark = value;
                     }
                     
                     // Update preview (debounced)
@@ -138,13 +194,7 @@
         }
         
         bindEvents() {
-            // Save button
-            $('#aisb-save-global-settings').on('click', (e) => {
-                e.preventDefault();
-                this.savePrimaryColor();
-            });
-            
-            // Reset button
+            // Reset button only - save is handled by main save button
             $('#aisb-reset-global-settings').on('click', (e) => {
                 e.preventDefault();
                 if (confirm('Are you sure you want to reset to default colors?')) {
@@ -157,6 +207,10 @@
             const primaryColor = $('#aisb-gs-primary').val();
             const textLightColor = $('#aisb-gs-text-light').val() || '#1a1a1a';  // Default if field doesn't exist
             const textDarkColor = $('#aisb-gs-text-dark').val() || '#fafafa';    // Default if field doesn't exist
+            const secondaryLightColor = $('#aisb-gs-secondary-light').val() || '#f1f5f9';
+            const secondaryDarkColor = $('#aisb-gs-secondary-dark').val() || '#374151';
+            const borderLightColor = $('#aisb-gs-border-light').val() || '#e2e8f0';
+            const borderDarkColor = $('#aisb-gs-border-dark').val() || '#4b5563';
             
             // Show loading state
             this.showMessage('Saving colors...', 'info');
@@ -170,6 +224,10 @@
                     primary_color: primaryColor,
                     text_light_color: textLightColor,
                     text_dark_color: textDarkColor,
+                    secondary_light_color: secondaryLightColor,
+                    secondary_dark_color: secondaryDarkColor,
+                    border_light_color: borderLightColor,
+                    border_dark_color: borderDarkColor,
                     nonce: this.getNonce()
                 },
                 success: (response) => {
@@ -181,7 +239,11 @@
                         this.updatePreview({
                             primary: response.data.colors.primary,
                             textLight: response.data.colors.text_light,
-                            textDark: response.data.colors.text_dark
+                            textDark: response.data.colors.text_dark,
+                            secondaryLight: response.data.colors.secondary_light,
+                            secondaryDark: response.data.colors.secondary_dark,
+                            borderLight: response.data.colors.border_light,
+                            borderDark: response.data.colors.border_dark
                         }, false);
                     } else {
                         this.showMessage(response.data?.message || 'Failed to save colors', 'error');
@@ -194,56 +256,55 @@
         }
         
         resetPrimaryColor() {
-            // Show loading state
-            this.showMessage('Resetting colors...', 'info');
+            // Define default colors
+            const defaults = {
+                primary: '#2563eb',
+                textLight: '#1a1a1a',
+                textDark: '#fafafa',
+                secondaryLight: '#f1f5f9',
+                secondaryDark: '#374151',
+                borderLight: '#e2e8f0',
+                borderDark: '#4b5563'
+            };
             
-            // Reset primary color
-            const resetPrimary = $.ajax({
-                url: ajaxurl,
-                type: 'POST',
-                data: {
-                    action: 'aisb_reset_primary_color',
-                    nonce: this.getNonce()
-                }
-            });
+            // Update all color pickers to defaults
+            $('#aisb-gs-primary').val(defaults.primary).trigger('input');
+            $('#aisb-gs-primary').siblings('.aisb-color-text').val(defaults.primary);
             
-            // Reset text colors
-            const resetText = $.ajax({
-                url: ajaxurl,
-                type: 'POST',
-                data: {
-                    action: 'aisb_reset_text_colors',
-                    nonce: this.getNonce()
-                }
-            });
+            $('#aisb-gs-text-light').val(defaults.textLight).trigger('input');
+            $('#aisb-gs-text-light').siblings('.aisb-color-text').val(defaults.textLight);
             
-            // Wait for all resets to complete
-            $.when(resetPrimary, resetText).done((primaryResponse, textResponse) => {
-                if (primaryResponse[0].success && textResponse[0].success) {
-                    this.showMessage('All colors reset to defaults', 'success');
-                    
-                    // Update color pickers to defaults
-                    $('#aisb-gs-primary').val(primaryResponse[0].data.color);
-                    $('#aisb-gs-primary').siblings('.aisb-color-text').val(primaryResponse[0].data.color);
-                    
-                    $('#aisb-gs-text-light').val(textResponse[0].data.text_light);
-                    $('#aisb-gs-text-light').siblings('.aisb-color-text').val(textResponse[0].data.text_light);
-                    
-                    $('#aisb-gs-text-dark').val(textResponse[0].data.text_dark);
-                    $('#aisb-gs-text-dark').siblings('.aisb-color-text').val(textResponse[0].data.text_dark);
-                    
-                    // Update preview without indicator (already saved)
-                    this.updatePreview({
-                        primary: primaryResponse[0].data.color,
-                        textLight: textResponse[0].data.text_light,
-                        textDark: textResponse[0].data.text_dark
-                    }, false);
-                } else {
-                    this.showMessage('Some colors failed to reset', 'error');
-                }
-            }).fail(() => {
-                this.showMessage('Network error. Please try again.', 'error');
-            });
+            $('#aisb-gs-text-dark').val(defaults.textDark).trigger('input');
+            $('#aisb-gs-text-dark').siblings('.aisb-color-text').val(defaults.textDark);
+            
+            $('#aisb-gs-secondary-light').val(defaults.secondaryLight).trigger('input');
+            $('#aisb-gs-secondary-light').siblings('.aisb-color-text').val(defaults.secondaryLight);
+            
+            $('#aisb-gs-secondary-dark').val(defaults.secondaryDark).trigger('input');
+            $('#aisb-gs-secondary-dark').siblings('.aisb-color-text').val(defaults.secondaryDark);
+            
+            $('#aisb-gs-border-light').val(defaults.borderLight).trigger('input');
+            $('#aisb-gs-border-light').siblings('.aisb-color-text').val(defaults.borderLight);
+            
+            $('#aisb-gs-border-dark').val(defaults.borderDark).trigger('input');
+            $('#aisb-gs-border-dark').siblings('.aisb-color-text').val(defaults.borderDark);
+            
+            // Mark as changed so user can save
+            this.markAsChanged();
+            
+            // Update preview with indicator showing changes need to be saved
+            this.updatePreview({
+                primary: defaults.primary,
+                textLight: defaults.textLight,
+                textDark: defaults.textDark,
+                secondaryLight: defaults.secondaryLight,
+                secondaryDark: defaults.secondaryDark,
+                borderLight: defaults.borderLight,
+                borderDark: defaults.borderDark
+            }, true);
+            
+            // Show message
+            this.showMessage('Colors reset to defaults - Click Save to apply changes', 'info');
         }
         
         updatePreview(colorsOrString, showIndicator = true) {
@@ -296,6 +357,33 @@
                 if (colors.textDark) {
                     currentCSS = currentCSS
                         .replace(/--aisb-color-dark-text:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-dark-text: ' + colors.textDark);
+                }
+                
+                // Update secondary light color if provided
+                if (colors.secondaryLight) {
+                    currentCSS = currentCSS
+                        .replace(/--aisb-color-secondary:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-secondary: ' + colors.secondaryLight)
+                        .replace(/--aisb-surface-secondary:\s*#[0-9a-fA-F]{6}/g, '--aisb-surface-secondary: ' + colors.secondaryLight);
+                }
+                
+                // Update secondary dark color if provided
+                if (colors.secondaryDark) {
+                    currentCSS = currentCSS
+                        .replace(/--aisb-color-dark-secondary:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-dark-secondary: ' + colors.secondaryDark);
+                }
+                
+                // Update border light color if provided
+                if (colors.borderLight) {
+                    currentCSS = currentCSS
+                        .replace(/--aisb-color-border:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-border: ' + colors.borderLight)
+                        .replace(/--aisb-border-primary:\s*#[0-9a-fA-F]{6}/g, '--aisb-border-primary: ' + colors.borderLight)
+                        .replace(/--aisb-border-secondary:\s*#[0-9a-fA-F]{6}/g, '--aisb-border-secondary: ' + colors.borderLight);
+                }
+                
+                // Update border dark color if provided
+                if (colors.borderDark) {
+                    currentCSS = currentCSS
+                        .replace(/--aisb-color-dark-border:\s*#[0-9a-fA-F]{6}/g, '--aisb-color-dark-border: ' + colors.borderDark);
                 }
                 
                 $style.html(currentCSS);

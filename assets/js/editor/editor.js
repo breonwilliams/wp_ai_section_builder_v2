@@ -34,7 +34,7 @@
     // Debug helper
     function debugLog(context, data) {
         if (editorState.debug) {
-            console.log(`[AISB DEBUG - ${context}]:`, data);
+            // console.log(`[AISB DEBUG - ${context}]:`, data);
         }
     }
     
@@ -1361,11 +1361,6 @@
                     setup: function(editor) {
                         editor.on('change keyup', function() {
                             editor.save(); // Save to textarea
-                            console.log('[DEBUG] TinyMCE content saved:', {
-                                editorId: editor.id,
-                                content: editor.getContent(),
-                                hasP: editor.getContent().includes('<p>')
-                            });
                             updatePreview();
                         });
                     }
@@ -1395,11 +1390,6 @@
                     setup: function(editor) {
                         editor.on('change keyup', function() {
                             editor.save(); // Save to textarea
-                            console.log('[DEBUG] TinyMCE content saved:', {
-                                editorId: editor.id,
-                                content: editor.getContent(),
-                                hasP: editor.getContent().includes('<p>')
-                            });
                             updatePreview();
                         });
                     }
@@ -1447,11 +1437,6 @@
                     setup: function(editor) {
                         editor.on('change keyup', function() {
                             editor.save(); // Save to textarea
-                            console.log('[DEBUG] TinyMCE content saved:', {
-                                editorId: editor.id,
-                                content: editor.getContent(),
-                                hasP: editor.getContent().includes('<p>')
-                            });
                             updatePreview();
                         });
                     }
@@ -1481,11 +1466,6 @@
                     setup: function(editor) {
                         editor.on('change keyup', function() {
                             editor.save(); // Save to textarea
-                            console.log('[DEBUG] TinyMCE content saved:', {
-                                editorId: editor.id,
-                                content: editor.getContent(),
-                                hasP: editor.getContent().includes('<p>')
-                            });
                             updatePreview();
                         });
                     }
@@ -1962,12 +1942,12 @@
         }
         
         // Debug content fields specifically
-        console.log('[DEBUG] updatePreview - Content fields:', {
-            'content': content.content,
-            'outro_content': content.outro_content,
-            'hasContentP': content.content ? content.content.includes('<p>') : false,
-            'hasOutroP': content.outro_content ? content.outro_content.includes('<p>') : false
-        });
+        // console.log('[DEBUG] updatePreview - Content fields:', {
+        //     'content': content.content,
+        //     'outro_content': content.outro_content,
+        //     'hasContentP': content.content ? content.content.includes('<p>') : false,
+        //     'hasOutroP': content.outro_content ? content.outro_content.includes('<p>') : false
+        // });
         
         debugLog('updatePreview - Content from Form', content);
         
@@ -2302,11 +2282,11 @@
         var content = section.content || section;
         
         // Debug: Log the raw content to see what we're getting
-        console.log('[DEBUG] Features content field:', {
-            raw: content.content,
-            hasHtmlTags: content.content ? content.content.includes('<p>') : false,
-            length: content.content ? content.content.length : 0
-        });
+        // console.log('[DEBUG] Features content field:', {
+        //     raw: content.content,
+        //     hasHtmlTags: content.content ? content.content.includes('<p>') : false,
+        //     length: content.content ? content.content.length : 0
+        // });
         
         // Build class list based on variants - must match PHP structure EXACTLY
         var sectionClasses = [
@@ -2497,10 +2477,14 @@
                 return;
             }
             
-            // Get color values
+            // Get all color values
             var primaryColor = $('#aisb-gs-primary').val();
             var textLightColor = $('#aisb-gs-text-light').val() || '#1a1a1a';
             var textDarkColor = $('#aisb-gs-text-dark').val() || '#fafafa';
+            var secondaryLightColor = $('#aisb-gs-secondary-light').val() || '#f1f5f9';
+            var secondaryDarkColor = $('#aisb-gs-secondary-dark').val() || '#374151';
+            var borderLightColor = $('#aisb-gs-border-light').val() || '#e2e8f0';
+            var borderDarkColor = $('#aisb-gs-border-dark').val() || '#4b5563';
             
             // Save via AJAX
             $.ajax({
@@ -2511,6 +2495,10 @@
                     primary_color: primaryColor,
                     text_light_color: textLightColor,
                     text_dark_color: textDarkColor,
+                    secondary_light_color: secondaryLightColor,
+                    secondary_dark_color: secondaryDarkColor,
+                    border_light_color: borderLightColor,
+                    border_dark_color: borderDarkColor,
                     nonce: window.aisbColorSettings?.nonce || $('#aisb-color-nonce').val() || ''
                 },
                 success: function(response) {
@@ -2902,31 +2890,31 @@
     
     // Debug helper for testing media system
     window.debugMediaSystem = function() {
-        console.log('=== MEDIA SYSTEM DEBUG ===');
-        console.log('Current Section Index:', editorState.currentSection);
+        // console.log('=== MEDIA SYSTEM DEBUG ===');
+        // console.log('Current Section Index:', editorState.currentSection);
         
         if (editorState.currentSection !== null) {
             var content = editorState.sections[editorState.currentSection].content;
-            console.log('Current Section Content:', content);
-            console.log('Media Type:', content.media_type);
-            console.log('Featured Image:', content.featured_image);
-            console.log('Video URL:', content.video_url);
+            // console.log('Current Section Content:', content);
+            // console.log('Media Type:', content.media_type);
+            // console.log('Featured Image:', content.featured_image);
+            // console.log('Video URL:', content.video_url);
             
             // Check what renderMediaPreview would return
             var preview = renderMediaPreview(content);
-            console.log('renderMediaPreview Output:', preview);
+            // console.log('renderMediaPreview Output:', preview);
             
             // Check DOM
             var $mediaInPreview = $('.aisb-section[data-index="' + editorState.currentSection + '"] .aisb-hero__media');
-            console.log('Media element in preview exists:', $mediaInPreview.length > 0);
+            // console.log('Media element in preview exists:', $mediaInPreview.length > 0);
             if ($mediaInPreview.length > 0) {
-                console.log('Media element HTML:', $mediaInPreview[0].outerHTML);
+                // console.log('Media element HTML:', $mediaInPreview[0].outerHTML);
             }
         } else {
-            console.log('No section currently selected');
+            // console.log('No section currently selected');
         }
         
-        console.log('=== END DEBUG ===');
+        // console.log('=== END DEBUG ===');
     };
     
     /**
@@ -3024,7 +3012,7 @@
     $(document).ready(function() {
         if ($('.aisb-editor-wrapper').length) {
             debugLog('Initializing editor...');
-            console.log('Debug mode enabled. Use window.debugMediaSystem() in console to check media state.');
+            // console.log('Debug mode enabled. Use window.debugMediaSystem() in console to check media state.');
             initEditor();
             
             // Initialize autocomplete on any existing URL fields
