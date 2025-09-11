@@ -224,9 +224,9 @@
     color: var(--section-link-hover);
 }
 
-.aisb-section a:visited {
-    color: var(--section-link-visited);
-}
+/* Visited links - removed for visual consistency
+   Modern sites typically don't style visited links differently
+   to maintain consistent branding and user-selected colors */
 
 /* Focus states for accessibility */
 .aisb-section a:focus-visible,

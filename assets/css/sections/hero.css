@@ -119,10 +119,7 @@
     font-weight: inherit;
 }
 
-.aisb-hero__body a:visited,
-.aisb-hero__outro a:visited {
-    color: var(--section-link-visited, var(--aisb-color-muted));
-}
+/* Visited links removed - maintains consistent link colors */
 
 .aisb-hero__body a:hover,
 .aisb-hero__outro a:hover {

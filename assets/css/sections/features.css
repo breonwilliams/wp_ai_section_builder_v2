@@ -87,6 +87,8 @@
 
 /* Feature Item - Mobile First */
 .aisb-features__item {
+    display: flex;
+    flex-direction: column;
     text-align: center;
     padding: 0; /* Remove padding when image is present */
     border-radius: 8px;
@@ -94,6 +96,7 @@
     background: var(--section-surface-secondary, var(--aisb-color-secondary));
     transition: background-color 200ms ease, border-color 200ms ease;
     overflow: hidden; /* Ensure image respects border radius */
+    height: 100%; /* Ensure full height for flex container */
 }
 
 /* Card image wrapper - enforces 16:9 aspect ratio */
@@ -119,6 +122,10 @@
 /* Card content area - padding for text content */
 .aisb-features__item-content {
     padding: 24px 20px; /* Mobile padding */
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Take up remaining space */
+    justify-content: space-between; /* Distribute space between elements */
 }
 
 /* Media Column */
@@ -173,6 +180,8 @@
     color: var(--section-link, var(--aisb-color-primary));
     text-decoration: none;
     transition: color 200ms ease;
+    margin-top: auto; /* Push to bottom of flex container */
+    align-self: center; /* Center align the link */
 }
 
 .aisb-features__item-link:hover {
