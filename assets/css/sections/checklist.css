@@ -88,16 +88,51 @@
 }
 
 /* =========================================
-   Items Placeholder (Phase 2)
+   Checklist Items
    ========================================= */
-.aisb-checklist__items-placeholder {
-    margin: var(--aisb-space-xl) 0;
-    padding: var(--aisb-space-lg);
-    border: 2px dashed var(--aisb-border);
-    border-radius: var(--aisb-radius-md);
-    background: var(--aisb-bg-secondary);
-    text-align: center;
-    color: var(--aisb-text-muted);
+.aisb-checklist__items {
+    margin: 32px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.aisb-checklist__item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.aisb-checklist__item-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+}
+
+.aisb-checklist__item-icon svg {
+    width: 24px;
+    height: 24px;
+    color: var(--section-primary, #2563eb);
+}
+
+.aisb-checklist__item-content {
+    flex: 1;
+}
+
+.aisb-checklist__item-heading {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0 0 8px 0;
+    color: var(--section-text, #1a1a1a);
+}
+
+.aisb-checklist__item-text {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    color: var(--section-text-muted, #64748b);
 }
 
 /* =========================================
@@ -206,10 +241,16 @@
     color: #1d4ed8 !important;
 }
 
-/* Placeholder for Phase 2 */
-.aisb-section--light .aisb-checklist__items-placeholder {
-    background: #f1f5f9;
-    border-color: #e2e8f0;
+/* Light mode checklist items */
+.aisb-section--light .aisb-checklist__item-icon svg {
+    color: #2563eb;
+}
+
+.aisb-section--light .aisb-checklist__item-heading {
+    color: #1a1a1a;
+}
+
+.aisb-section--light .aisb-checklist__item-text {
     color: #64748b;
 }
 
@@ -250,10 +291,16 @@
     color: #3b82f6 !important;
 }
 
-/* Placeholder for Phase 2 */
-.aisb-section--dark .aisb-checklist__items-placeholder {
-    background: #374151;
-    border-color: #4b5563;
+/* Dark mode checklist items */
+.aisb-section--dark .aisb-checklist__item-icon svg {
+    color: #60a5fa;
+}
+
+.aisb-section--dark .aisb-checklist__item-heading {
+    color: #fafafa;
+}
+
+.aisb-section--dark .aisb-checklist__item-text {
     color: #9ca3af;
 }
 
@@ -273,6 +320,19 @@
 }
 
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__outro {
+    color: #64748b;
+}
+
+/* Default theme checklist items */
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__item-icon svg {
+    color: #2563eb;
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__item-heading {
+    color: #1a1a1a;
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__item-text {
     color: #64748b;
 }
 

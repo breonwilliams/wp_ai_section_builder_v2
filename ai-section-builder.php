@@ -1773,6 +1773,42 @@ function aisb_render_features_section($section) {
 }
 
 /**
+ * Render Checklist Items
+ */
+function aisb_render_checklist_items($items) {
+    if (empty($items) || !is_array($items)) {
+        return '';
+    }
+    
+    ob_start();
+    ?>
+    <div class="aisb-checklist__items">
+        <?php foreach ($items as $item): ?>
+            <?php 
+            $item_heading = esc_html($item['heading'] ?? 'Checklist Item');
+            $item_content = esc_html($item['content'] ?? '');
+            ?>
+            <div class="aisb-checklist__item">
+                <div class="aisb-checklist__item-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M7 12L10 15L17 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="aisb-checklist__item-content">
+                    <h4 class="aisb-checklist__item-heading"><?php echo $item_heading; ?></h4>
+                    <?php if ($item_content): ?>
+                        <p class="aisb-checklist__item-text"><?php echo $item_content; ?></p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
  * Render Checklist section on frontend
  */
 function aisb_render_checklist_section($section) {
@@ -1829,11 +1865,9 @@ function aisb_render_checklist_section($section) {
                             <div class="aisb-checklist__content"><?php echo $content_text; ?></div>
                         <?php endif; ?>
                         
-                        <!-- Phase 2: Checklist items will go here -->
+                        <!-- Checklist Items -->
                         <?php if (!empty($items)): ?>
-                            <div class="aisb-checklist__items-placeholder">
-                                <!-- TODO: Render checklist items in Phase 2 -->
-                            </div>
+                            <?php echo aisb_render_checklist_items($items); ?>
                         <?php endif; ?>
                         
                         <?php if (!empty($global_blocks)): ?>
@@ -1911,11 +1945,9 @@ function aisb_render_checklist_section($section) {
                         <div class="aisb-checklist__content"><?php echo $content_text; ?></div>
                     <?php endif; ?>
                     
-                    <!-- Phase 2: Checklist items will go here -->
+                    <!-- Checklist Items -->
                     <?php if (!empty($items)): ?>
-                        <div class="aisb-checklist__items-placeholder">
-                            <!-- TODO: Render checklist items in Phase 2 -->
-                        </div>
+                        <?php echo aisb_render_checklist_items($items); ?>
                     <?php endif; ?>
                     
                     <?php if (!empty($global_blocks)): ?>

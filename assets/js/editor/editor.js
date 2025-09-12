@@ -540,7 +540,7 @@
             // Phase 2: Will add items repeater
             setTimeout(function() {
                 initGlobalBlocksRepeater(content, 'checklist');
-                // TODO Phase 2: initChecklistItemsRepeater(content);
+                initChecklistItemsRepeater(content);
             }, 50);
         }
     }
@@ -1107,12 +1107,9 @@
                 <div class="aisb-editor-form-group">
                     <label class="aisb-editor-form-label">
                         Checklist Items
+                        <span class="aisb-editor-form-help">Add items to your checklist</span>
                     </label>
-                    <div id="checklist-items" class="aisb-repeater-container">
-                        <div style="padding: 20px; background: #f5f5f5; border: 2px dashed #ddd; text-align: center; color: #999;">
-                            Phase 2: Checklist items will be added here
-                        </div>
-                    </div>
+                    <div id="checklist-items" class="aisb-repeater-container"></div>
                 </div>
                 
                 <div class="aisb-editor-form-group">
@@ -1329,6 +1326,44 @@
     }
     
     /**
+     * Render Checklist Items
+     */
+    function renderChecklistItems(items) {
+        debugLog('renderChecklistItems called', {
+            items: items,
+            isArray: Array.isArray(items),
+            length: items ? items.length : 0
+        });
+        
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            debugLog('renderChecklistItems - no items to render');
+            return '';
+        }
+        
+        var itemsHtml = items.map(function(item) {
+            var itemHeading = escapeHtml(item.heading || 'Checklist Item');
+            var itemContent = escapeHtml(item.content || '');
+            
+            return `
+                <div class="aisb-checklist__item">
+                    <div class="aisb-checklist__item-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M7 12L10 15L17 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="aisb-checklist__item-content">
+                        <h4 class="aisb-checklist__item-heading">${itemHeading}</h4>
+                        ${itemContent ? `<p class="aisb-checklist__item-text">${itemContent}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        return `<div class="aisb-checklist__items">${itemsHtml}</div>`;
+    }
+    
+    /**
      * Render Feature Cards
      */
     function renderFeatureCards(cards) {
@@ -1489,6 +1524,72 @@
         }, 250);
         
         return cardsRepeater;
+    }
+    
+    /**
+     * Initialize Checklist Items Repeater
+     */
+    function initChecklistItemsRepeater(content) {
+        var $container = $('#checklist-items');
+        if (!$container.length) {
+            return; // Container not found
+        }
+        
+        // Get items from content or empty array
+        var items = content.items || [];
+        
+        // Initialize repeater field
+        var itemsRepeater = $container.aisbRepeaterField({
+            fieldName: 'items',
+            items: items,
+            defaultItem: {
+                heading: 'Checklist Item',
+                content: 'Description of what this includes or covers.'
+            },
+            maxItems: 10,
+            minItems: 0,
+            itemLabel: 'Item',
+            addButtonText: 'Add Checklist Item',
+            template: function(item, index) {
+                return `
+                    <div class="aisb-repeater-fields">
+                        <div class="aisb-repeater-field-group">
+                            <label>Item Heading</label>
+                            <input type="text" 
+                                   class="aisb-repeater-field aisb-editor-form-input" 
+                                   data-field="heading" 
+                                   value="${escapeHtml(item.heading || '')}"
+                                   placeholder="e.g., 24/7 Support">
+                        </div>
+                        <div class="aisb-repeater-field-group">
+                            <label>Item Description</label>
+                            <textarea class="aisb-repeater-field aisb-editor-form-input" 
+                                      data-field="content" 
+                                      rows="3"
+                                      placeholder="Describe this checklist item...">${escapeHtml(item.content || '')}</textarea>
+                        </div>
+                    </div>
+                `;
+            },
+            onUpdate: function(items) {
+                debugLog('Checklist items updated', {
+                    items: items,
+                    currentSection: editorState.currentSection,
+                    sectionType: editorState.currentSection !== null ? editorState.sections[editorState.currentSection].type : null
+                });
+                
+                // Update the content
+                if (editorState.currentSection !== null) {
+                    editorState.sections[editorState.currentSection].content.items = items;
+                    debugLog('Updated section content with items', {
+                        sectionContent: editorState.sections[editorState.currentSection].content
+                    });
+                    updatePreview();
+                }
+            }
+        });
+        
+        return itemsRepeater;
     }
     
     /**
@@ -2169,6 +2270,12 @@
             content[field.name] = field.value;
         });
         
+        // Debug: Check if items are in form data
+        debugLog('updatePreview - Checking for items in form data', {
+            hasItemsInFormData: formData.some(field => field.name === 'items'),
+            formDataKeys: formData.map(field => field.name)
+        });
+        
         // Get the current section first
         var currentSection = editorState.sections[editorState.currentSection];
         
@@ -2232,6 +2339,15 @@
             // Preserve cards managed by repeater
             if (currentSection.content.cards) {
                 content.cards = currentSection.content.cards;
+            }
+            
+            // Preserve checklist items managed by repeater
+            if (currentSection.content.items) {
+                content.items = currentSection.content.items;
+                debugLog('Preserving checklist items in updatePreview', {
+                    items: currentSection.content.items,
+                    itemCount: currentSection.content.items.length
+                });
             }
             
             // Preserve variant data managed by toggle buttons
@@ -2617,6 +2733,13 @@
     function renderChecklistSection(section, index) {
         var content = section.content || section;
         
+        debugLog('renderChecklistSection called', {
+            section: section,
+            content: content,
+            items: content.items,
+            itemsLength: content.items ? content.items.length : 0
+        });
+        
         // Build class list based on variants
         var sectionClasses = [
             'aisb-section',
@@ -2625,9 +2748,8 @@
             'aisb-section--' + (content.layout_variant || 'content-left')
         ].join(' ');
         
-        // Phase 1: Items placeholder
-        var itemsHtml = content.items && content.items.length > 0 ? 
-            '<div class="aisb-checklist__items-placeholder">Checklist items will appear here (Phase 2)</div>' : '';
+        // Render checklist items
+        var itemsHtml = renderChecklistItems(content.items);
         
         // Build the section HTML based on layout
         var sectionContent = '';
