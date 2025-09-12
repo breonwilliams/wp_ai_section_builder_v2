@@ -32,6 +32,7 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 32px;
+    align-items: center; /* Vertically center content and media */
 }
 
 /* Left/Right layouts - always left-aligned content */
