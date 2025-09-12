@@ -74,10 +74,11 @@
 
 /* Center layout - items container */
 .aisb-section--center .aisb-checklist__items {
-    max-width: 600px;
-    margin-left: auto;
+    width: fit-content;          /* Shrink to content width */
+    max-width: 600px;            /* Cap at 600px for readability */
+    margin-left: auto;           /* Center horizontally */
     margin-right: auto;
-    text-align: left; /* Items always left-aligned */
+    text-align: left;            /* Items always left-aligned */
 }
 
 .aisb-section--center .aisb-checklist__media {
