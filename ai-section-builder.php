@@ -1897,7 +1897,7 @@ function aisb_render_checklist_section($section) {
                     <?php endif; ?>
                 </div>
             <?php else: ?>
-                <!-- Center layout - single column, no media -->
+                <!-- Center layout - single column, with media below content (matching hero/features) -->
                 <div class="aisb-checklist__center">
                     <?php if ($eyebrow_heading): ?>
                         <div class="aisb-checklist__eyebrow"><?php echo $eyebrow_heading; ?></div>
@@ -1942,6 +1942,37 @@ function aisb_render_checklist_section($section) {
                     
                     <?php if ($outro_content): ?>
                         <div class="aisb-checklist__outro"><?php echo $outro_content; ?></div>
+                    <?php endif; ?>
+                    
+                    <!-- Media below content for center layout (matching hero/features) -->
+                    <?php if ($media_type !== 'none'): ?>
+                        <?php if ($media_type === 'image' && $featured_image): ?>
+                            <div class="aisb-checklist__media">
+                                <img src="<?php echo $featured_image; ?>" 
+                                     alt="<?php echo esc_attr($heading); ?>" 
+                                     class="aisb-checklist__image">
+                            </div>
+                        <?php elseif ($media_type === 'video' && $video_url): ?>
+                            <div class="aisb-checklist__media">
+                                <?php
+                                // Check if YouTube
+                                if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/', $video_url, $matches)): 
+                                    $youtube_id = $matches[1];
+                                ?>
+                                    <iframe class="aisb-checklist__video" 
+                                            src="https://www.youtube-nocookie.com/embed/<?php echo esc_attr($youtube_id); ?>" 
+                                            frameborder="0" 
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                            allowfullscreen>
+                                    </iframe>
+                                <?php else: ?>
+                                    <video class="aisb-checklist__video" controls>
+                                        <source src="<?php echo $video_url; ?>" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>

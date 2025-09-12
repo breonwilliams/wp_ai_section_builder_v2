@@ -1095,8 +1095,8 @@
                     </div>
                 </div>
                 
-                <!-- Media field - only show for left/right layouts -->
-                <div class="aisb-editor-form-group aisb-media-field" ${content.layout_variant === 'center' ? 'style="display:none;"' : ''}>
+                <!-- Media field - now visible for ALL layouts including center (matching hero/features) -->
+                <div class="aisb-editor-form-group aisb-media-field">
                     <label class="aisb-editor-form-label">
                         Featured Image
                     </label>
@@ -1748,21 +1748,17 @@
                 } else if (variantType === 'layout') {
                     content.layout_variant = variantValue;
                     
-                    // For checklist section, hide/show media field based on layout
-                    var sectionType = editorState.sections[editorState.currentSection].type;
-                    if (sectionType === 'checklist') {
-                        if (variantValue === 'center') {
-                            // Hide media field for center layout
-                            $('.aisb-media-field').hide();
-                            // Clear media values
-                            content.media_type = 'none';
-                            content.featured_image = '';
-                            content.video_url = '';
-                        } else {
-                            // Show media field for left/right layouts
-                            $('.aisb-media-field').show();
-                        }
-                    }
+                    // Debug logging to track media state
+                    debugLog('Layout variant changed', {
+                        sectionType: editorState.sections[editorState.currentSection].type,
+                        newLayout: variantValue,
+                        mediaType: content.media_type,
+                        hasImage: !!content.featured_image,
+                        hasVideo: !!content.video_url
+                    });
+                    
+                    // Note: Media fields are now visible for ALL layouts including center
+                    // This matches hero and features section behavior
                 } else if (variantType === 'card_alignment') {
                     content.card_alignment = variantValue;
                 }
@@ -2195,6 +2191,17 @@
                     content.outro_content = tinyMCE.get('features-outro-content').getContent();
                 }
             } else if (sectionType === 'checklist') {
+                // Debug checklist media state BEFORE update
+                debugLog('Checklist updatePreview - Before', {
+                    formMediaType: content.media_type,
+                    formImage: content.featured_image,
+                    formVideo: content.video_url,
+                    currentMediaType: currentSection.content.media_type,
+                    currentImage: currentSection.content.featured_image,
+                    currentVideo: currentSection.content.video_url,
+                    layoutVariant: content.layout_variant
+                });
+                
                 if (typeof tinyMCE !== 'undefined' && tinyMCE.get('checklist-content')) {
                     content.content = tinyMCE.get('checklist-content').getContent();
                 }
@@ -2257,6 +2264,17 @@
         if (editorState.sections[editorState.currentSection]) {
             editorState.sections[editorState.currentSection].content = content;
             editorState.isDirty = true;
+            
+            // Debug checklist media state AFTER update
+            if (editorState.sections[editorState.currentSection].type === 'checklist') {
+                debugLog('Checklist updatePreview - After Update', {
+                    savedMediaType: content.media_type,
+                    savedImage: content.featured_image,
+                    savedVideo: content.video_url,
+                    layoutVariant: content.layout_variant,
+                    fullContent: content
+                });
+            }
             
             // Re-render just this section
             var section = editorState.sections[editorState.currentSection];
@@ -2615,7 +2633,7 @@
         var sectionContent = '';
         
         if (content.layout_variant === 'center') {
-            // Center layout - single column, no media
+            // Center layout - single column, with media below content (matching hero/features)
             sectionContent = `
                 <div class="aisb-checklist__center">
                     ${content.eyebrow_heading ? `<div class="aisb-checklist__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
@@ -2624,6 +2642,7 @@
                     ${itemsHtml}
                     ${renderGlobalBlocks(content.global_blocks, 'checklist')}
                     ${content.outro_content ? `<div class="aisb-checklist__outro">${content.outro_content}</div>` : ''}
+                    ${renderMediaPreview(content, 'checklist')}
                 </div>
             `;
         } else {
@@ -2660,14 +2679,6 @@
             <section class="${sectionClasses}" data-index="${index}">
                 <div class="aisb-checklist__container">
                     ${sectionContent}
-                </div>
-                <div class="aisb-section-controls">
-                    <button class="aisb-section-control" data-action="edit" data-index="${index}" title="Edit Section">
-                        <span class="dashicons dashicons-edit"></span>
-                    </button>
-                    <button class="aisb-section-control" data-action="remove" data-index="${index}" title="Remove Section">
-                        <span class="dashicons dashicons-trash"></span>
-                    </button>
                 </div>
             </section>
         `;

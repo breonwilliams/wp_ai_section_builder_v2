@@ -55,24 +55,27 @@
    Content Elements
    ========================================= */
 .aisb-checklist__eyebrow {
-    font-size: var(--aisb-text-sm);
-    font-weight: var(--aisb-font-semibold);
+    font-size: 13px; /* Mobile first - matching hero/features */
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: var(--aisb-space-sm);
+    margin-bottom: 12px;
+    color: var(--section-primary, var(--aisb-color-primary));
 }
 
 .aisb-checklist__heading {
-    font-size: var(--aisb-text-4xl);
-    font-weight: var(--aisb-font-bold);
-    line-height: var(--aisb-leading-tight);
-    margin: 0 0 var(--aisb-space-md) 0;
+    font-size: 32px; /* Mobile first - matching features section scale */
+    font-weight: 700;
+    line-height: var(--aisb-gs-line-height-heading, 1.2);
+    color: var(--section-text, var(--aisb-color-text));
+    margin: 0 0 16px 0; /* Smaller margin on mobile */
 }
 
 .aisb-checklist__content {
-    font-size: var(--aisb-text-lg);
-    line-height: var(--aisb-leading-relaxed);
-    margin-bottom: var(--aisb-space-xl);
+    font-size: 16px; /* Mobile first - matching features */
+    line-height: var(--aisb-gs-line-height-body, 1.6);
+    color: var(--section-text-muted, var(--aisb-color-text-muted));
+    margin-bottom: 32px;
 }
 
 /* Clear default paragraph margins */
@@ -116,9 +119,10 @@
    Outro Content
    ========================================= */
 .aisb-checklist__outro {
-    margin-top: var(--aisb-space-xl);
-    font-size: var(--aisb-text-base);
-    line-height: var(--aisb-leading-relaxed);
+    margin-top: 32px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--section-text-muted, var(--aisb-color-text-muted));
 }
 
 .aisb-checklist__outro p {
@@ -299,14 +303,6 @@
         order: 2;
     }
     
-    .aisb-checklist__heading {
-        font-size: var(--aisb-text-3xl);
-    }
-    
-    .aisb-checklist__content {
-        font-size: var(--aisb-text-base);
-    }
-    
     .aisb-checklist {
         padding: var(--aisb-space-2xl) 0;
     }
@@ -325,8 +321,57 @@
     }
 }
 
-@media (max-width: 480px) {
+/* Tablet and up */
+@media (min-width: 768px) {
+    .aisb-checklist__eyebrow {
+        font-size: 14px;
+    }
+    
     .aisb-checklist__heading {
-        font-size: var(--aisb-text-2xl);
+        font-size: 36px;
+        margin-bottom: 20px;
+    }
+    
+    .aisb-checklist__content,
+    .aisb-checklist__outro {
+        font-size: 17px;
+    }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+    .aisb-checklist__heading {
+        font-size: 40px;
+    }
+}
+
+/* Large desktop */
+@media (min-width: 1280px) {
+    .aisb-checklist__eyebrow {
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+    
+    .aisb-checklist__heading {
+        font-size: 48px;
+        margin-bottom: 24px;
+    }
+    
+    .aisb-checklist__content,
+    .aisb-checklist__outro {
+        font-size: 18px;
+        margin-bottom: 40px;
+    }
+}
+
+/* Extra large desktop */
+@media (min-width: 1536px) {
+    .aisb-checklist__heading {
+        font-size: 52px;
+    }
+    
+    .aisb-checklist__content,
+    .aisb-checklist__outro {
+        font-size: 19px;
     }
 }
