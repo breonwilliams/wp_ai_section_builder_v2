@@ -27,28 +27,61 @@
    Layout Variants
    ========================================= */
 
-/* Two-column layouts */
+/* Two-column layouts - Mobile first (stacked) */
 .aisb-checklist__columns {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--aisb-space-3xl);
-    align-items: center;
+    grid-template-columns: 1fr;
+    gap: 32px;
 }
 
-/* Content-right layout - flip the columns */
+/* Left/Right layouts - always left-aligned content */
+.aisb-section--content-left .aisb-checklist__content-column,
 .aisb-section--content-right .aisb-checklist__content-column {
-    order: 2;
+    text-align: left;
 }
 
+/* On mobile, all layouts stack the same way */
+.aisb-section--content-left .aisb-checklist__columns,
+.aisb-section--content-right .aisb-checklist__columns {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    direction: ltr; /* Reset any RTL on mobile */
+}
+
+.aisb-section--content-right .aisb-checklist__content-column,
 .aisb-section--content-right .aisb-checklist__media-column {
-    order: 1;
+    direction: ltr; /* Ensure LTR text */
 }
 
-/* Center layout */
-.aisb-checklist__center {
+/* Center layout ONLY */
+.aisb-section--center .aisb-checklist__center {
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
+}
+
+.aisb-section--center .aisb-checklist__content {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.aisb-section--center .aisb-checklist__outro {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Center layout - items container */
+.aisb-section--center .aisb-checklist__items {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left; /* Items always left-aligned */
+}
+
+.aisb-section--center .aisb-checklist__media {
+    margin-top: 48px;
 }
 
 /* =========================================
@@ -60,7 +93,7 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 12px;
-    color: var(--section-primary, var(--aisb-color-primary));
+    color: var(--section-link, var(--aisb-color-primary));
 }
 
 .aisb-checklist__heading {
@@ -74,13 +107,15 @@
 .aisb-checklist__content {
     font-size: 16px; /* Mobile first - matching features */
     line-height: var(--aisb-gs-line-height-body, 1.6);
-    color: var(--section-text-muted, var(--aisb-color-text-muted));
-    margin-bottom: 32px;
+    color: var(--section-text-secondary, var(--aisb-color-muted));
+    margin: 0 0 32px 0;
 }
 
 /* Clear default paragraph margins */
 .aisb-checklist__content p {
-    margin: 0 0 var(--aisb-space-md) 0;
+    margin: 0 0 16px 0;
+    font-size: 16px; /* Ensure paragraphs maintain correct size */
+    line-height: 1.6;
 }
 
 .aisb-checklist__content p:last-child {
@@ -113,7 +148,7 @@
 .aisb-checklist__item-icon svg {
     width: 24px;
     height: 24px;
-    color: var(--section-primary, #2563eb);
+    color: var(--section-link, var(--aisb-color-primary));
 }
 
 .aisb-checklist__item-content {
@@ -125,14 +160,14 @@
     font-weight: 600;
     line-height: 1.3;
     margin: 0 0 8px 0;
-    color: var(--section-text, #1a1a1a);
+    color: var(--section-text, var(--aisb-color-text));
 }
 
 .aisb-checklist__item-text {
     font-size: 16px;
     line-height: 1.6;
     margin: 0;
-    color: var(--section-text-muted, #64748b);
+    color: var(--section-text-secondary, var(--aisb-color-muted));
 }
 
 /* =========================================
@@ -145,8 +180,14 @@
     margin-top: var(--aisb-space-xl);
 }
 
+/* Left/Right layouts - left-align buttons */
+.aisb-section--content-left .aisb-checklist__buttons,
+.aisb-section--content-right .aisb-checklist__buttons {
+    justify-content: flex-start;
+}
+
 /* Center layout - center buttons */
-.aisb-checklist__center .aisb-checklist__buttons {
+.aisb-section--center .aisb-checklist__buttons {
     justify-content: center;
 }
 
@@ -154,14 +195,16 @@
    Outro Content
    ========================================= */
 .aisb-checklist__outro {
-    margin-top: 32px;
+    margin: 32px 0 0 0;
     font-size: 16px;
     line-height: 1.6;
-    color: var(--section-text-muted, var(--aisb-color-text-muted));
+    color: var(--section-text-secondary, var(--aisb-color-muted));
 }
 
 .aisb-checklist__outro p {
-    margin: 0 0 var(--aisb-space-md) 0;
+    margin: 0 0 16px 0;
+    font-size: 16px; /* Ensure paragraphs maintain correct size */
+    line-height: 1.6;
 }
 
 .aisb-checklist__outro p:last-child {
@@ -208,24 +251,24 @@
    Light Theme Styles
    ========================================= */
 .aisb-section--light.aisb-checklist {
-    background: #ffffff;
-    color: #1a1a1a;
+    background: var(--aisb-color-base);
+    color: var(--aisb-color-text);
 }
 
 .aisb-section--light .aisb-checklist__eyebrow {
-    color: #2563eb; /* Primary blue */
+    color: var(--section-link, var(--aisb-color-primary)); /* Primary blue */
 }
 
 .aisb-section--light .aisb-checklist__heading {
-    color: #1a1a1a;
+    color: var(--section-text, var(--aisb-color-text));
 }
 
 .aisb-section--light .aisb-checklist__content {
-    color: #64748b; /* Muted text */
+    color: var(--section-text-secondary, var(--aisb-color-muted)); /* Muted text */
 }
 
 .aisb-section--light .aisb-checklist__outro {
-    color: #64748b;
+    color: var(--section-text-secondary, var(--aisb-color-muted));
 }
 
 /* Light mode links */
@@ -233,49 +276,49 @@
 .aisb-section--light .aisb-checklist__content a:visited,
 .aisb-section--light .aisb-checklist__outro a,
 .aisb-section--light .aisb-checklist__outro a:visited {
-    color: #2563eb !important;
+    color: var(--section-link, var(--aisb-color-primary));
 }
 
 .aisb-section--light .aisb-checklist__content a:hover,
 .aisb-section--light .aisb-checklist__outro a:hover {
-    color: #1d4ed8 !important;
+    color: var(--section-link-hover, var(--aisb-color-primary-hover));
 }
 
 /* Light mode checklist items */
 .aisb-section--light .aisb-checklist__item-icon svg {
-    color: #2563eb;
+    color: var(--section-link, var(--aisb-color-primary));
 }
 
 .aisb-section--light .aisb-checklist__item-heading {
-    color: #1a1a1a;
+    color: var(--section-text, var(--aisb-color-text));
 }
 
 .aisb-section--light .aisb-checklist__item-text {
-    color: #64748b;
+    color: var(--section-text-secondary, var(--aisb-color-muted));
 }
 
 /* =========================================
    Dark Theme Styles
    ========================================= */
 .aisb-section--dark.aisb-checklist {
-    background: #1a1a1a;
-    color: #fafafa;
+    background: var(--aisb-color-dark-base);
+    color: var(--aisb-color-dark-text);
 }
 
 .aisb-section--dark .aisb-checklist__eyebrow {
-    color: #60a5fa; /* Light blue for dark mode */
+    color: var(--section-link, var(--aisb-color-dark-primary)); /* Light blue for dark mode */
 }
 
 .aisb-section--dark .aisb-checklist__heading {
-    color: #fafafa;
+    color: var(--section-text, var(--aisb-color-dark-text));
 }
 
 .aisb-section--dark .aisb-checklist__content {
-    color: #9ca3af; /* Muted text for dark mode */
+    color: var(--section-text-secondary, var(--aisb-color-dark-muted)); /* Muted text for dark mode */
 }
 
 .aisb-section--dark .aisb-checklist__outro {
-    color: #9ca3af;
+    color: var(--section-text-secondary, var(--aisb-color-dark-muted));
 }
 
 /* Dark mode links */
@@ -283,84 +326,93 @@
 .aisb-section--dark .aisb-checklist__content a:visited,
 .aisb-section--dark .aisb-checklist__outro a,
 .aisb-section--dark .aisb-checklist__outro a:visited {
-    color: #60a5fa !important;
+    color: var(--section-link, var(--aisb-color-dark-primary));
 }
 
 .aisb-section--dark .aisb-checklist__content a:hover,
 .aisb-section--dark .aisb-checklist__outro a:hover {
-    color: #3b82f6 !important;
+    color: var(--section-link-hover, var(--aisb-color-dark-primary-hover));
 }
 
 /* Dark mode checklist items */
 .aisb-section--dark .aisb-checklist__item-icon svg {
-    color: #60a5fa;
+    color: var(--section-link, var(--aisb-color-dark-primary));
 }
 
 .aisb-section--dark .aisb-checklist__item-heading {
-    color: #fafafa;
+    color: var(--section-text, var(--aisb-color-dark-text));
 }
 
 .aisb-section--dark .aisb-checklist__item-text {
-    color: #9ca3af;
+    color: var(--section-text-secondary, var(--aisb-color-dark-muted));
 }
 
 /* =========================================
    Default Theme (no explicit theme class)
    ========================================= */
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__eyebrow {
-    color: #2563eb;
+    color: var(--section-link, var(--aisb-color-primary));
 }
 
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__heading {
-    color: #1a1a1a;
+    color: var(--section-text, var(--aisb-color-text));
 }
 
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__content {
-    color: #64748b;
+    color: var(--section-text-secondary, var(--aisb-color-muted));
 }
 
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__outro {
-    color: #64748b;
+    color: var(--section-text-secondary, var(--aisb-color-muted));
 }
 
 /* Default theme checklist items */
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__item-icon svg {
-    color: #2563eb;
+    color: var(--section-link, var(--aisb-color-primary));
 }
 
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__item-heading {
-    color: #1a1a1a;
+    color: var(--section-text, var(--aisb-color-text));
 }
 
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__item-text {
-    color: #64748b;
+    color: var(--section-text-secondary, var(--aisb-color-muted));
 }
 
 /* =========================================
    Responsive Design
    ========================================= */
-@media (max-width: 1024px) {
-    .aisb-checklist__columns {
-        gap: var(--aisb-space-2xl);
+
+/* Desktop - 1024px and up (2-column layouts activate) */
+@media (min-width: 1024px) {
+    /* Activate 2-column grid for left/right layouts */
+    .aisb-section--content-left .aisb-checklist__columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 64px;
+    }
+    
+    .aisb-section--content-right .aisb-checklist__columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 64px;
+        direction: rtl; /* Flip for right variant */
+    }
+    
+    .aisb-section--content-right .aisb-checklist__content-column,
+    .aisb-section--content-right .aisb-checklist__media-column {
+        direction: ltr; /* Reset text direction */
+    }
+    
+    .aisb-section--center .aisb-checklist__media {
+        margin-top: 48px;
     }
 }
 
-@media (max-width: 768px) {
-    /* Stack columns on mobile */
-    .aisb-checklist__columns {
-        grid-template-columns: 1fr;
-        gap: var(--aisb-space-xl);
-    }
-    
-    /* Reset order for mobile */
-    .aisb-section--content-right .aisb-checklist__content-column,
-    .aisb-section--content-right .aisb-checklist__media-column {
-        order: initial;
-    }
-    
-    /* Media always comes after content on mobile */
-    .aisb-checklist__media-column {
-        order: 2;
+/* Large Desktop - 1280px and up */
+@media (min-width: 1280px) {
+    /* Full spacing for 2-column layouts */
+    .aisb-section--content-left .aisb-checklist__columns,
+    .aisb-section--content-right .aisb-checklist__columns {
+        gap: 96px;
     }
     
     .aisb-checklist {
@@ -371,14 +423,7 @@
         padding: 0 var(--aisb-space-md);
     }
     
-    /* Center alignment on mobile for all layouts */
-    .aisb-checklist__content-column {
-        text-align: center;
-    }
-    
-    .aisb-checklist__buttons {
-        justify-content: center;
-    }
+    /* Keep existing padding adjustments only */
 }
 
 /* Tablet and up */
@@ -394,6 +439,11 @@
     
     .aisb-checklist__content,
     .aisb-checklist__outro {
+        font-size: 17px;
+    }
+    
+    .aisb-checklist__content p,
+    .aisb-checklist__outro p {
         font-size: 17px;
     }
 }
@@ -417,10 +467,19 @@
         margin-bottom: 24px;
     }
     
-    .aisb-checklist__content,
-    .aisb-checklist__outro {
+    .aisb-checklist__content {
         font-size: 18px;
         margin-bottom: 40px;
+    }
+    
+    .aisb-checklist__outro {
+        font-size: 18px;
+    }
+    
+    .aisb-checklist__content p,
+    .aisb-checklist__outro p {
+        font-size: 18px;
+        line-height: 1.6;
     }
 }
 
@@ -432,6 +491,11 @@
     
     .aisb-checklist__content,
     .aisb-checklist__outro {
+        font-size: 19px;
+    }
+    
+    .aisb-checklist__content p,
+    .aisb-checklist__outro p {
         font-size: 19px;
     }
 }
