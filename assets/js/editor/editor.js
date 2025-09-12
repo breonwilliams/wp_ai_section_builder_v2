@@ -384,6 +384,8 @@
                 sectionDefaults = heroDefaults;
             } else if (sectionType === 'features') {
                 sectionDefaults = featuresDefaults;
+            } else if (sectionType === 'checklist') {
+                sectionDefaults = checklistDefaults;
             } else {
                 // Fallback to hero defaults for unknown types
                 sectionDefaults = heroDefaults;
@@ -484,6 +486,8 @@
             formHtml = generateHeroForm(sectionContent);
         } else if (sectionType === 'features') {
             formHtml = generateFeaturesForm(sectionContent);
+        } else if (sectionType === 'checklist') {
+            formHtml = generateChecklistForm(sectionContent);
         }
         
         // Switch to edit mode in left panel
@@ -506,6 +510,8 @@
                 initWysiwygEditors();
             } else if (sectionType === 'features') {
                 initFeaturesWysiwygEditors();
+            } else if (sectionType === 'checklist') {
+                initChecklistWysiwygEditors();
             }
         }, 100);
         
@@ -526,6 +532,15 @@
             setTimeout(function() {
                 initCardsRepeater(content);
                 initGlobalBlocksRepeater(content, 'features');
+            }, 50);
+        } else if (sectionType === 'checklist') {
+            // Use sectionContent if editing, otherwise use defaults
+            var content = sectionContent || checklistDefaults;
+            // Phase 1: Only initialize global blocks (buttons)
+            // Phase 2: Will add items repeater
+            setTimeout(function() {
+                initGlobalBlocksRepeater(content, 'checklist');
+                // TODO Phase 2: initChecklistItemsRepeater(content);
             }, 50);
         }
     }
@@ -703,6 +718,38 @@
         card_alignment: 'left',  // Card content alignment: 'left' | 'center'
         
         // CTA fields (for future use)
+        primary_cta_label: '',
+        primary_cta_url: '',
+        secondary_cta_label: '',
+        secondary_cta_url: ''
+    };
+    
+    /**
+     * Checklist section field defaults - Same structure as Features
+     */
+    var checklistDefaults = {
+        // Standard content fields (SAME field names as Features)
+        eyebrow_heading: 'Why Choose Us',
+        heading: 'Everything You Need',
+        content: '<p>Our comprehensive solution includes:</p>',
+        outro_content: '',
+        
+        // Media fields (same as Features)
+        media_type: 'none',
+        featured_image: '',
+        video_url: '',
+        
+        // Items array (empty for Phase 1, will be populated in Phase 2)
+        items: [],
+        
+        // Global blocks for buttons (same as Features)
+        global_blocks: [],
+        
+        // Variant fields (same as Features)
+        theme_variant: 'light',
+        layout_variant: 'content-left',  // 'content-left' | 'center' | 'content-right'
+        
+        // CTA fields (for future use, same as Features)
         primary_cta_label: '',
         primary_cta_url: '',
         secondary_cta_label: '',
@@ -967,6 +1014,122 @@
                     </label>
                     <div class="aisb-editor-wysiwyg-container">
                         <textarea id="features-outro-content" 
+                                  name="outro_content" 
+                                  class="aisb-editor-wysiwyg">${content.outro_content || ''}</textarea>
+                    </div>
+                </div>
+            </form>
+        `;
+    }
+    
+    /**
+     * Generate Checklist section form - Same structure as Features
+     */
+    function generateChecklistForm(content) {
+        // Use existing content or defaults
+        content = content || checklistDefaults;
+        
+        return `
+            <form id="aisb-section-form">
+                <!-- Variant Controls -->
+                <div class="aisb-editor-form-group aisb-variant-controls">
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Theme</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'light' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="light">
+                                <span class="dashicons dashicons-sun"></span> Light
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'dark' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="dark">
+                                <span class="dashicons dashicons-moon"></span> Dark
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Layout</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-left' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-left">
+                                <span class="dashicons dashicons-align-left"></span> Left
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'center' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="center">
+                                <span class="dashicons dashicons-align-center"></span> Center
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-right' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-right">
+                                <span class="dashicons dashicons-align-right"></span> Right
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Eyebrow Heading
+                    </label>
+                    <input type="text" name="eyebrow_heading" 
+                           value="${escapeHtml(content.eyebrow_heading || '')}" 
+                           placeholder="Optional eyebrow text">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Heading
+                    </label>
+                    <input type="text" name="heading" 
+                           value="${escapeHtml(content.heading || '')}" 
+                           placeholder="Section heading" required>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="checklist-content">
+                        Content
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="checklist-content" 
+                                  name="content" 
+                                  class="aisb-editor-wysiwyg">${content.content || ''}</textarea>
+                    </div>
+                </div>
+                
+                <!-- Media field - only show for left/right layouts -->
+                <div class="aisb-editor-form-group aisb-media-field" ${content.layout_variant === 'center' ? 'style="display:none;"' : ''}>
+                    <label class="aisb-editor-form-label">
+                        Featured Image
+                    </label>
+                    ${generateMediaField(content)}
+                </div>
+                
+                <!-- Phase 2: Checklist items will go here -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Checklist Items
+                    </label>
+                    <div id="checklist-items" class="aisb-repeater-container">
+                        <div style="padding: 20px; background: #f5f5f5; border: 2px dashed #ddd; text-align: center; color: #999;">
+                            Phase 2: Checklist items will be added here
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Buttons
+                    </label>
+                    <div id="checklist-global-blocks" class="aisb-repeater-container">
+                        <!-- Global blocks repeater will be initialized here -->
+                    </div>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="checklist-outro-content">
+                        Outro Content (Optional)
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="checklist-outro-content" 
                                   name="outro_content" 
                                   class="aisb-editor-wysiwyg">${content.outro_content || ''}</textarea>
                     </div>
@@ -1481,6 +1644,83 @@
     }
     
     /**
+     * Initialize checklist WYSIWYG editors
+     */
+    function initChecklistWysiwygEditors() {
+        // Destroy existing instances first (if any)
+        if (typeof wp !== 'undefined' && wp.editor) {
+            wp.editor.remove('checklist-content');
+            wp.editor.remove('checklist-outro-content');
+        }
+        
+        // Initialize TinyMCE for content fields
+        if (typeof wp !== 'undefined' && wp.editor && wp.editor.initialize) {
+            // Main content editor
+            wp.editor.initialize('checklist-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink',
+                    toolbar2: '',
+                    format_tags: 'p;h2;h3;h4',
+                    forced_root_block: 'p',
+                    force_br_newlines: false,
+                    force_p_newlines: true,
+                    remove_linebreaks: false,
+                    convert_newlines_to_brs: false,
+                    paste_as_text: false,
+                    paste_remove_styles: true,
+                    paste_remove_styles_if_webkit: true,
+                    paste_strip_class_attributes: 'all',
+                    height: 200,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save(); // Save to textarea
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: {
+                    buttons: 'strong,em,link'
+                },
+                mediaButtons: false
+            });
+            
+            // Outro content editor
+            wp.editor.initialize('checklist-outro-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'bold,italic,link,unlink',
+                    toolbar2: '',
+                    forced_root_block: 'p',
+                    force_br_newlines: false,
+                    force_p_newlines: true,
+                    remove_linebreaks: false,
+                    convert_newlines_to_brs: false,
+                    paste_as_text: false,
+                    paste_remove_styles: true,
+                    paste_remove_styles_if_webkit: true,
+                    paste_strip_class_attributes: 'all',
+                    height: 150,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save();
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: {
+                    buttons: 'strong,em,link'
+                },
+                mediaButtons: false
+            });
+        } else {
+            console.warn('WordPress editor not available for Checklist section, falling back to textarea');
+        }
+    }
+    
+    /**
      * Bind form events
      */
     function bindFormEvents() {
@@ -1507,6 +1747,22 @@
                     content.theme_variant = variantValue;
                 } else if (variantType === 'layout') {
                     content.layout_variant = variantValue;
+                    
+                    // For checklist section, hide/show media field based on layout
+                    var sectionType = editorState.sections[editorState.currentSection].type;
+                    if (sectionType === 'checklist') {
+                        if (variantValue === 'center') {
+                            // Hide media field for center layout
+                            $('.aisb-media-field').hide();
+                            // Clear media values
+                            content.media_type = 'none';
+                            content.featured_image = '';
+                            content.video_url = '';
+                        } else {
+                            // Show media field for left/right layouts
+                            $('.aisb-media-field').show();
+                        }
+                    }
                 } else if (variantType === 'card_alignment') {
                     content.card_alignment = variantValue;
                 }
@@ -1938,6 +2194,13 @@
                 if (typeof tinyMCE !== 'undefined' && tinyMCE.get('features-outro-content')) {
                     content.outro_content = tinyMCE.get('features-outro-content').getContent();
                 }
+            } else if (sectionType === 'checklist') {
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('checklist-content')) {
+                    content.content = tinyMCE.get('checklist-content').getContent();
+                }
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('checklist-outro-content')) {
+                    content.outro_content = tinyMCE.get('checklist-outro-content').getContent();
+                }
             }
         }
         
@@ -2100,6 +2363,8 @@
             return renderHeroSection(section, index);
         } else if (section.type === 'features') {
             return renderFeaturesSection(section, index);
+        } else if (section.type === 'checklist') {
+            return renderChecklistSection(section, index);
         }
         return '';
     }
@@ -2113,7 +2378,9 @@
         var videoUrl = content.video_url || '';
         
         // Determine media class based on section type (default to hero for backward compatibility)
-        var mediaClass = sectionType === 'features' ? 'aisb-features__media' : 'aisb-hero__media';
+        var mediaClass = sectionType === 'features' ? 'aisb-features__media' : 
+                        sectionType === 'checklist' ? 'aisb-checklist__media' : 
+                        'aisb-hero__media';
         
         debugLog('renderMediaPreview Called', {
             mediaType: mediaType,
@@ -2164,7 +2431,9 @@
                 var youtubeMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
                 if (youtubeMatch && youtubeMatch[1]) {
                     debugLog('renderMediaPreview - YouTube Video Detected', youtubeMatch[1]);
-                    var videoClass = sectionType === 'features' ? 'aisb-features__video' : 'aisb-hero__video';
+                    var videoClass = sectionType === 'features' ? 'aisb-features__video' : 
+                                    sectionType === 'checklist' ? 'aisb-checklist__video' :
+                                    'aisb-hero__video';
                     return `
                         <div class="${mediaClass}">
                             <iframe class="${videoClass}" 
@@ -2177,7 +2446,9 @@
                     `;
                 } else {
                     // Self-hosted video
-                    var videoClass = sectionType === 'features' ? 'aisb-features__video' : 'aisb-hero__video';
+                    var videoClass = sectionType === 'features' ? 'aisb-features__video' : 
+                                    sectionType === 'checklist' ? 'aisb-checklist__video' :
+                                    'aisb-hero__video';
                     return `
                         <div class="${mediaClass}">
                             <video class="${videoClass}" controls>
@@ -2229,8 +2500,9 @@
             
             if (buttonHtml) {
                 // Use correct container class based on section type
-                const containerClass = sectionType === 'features' ? 
-                    'aisb-features__buttons' : 'aisb-hero__buttons';
+                const containerClass = sectionType === 'features' ? 'aisb-features__buttons' :
+                                      sectionType === 'checklist' ? 'aisb-checklist__buttons' :
+                                      'aisb-hero__buttons';
                 html += `<div class="${containerClass}">${buttonHtml}</div>`;
             }
         }
@@ -2317,6 +2589,86 @@
                         ${renderGlobalBlocks(content.global_blocks, 'features')}
                         ${content.outro_content ? `<div class="aisb-features__outro">${content.outro_content}</div>` : ''}
                     </div>
+            </section>
+        `;
+    }
+    
+    /**
+     * Render Checklist section preview
+     */
+    function renderChecklistSection(section, index) {
+        var content = section.content || section;
+        
+        // Build class list based on variants
+        var sectionClasses = [
+            'aisb-section',
+            'aisb-checklist',
+            'aisb-section--' + (content.theme_variant || 'light'),
+            'aisb-section--' + (content.layout_variant || 'content-left')
+        ].join(' ');
+        
+        // Phase 1: Items placeholder
+        var itemsHtml = content.items && content.items.length > 0 ? 
+            '<div class="aisb-checklist__items-placeholder">Checklist items will appear here (Phase 2)</div>' : '';
+        
+        // Build the section HTML based on layout
+        var sectionContent = '';
+        
+        if (content.layout_variant === 'center') {
+            // Center layout - single column, no media
+            sectionContent = `
+                <div class="aisb-checklist__center">
+                    ${content.eyebrow_heading ? `<div class="aisb-checklist__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
+                    ${content.heading ? `<h2 class="aisb-checklist__heading">${escapeHtml(content.heading)}</h2>` : ''}
+                    ${content.content ? `<div class="aisb-checklist__content">${content.content}</div>` : ''}
+                    ${itemsHtml}
+                    ${renderGlobalBlocks(content.global_blocks, 'checklist')}
+                    ${content.outro_content ? `<div class="aisb-checklist__outro">${content.outro_content}</div>` : ''}
+                </div>
+            `;
+        } else {
+            // Two-column layout
+            var contentColumn = `
+                <div class="aisb-checklist__content-column">
+                    ${content.eyebrow_heading ? `<div class="aisb-checklist__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
+                    ${content.heading ? `<h2 class="aisb-checklist__heading">${escapeHtml(content.heading)}</h2>` : ''}
+                    ${content.content ? `<div class="aisb-checklist__content">${content.content}</div>` : ''}
+                    ${itemsHtml}
+                    ${renderGlobalBlocks(content.global_blocks, 'checklist')}
+                    ${content.outro_content ? `<div class="aisb-checklist__outro">${content.outro_content}</div>` : ''}
+                </div>
+            `;
+            
+            var mediaColumn = '';
+            if (content.media_type !== 'none') {
+                mediaColumn = `
+                    <div class="aisb-checklist__media-column">
+                        ${renderMediaPreview(content, 'checklist')}
+                    </div>
+                `;
+            }
+            
+            sectionContent = `
+                <div class="aisb-checklist__columns">
+                    ${contentColumn}
+                    ${mediaColumn}
+                </div>
+            `;
+        }
+        
+        return `
+            <section class="${sectionClasses}" data-index="${index}">
+                <div class="aisb-checklist__container">
+                    ${sectionContent}
+                </div>
+                <div class="aisb-section-controls">
+                    <button class="aisb-section-control" data-action="edit" data-index="${index}" title="Edit Section">
+                        <span class="dashicons dashicons-edit"></span>
+                    </button>
+                    <button class="aisb-section-control" data-action="remove" data-index="${index}" title="Remove Section">
+                        <span class="dashicons dashicons-trash"></span>
+                    </button>
+                </div>
             </section>
         `;
     }

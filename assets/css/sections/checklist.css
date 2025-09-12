@@ -1,0 +1,332 @@
+/**
+ * AI Section Builder - Checklist Section Styles
+ * 
+ * @package AISB
+ * @version 2.0.0
+ */
+
+/* Import core design system */
+@import url('../core/00-tokens.css');
+@import url('../core/01-base.css');
+@import url('../core/02-utilities.css');
+
+/* =========================================
+   Checklist Section Base
+   ========================================= */
+.aisb-checklist {
+    padding: var(--aisb-space-3xl) 0;
+}
+
+.aisb-checklist__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--aisb-space-lg);
+}
+
+/* =========================================
+   Layout Variants
+   ========================================= */
+
+/* Two-column layouts */
+.aisb-checklist__columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--aisb-space-3xl);
+    align-items: center;
+}
+
+/* Content-right layout - flip the columns */
+.aisb-section--content-right .aisb-checklist__content-column {
+    order: 2;
+}
+
+.aisb-section--content-right .aisb-checklist__media-column {
+    order: 1;
+}
+
+/* Center layout */
+.aisb-checklist__center {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* =========================================
+   Content Elements
+   ========================================= */
+.aisb-checklist__eyebrow {
+    font-size: var(--aisb-text-sm);
+    font-weight: var(--aisb-font-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--aisb-space-sm);
+}
+
+.aisb-checklist__heading {
+    font-size: var(--aisb-text-4xl);
+    font-weight: var(--aisb-font-bold);
+    line-height: var(--aisb-leading-tight);
+    margin: 0 0 var(--aisb-space-md) 0;
+}
+
+.aisb-checklist__content {
+    font-size: var(--aisb-text-lg);
+    line-height: var(--aisb-leading-relaxed);
+    margin-bottom: var(--aisb-space-xl);
+}
+
+/* Clear default paragraph margins */
+.aisb-checklist__content p {
+    margin: 0 0 var(--aisb-space-md) 0;
+}
+
+.aisb-checklist__content p:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================================
+   Items Placeholder (Phase 2)
+   ========================================= */
+.aisb-checklist__items-placeholder {
+    margin: var(--aisb-space-xl) 0;
+    padding: var(--aisb-space-lg);
+    border: 2px dashed var(--aisb-border);
+    border-radius: var(--aisb-radius-md);
+    background: var(--aisb-bg-secondary);
+    text-align: center;
+    color: var(--aisb-text-muted);
+}
+
+/* =========================================
+   Buttons
+   ========================================= */
+.aisb-checklist__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--aisb-space-sm);
+    margin-top: var(--aisb-space-xl);
+}
+
+/* Center layout - center buttons */
+.aisb-checklist__center .aisb-checklist__buttons {
+    justify-content: center;
+}
+
+/* =========================================
+   Outro Content
+   ========================================= */
+.aisb-checklist__outro {
+    margin-top: var(--aisb-space-xl);
+    font-size: var(--aisb-text-base);
+    line-height: var(--aisb-leading-relaxed);
+}
+
+.aisb-checklist__outro p {
+    margin: 0 0 var(--aisb-space-md) 0;
+}
+
+.aisb-checklist__outro p:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================================
+   Media Column
+   ========================================= */
+.aisb-checklist__media-column {
+    position: relative;
+    width: 100%;
+}
+
+.aisb-checklist__media {
+    position: relative;
+    width: 100%;
+    border-radius: var(--aisb-radius-lg);
+    overflow: hidden;
+}
+
+/* Image Constraints - prevent layout breaking */
+.aisb-checklist__media img,
+.aisb-checklist__image {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-width: 100%;
+    object-fit: cover;
+}
+
+/* Video Constraints */
+.aisb-checklist__media iframe,
+.aisb-checklist__media video,
+.aisb-checklist__video {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 16 / 9;
+    max-width: 100%;
+}
+
+/* =========================================
+   Light Theme Styles
+   ========================================= */
+.aisb-section--light.aisb-checklist {
+    background: #ffffff;
+    color: #1a1a1a;
+}
+
+.aisb-section--light .aisb-checklist__eyebrow {
+    color: #2563eb; /* Primary blue */
+}
+
+.aisb-section--light .aisb-checklist__heading {
+    color: #1a1a1a;
+}
+
+.aisb-section--light .aisb-checklist__content {
+    color: #64748b; /* Muted text */
+}
+
+.aisb-section--light .aisb-checklist__outro {
+    color: #64748b;
+}
+
+/* Light mode links */
+.aisb-section--light .aisb-checklist__content a,
+.aisb-section--light .aisb-checklist__content a:visited,
+.aisb-section--light .aisb-checklist__outro a,
+.aisb-section--light .aisb-checklist__outro a:visited {
+    color: #2563eb !important;
+}
+
+.aisb-section--light .aisb-checklist__content a:hover,
+.aisb-section--light .aisb-checklist__outro a:hover {
+    color: #1d4ed8 !important;
+}
+
+/* Placeholder for Phase 2 */
+.aisb-section--light .aisb-checklist__items-placeholder {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #64748b;
+}
+
+/* =========================================
+   Dark Theme Styles
+   ========================================= */
+.aisb-section--dark.aisb-checklist {
+    background: #1a1a1a;
+    color: #fafafa;
+}
+
+.aisb-section--dark .aisb-checklist__eyebrow {
+    color: #60a5fa; /* Light blue for dark mode */
+}
+
+.aisb-section--dark .aisb-checklist__heading {
+    color: #fafafa;
+}
+
+.aisb-section--dark .aisb-checklist__content {
+    color: #9ca3af; /* Muted text for dark mode */
+}
+
+.aisb-section--dark .aisb-checklist__outro {
+    color: #9ca3af;
+}
+
+/* Dark mode links */
+.aisb-section--dark .aisb-checklist__content a,
+.aisb-section--dark .aisb-checklist__content a:visited,
+.aisb-section--dark .aisb-checklist__outro a,
+.aisb-section--dark .aisb-checklist__outro a:visited {
+    color: #60a5fa !important;
+}
+
+.aisb-section--dark .aisb-checklist__content a:hover,
+.aisb-section--dark .aisb-checklist__outro a:hover {
+    color: #3b82f6 !important;
+}
+
+/* Placeholder for Phase 2 */
+.aisb-section--dark .aisb-checklist__items-placeholder {
+    background: #374151;
+    border-color: #4b5563;
+    color: #9ca3af;
+}
+
+/* =========================================
+   Default Theme (no explicit theme class)
+   ========================================= */
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__eyebrow {
+    color: #2563eb;
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__heading {
+    color: #1a1a1a;
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__content {
+    color: #64748b;
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-checklist__outro {
+    color: #64748b;
+}
+
+/* =========================================
+   Responsive Design
+   ========================================= */
+@media (max-width: 1024px) {
+    .aisb-checklist__columns {
+        gap: var(--aisb-space-2xl);
+    }
+}
+
+@media (max-width: 768px) {
+    /* Stack columns on mobile */
+    .aisb-checklist__columns {
+        grid-template-columns: 1fr;
+        gap: var(--aisb-space-xl);
+    }
+    
+    /* Reset order for mobile */
+    .aisb-section--content-right .aisb-checklist__content-column,
+    .aisb-section--content-right .aisb-checklist__media-column {
+        order: initial;
+    }
+    
+    /* Media always comes after content on mobile */
+    .aisb-checklist__media-column {
+        order: 2;
+    }
+    
+    .aisb-checklist__heading {
+        font-size: var(--aisb-text-3xl);
+    }
+    
+    .aisb-checklist__content {
+        font-size: var(--aisb-text-base);
+    }
+    
+    .aisb-checklist {
+        padding: var(--aisb-space-2xl) 0;
+    }
+    
+    .aisb-checklist__container {
+        padding: 0 var(--aisb-space-md);
+    }
+    
+    /* Center alignment on mobile for all layouts */
+    .aisb-checklist__content-column {
+        text-align: center;
+    }
+    
+    .aisb-checklist__buttons {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .aisb-checklist__heading {
+        font-size: var(--aisb-text-2xl);
+    }
+}
