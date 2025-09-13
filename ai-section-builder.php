@@ -2186,7 +2186,11 @@ function aisb_render_faq_section($section) {
                                         <h3 class="aisb-faq__item-question" data-faq-toggle="<?php echo $index; ?>"><?php echo esc_html($item['question']); ?></h3>
                                     <?php endif; ?>
                                     <?php if (!empty($item['answer'])): ?>
-                                        <div class="aisb-faq__item-answer" data-faq-content="<?php echo $index; ?>"><?php echo wp_kses_post($item['answer']); ?></div>
+                                        <div class="aisb-faq__item-answer" data-faq-content="<?php echo $index; ?>">
+                                            <div class="aisb-faq__item-answer-inner">
+                                                <?php echo wp_kses_post($item['answer']); ?>
+                                            </div>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>

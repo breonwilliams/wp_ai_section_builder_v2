@@ -1800,6 +1800,8 @@
             itemLabel: 'FAQ',
             addButtonText: 'Add FAQ Item',
             template: function(item, index) {
+                // Generate unique ID for WYSIWYG
+                var editorId = 'faq-answer-' + Date.now() + '-' + index;
                 return `
                     <div class="aisb-repeater-fields">
                         <div class="aisb-repeater-field-group">
@@ -1812,7 +1814,8 @@
                         </div>
                         <div class="aisb-repeater-field-group">
                             <label>Answer</label>
-                            <textarea class="aisb-repeater-field aisb-editor-form-input aisb-faq-answer" 
+                            <textarea id="${editorId}"
+                                      class="aisb-repeater-field aisb-editor-form-input aisb-faq-answer-wysiwyg" 
                                       data-field="answer" 
                                       data-index="${index}"
                                       rows="4"
@@ -1820,6 +1823,12 @@
                         </div>
                     </div>
                 `;
+            },
+            onItemAdded: function($item, index) {
+                // Initialize WYSIWYG for the new answer field
+                setTimeout(function() {
+                    initFaqAnswerEditor(index);
+                }, 100);
             },
             onUpdate: function(items) {
                 debugLog('FAQ items updated', {
@@ -1838,19 +1847,19 @@
                 }
             },
             onItemAdded: function(item, index) {
-                // WYSIWYG disabled temporarily for debugging
-                // setTimeout(function() {
-                //     initFaqAnswerEditor(index);
-                // }, 100);
+                // Initialize WYSIWYG for new item
+                setTimeout(function() {
+                    initFaqAnswerEditor(index);
+                }, 100);
             }
         });
         
-        // WYSIWYG disabled temporarily for debugging
-        // items.forEach(function(item, index) {
-        //     setTimeout(function() {
-        //         initFaqAnswerEditor(index);
-        //     }, 100 * (index + 1));
-        // });
+        // Initialize WYSIWYG for existing items
+        items.forEach(function(item, index) {
+            setTimeout(function() {
+                initFaqAnswerEditor(index);
+            }, 100 * (index + 1));
+        });
         
         return itemsRepeater;
     }
@@ -1860,7 +1869,12 @@
      */
     function initFaqAnswerEditor(index) {
         var editorId = 'faq-answer-' + index;
-        var $textarea = $('.aisb-faq-answer[data-index="' + index + '"]');
+        var $textarea = $('.aisb-faq-answer-wysiwyg[data-index="' + index + '"]');
+        
+        // Also check for the old class name for compatibility
+        if (!$textarea.length) {
+            $textarea = $('.aisb-faq-answer[data-index="' + index + '"]');
+        }
         
         if (!$textarea.length) {
             return;
@@ -2140,6 +2154,11 @@
         if (typeof wp !== 'undefined' && wp.editor) {
             wp.editor.remove('faq-content');
             wp.editor.remove('faq-outro-content');
+            
+            // Also remove any FAQ answer editors
+            for (var i = 0; i < 20; i++) {
+                wp.editor.remove('faq-answer-' + i);
+            }
         }
         
         // Initialize TinyMCE for content fields
@@ -2616,6 +2635,17 @@
         if (typeof wp !== 'undefined' && wp.editor) {
             wp.editor.remove('hero-content');
             wp.editor.remove('hero-outro-content');
+            wp.editor.remove('features-content');
+            wp.editor.remove('features-outro-content');
+            wp.editor.remove('checklist-content');
+            wp.editor.remove('checklist-outro-content');
+            wp.editor.remove('faq-content');
+            wp.editor.remove('faq-outro-content');
+            
+            // Remove any FAQ answer editors
+            for (var i = 0; i < 20; i++) {
+                wp.editor.remove('faq-answer-' + i);
+            }
         }
         
         // Ensure sections panel is active

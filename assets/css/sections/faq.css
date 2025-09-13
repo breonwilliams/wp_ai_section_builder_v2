@@ -76,10 +76,14 @@
 
 /* Center layout - items container */
 .aisb-section--center .aisb-faq__items {
-    width: fit-content;
+    width: 100%;
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Ensure FAQ items in center layout maintain proper text alignment */
+.aisb-section--center .aisb-faq__item {
     text-align: left;
 }
 
@@ -225,6 +229,8 @@
 .aisb-faq__item-answer p:first-child {
     margin-top: 0;
 }
+
+/* No special overrides needed for centered layout anymore - all layouts use same structure */
 
 /* =========================================
    Buttons
