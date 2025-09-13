@@ -265,14 +265,23 @@
     margin-bottom: 32px;
 }
 
-/* Buttons Container - Always centered below grid */
+/* Buttons Container - Mobile first approach */
 .aisb-features__buttons {
     display: flex;
     flex-direction: column; /* Stack on mobile */
     gap: 16px;
     margin-top: var(--aisb-gs-element-spacing, 24px);
-    align-items: center; /* Always centered */
-    justify-content: center; /* Always centered */
+}
+
+/* Left/Right layouts - left-align buttons */
+.aisb-section--content-left .aisb-features__buttons,
+.aisb-section--content-right .aisb-features__buttons {
+    justify-content: flex-start;
+}
+
+/* Center layout - center buttons */
+.aisb-section--center .aisb-features__buttons {
+    justify-content: center;
 }
 
 /* =========================================
@@ -356,6 +365,10 @@
     
     .aisb-features__item-description {
         font-size: 16px;
+    }
+    
+    .aisb-features__buttons {
+        margin-top: 32px;
     }
 }
 
