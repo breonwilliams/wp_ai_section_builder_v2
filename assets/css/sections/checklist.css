@@ -177,8 +177,8 @@
    ========================================= */
 .aisb-checklist__buttons {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--aisb-space-sm);
+    flex-direction: column; /* Stack on mobile */
+    gap: 16px; /* Match hero/features gap */
     margin-top: var(--aisb-space-xl);
 }
 
@@ -428,6 +428,16 @@
     /* Keep existing padding adjustments only */
 }
 
+/* Small screens and up - 640px and up */
+@media (min-width: 640px) {
+    .aisb-checklist__buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 28px;
+    }
+}
+
 /* Tablet and up */
 @media (min-width: 768px) {
     .aisb-checklist__eyebrow {
@@ -448,12 +458,21 @@
     .aisb-checklist__outro p {
         font-size: 17px;
     }
+    
+    .aisb-checklist__buttons {
+        margin-top: 32px;
+    }
 }
 
 /* Desktop and up */
 @media (min-width: 1024px) {
     .aisb-checklist__heading {
         font-size: 40px;
+    }
+    
+    .aisb-checklist__buttons {
+        gap: 24px;
+        margin-top: 32px;
     }
 }
 
