@@ -273,17 +273,6 @@
     margin-top: var(--aisb-gs-element-spacing, 24px);
 }
 
-/* Left/Right layouts - left-align buttons */
-.aisb-section--content-left .aisb-features__buttons,
-.aisb-section--content-right .aisb-features__buttons {
-    justify-content: flex-start;
-}
-
-/* Center layout - center buttons */
-.aisb-section--center .aisb-features__buttons {
-    justify-content: center;
-}
-
 /* =========================================
    Theme Variants - Now handled by base architecture
    Components automatically adapt via context variables
@@ -335,6 +324,7 @@
         flex-wrap: wrap;
         gap: 20px;
         margin-top: 28px;
+        justify-content: center; /* Center buttons on larger screens */
     }
 }
 
