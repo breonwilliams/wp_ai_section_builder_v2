@@ -101,14 +101,14 @@
 .aisb-checklist__heading {
     font-size: 32px; /* Mobile first - matching features section scale */
     font-weight: 700;
-    line-height: var(--aisb-gs-line-height-heading, 1.2);
+    line-height: 1.2;
     color: var(--section-text, var(--aisb-color-text));
     margin: 0 0 16px 0; /* Smaller margin on mobile */
 }
 
 .aisb-checklist__content {
     font-size: 16px; /* Mobile first - matching features */
-    line-height: var(--aisb-gs-line-height-body, 1.6);
+    line-height: 1.6;
     color: var(--section-text-secondary, var(--aisb-color-muted));
     margin: 0 0 32px 0;
 }
@@ -382,51 +382,8 @@
 }
 
 /* =========================================
-   Responsive Design
+   Responsive Design - Mobile First
    ========================================= */
-
-/* Desktop - 1024px and up (2-column layouts activate) */
-@media (min-width: 1024px) {
-    /* Activate 2-column grid for left/right layouts */
-    .aisb-section--content-left .aisb-checklist__columns {
-        grid-template-columns: 1fr 1fr;
-        gap: 64px;
-    }
-    
-    .aisb-section--content-right .aisb-checklist__columns {
-        grid-template-columns: 1fr 1fr;
-        gap: 64px;
-        direction: rtl; /* Flip for right variant */
-    }
-    
-    .aisb-section--content-right .aisb-checklist__content-column,
-    .aisb-section--content-right .aisb-checklist__media-column {
-        direction: ltr; /* Reset text direction */
-    }
-    
-    .aisb-section--center .aisb-checklist__media {
-        margin-top: 48px;
-    }
-}
-
-/* Large Desktop - 1280px and up */
-@media (min-width: 1280px) {
-    /* Full spacing for 2-column layouts */
-    .aisb-section--content-left .aisb-checklist__columns,
-    .aisb-section--content-right .aisb-checklist__columns {
-        gap: 96px;
-    }
-    
-    .aisb-checklist {
-        padding: var(--aisb-space-2xl) 0;
-    }
-    
-    .aisb-checklist__container {
-        padding: 0 var(--aisb-space-md);
-    }
-    
-    /* Keep existing padding adjustments only */
-}
 
 /* Small screens and up - 640px and up */
 @media (min-width: 640px) {
@@ -464,8 +421,29 @@
     }
 }
 
-/* Desktop and up */
+/* Desktop and up - 1024px and up */
 @media (min-width: 1024px) {
+    /* Activate 2-column grid for left/right layouts */
+    .aisb-section--content-left .aisb-checklist__columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 64px;
+    }
+    
+    .aisb-section--content-right .aisb-checklist__columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 64px;
+        direction: rtl; /* Flip for right variant */
+    }
+    
+    .aisb-section--content-right .aisb-checklist__content-column,
+    .aisb-section--content-right .aisb-checklist__media-column {
+        direction: ltr; /* Reset text direction */
+    }
+    
+    .aisb-section--center .aisb-checklist__media {
+        margin-top: 48px;
+    }
+    
     .aisb-checklist__heading {
         font-size: 40px;
     }
@@ -476,8 +454,22 @@
     }
 }
 
-/* Large desktop */
+/* Large desktop - 1280px and up */
 @media (min-width: 1280px) {
+    /* Full spacing for 2-column layouts */
+    .aisb-section--content-left .aisb-checklist__columns,
+    .aisb-section--content-right .aisb-checklist__columns {
+        gap: 96px;
+    }
+    
+    .aisb-checklist {
+        padding: var(--aisb-space-2xl) 0;
+    }
+    
+    .aisb-checklist__container {
+        padding: 0 var(--aisb-space-md);
+    }
+    
     .aisb-checklist__eyebrow {
         font-size: 15px;
         margin-bottom: 16px;

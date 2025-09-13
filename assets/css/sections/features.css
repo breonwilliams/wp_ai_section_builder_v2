@@ -16,7 +16,7 @@
    ========================================= */
 .aisb-features {
     position: relative;
-    padding: 48px 0; /* Mobile first - matches Hero */
+    padding: var(--aisb-space-3xl) 0; /* Mobile first - consistent with other sections */
     /* Inherits background and color from .aisb-section base class */
     transition: background-color 200ms ease, color 200ms ease;
 }
@@ -59,7 +59,7 @@
 .aisb-features__heading {
     font-size: 32px; /* Mobile first - slightly smaller than Hero */
     font-weight: 700;
-    line-height: var(--aisb-gs-line-height-heading, 1.2);
+    line-height: 1.2;
     color: var(--section-text, var(--aisb-color-text));
     margin: 0 0 16px 0; /* Smaller margin on mobile */
     transition: color 200ms ease;
@@ -68,7 +68,7 @@
 /* Intro Text - Mobile First */
 .aisb-features__intro {
     font-size: var(--aisb-gs-size-base, 16px);
-    line-height: var(--aisb-gs-line-height-body, 1.6);
+    line-height: 1.6;
     color: var(--section-text-secondary, var(--aisb-color-muted));
     max-width: 100%; /* Full width on mobile */
     transition: color 200ms ease;
@@ -166,7 +166,7 @@
 /* Feature Description */
 .aisb-features__item-description {
     font-size: 15px; /* Mobile size */
-    line-height: var(--aisb-gs-line-height-body, 1.6);
+    line-height: 1.6;
     color: var(--section-text-secondary, var(--aisb-color-muted));
     margin: 0 0 16px 0;
     transition: color 200ms ease;
@@ -195,7 +195,7 @@
     text-align: center;
     margin-top: var(--aisb-gs-element-spacing, 24px);
     font-size: 14px; /* Smaller on mobile */
-    line-height: var(--aisb-gs-line-height-body, 1.6);
+    line-height: 1.6;
     color: var(--section-text-secondary, var(--aisb-color-muted));
     transition: color 200ms ease;
 }

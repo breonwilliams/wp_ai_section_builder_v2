@@ -374,6 +374,23 @@
             $('#aisb-panel-' + panelId).addClass('active').show();
         });
         
+        // FAQ Accordion click handler for preview - uses CSS for animation
+        $(document).on('click', '.aisb-faq__item-question', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var $question = $(this);
+            var $item = $question.closest('.aisb-faq__item');
+            var isExpanded = $item.hasClass('aisb-faq__item--expanded');
+            
+            // Toggle expanded state - CSS handles the animation
+            if (isExpanded) {
+                $item.removeClass('aisb-faq__item--expanded');
+            } else {
+                $item.addClass('aisb-faq__item--expanded');
+            }
+        });
+        
         // Add section button - auto-add with defaults
         $('.aisb-section-type').on('click', function() {
             var sectionType = $(this).data('type');
@@ -386,6 +403,8 @@
                 sectionDefaults = featuresDefaults;
             } else if (sectionType === 'checklist') {
                 sectionDefaults = checklistDefaults;
+            } else if (sectionType === 'faq') {
+                sectionDefaults = faqDefaults;
             } else {
                 // Fallback to hero defaults for unknown types
                 sectionDefaults = heroDefaults;
@@ -411,7 +430,12 @@
         });
         
         // Edit section on click
-        $(document).on('click', '.aisb-section', function() {
+        $(document).on('click', '.aisb-section', function(e) {
+            // Don't open edit if clicking on FAQ question
+            if ($(e.target).closest('.aisb-faq__item-question').length) {
+                return;
+            }
+            
             var index = $(this).data('index');
             var section = editorState.sections[index];
             if (section) {
@@ -488,6 +512,8 @@
             formHtml = generateFeaturesForm(sectionContent);
         } else if (sectionType === 'checklist') {
             formHtml = generateChecklistForm(sectionContent);
+        } else if (sectionType === 'faq') {
+            formHtml = generateFaqForm(sectionContent);
         }
         
         // Switch to edit mode in left panel
@@ -512,6 +538,8 @@
                 initFeaturesWysiwygEditors();
             } else if (sectionType === 'checklist') {
                 initChecklistWysiwygEditors();
+            } else if (sectionType === 'faq') {
+                initFaqWysiwygEditors();
             }
         }, 100);
         
@@ -541,6 +569,14 @@
             setTimeout(function() {
                 initGlobalBlocksRepeater(content, 'checklist');
                 initChecklistItemsRepeater(content);
+            }, 50);
+        } else if (sectionType === 'faq') {
+            // Use sectionContent if editing, otherwise use defaults
+            var content = sectionContent || faqDefaults;
+            // Initialize both global blocks and FAQ items repeater
+            setTimeout(function() {
+                initGlobalBlocksRepeater(content, 'faq');
+                initFaqItemsRepeater(content);
             }, 50);
         }
     }
@@ -750,6 +786,38 @@
         layout_variant: 'content-left',  // 'content-left' | 'center' | 'content-right'
         
         // CTA fields (for future use, same as Features)
+        primary_cta_label: '',
+        primary_cta_url: '',
+        secondary_cta_label: '',
+        secondary_cta_url: ''
+    };
+    
+    /**
+     * FAQ section field defaults - Based on Checklist structure
+     */
+    var faqDefaults = {
+        // Standard content fields (SAME field names as Checklist)
+        eyebrow_heading: 'FAQs',
+        heading: 'Frequently Asked Questions',
+        content: '<p>Find answers to common questions about our services.</p>',
+        outro_content: '',
+        
+        // Media fields (same as Checklist)
+        media_type: 'none',
+        featured_image: '',
+        video_url: '',
+        
+        // FAQ items array (empty for Phase 1, will be populated in Phase 2)
+        faq_items: [],
+        
+        // Global blocks for buttons (same as Checklist)
+        global_blocks: [],
+        
+        // Display options (same as Checklist)
+        theme_variant: 'light',  // 'light' | 'dark'
+        layout_variant: 'center',  // 'content-left' | 'center' | 'content-right'
+        
+        // CTA fields (for future use, same as Checklist)
         primary_cta_label: '',
         primary_cta_url: '',
         secondary_cta_label: '',
@@ -1127,6 +1195,121 @@
                     </label>
                     <div class="aisb-editor-wysiwyg-container">
                         <textarea id="checklist-outro-content" 
+                                  name="outro_content" 
+                                  class="aisb-editor-wysiwyg">${content.outro_content || ''}</textarea>
+                    </div>
+                </div>
+            </form>
+        `;
+    }
+    
+    /**
+     * Generate FAQ section form - Based on Checklist structure
+     */
+    function generateFaqForm(content) {
+        // Use existing content or defaults
+        content = content || faqDefaults;
+        
+        return `
+            <form id="aisb-section-form">
+                <!-- Variant Controls -->
+                <div class="aisb-editor-form-group aisb-variant-controls">
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Theme</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'light' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="light">
+                                <span class="dashicons dashicons-sun"></span> Light
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'dark' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="dark">
+                                <span class="dashicons dashicons-moon"></span> Dark
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Layout</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-left' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-left">
+                                <span class="dashicons dashicons-align-left"></span> Left
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'center' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="center">
+                                <span class="dashicons dashicons-align-center"></span> Center
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-right' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-right">
+                                <span class="dashicons dashicons-align-right"></span> Right
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Eyebrow Heading
+                    </label>
+                    <input type="text" name="eyebrow_heading" 
+                           value="${escapeHtml(content.eyebrow_heading || '')}" 
+                           placeholder="Optional eyebrow text">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Heading
+                    </label>
+                    <input type="text" name="heading" 
+                           value="${escapeHtml(content.heading || '')}" 
+                           placeholder="Section heading" required>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="faq-content">
+                        Content
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="faq-content" 
+                                  name="content" 
+                                  class="aisb-editor-wysiwyg">${content.content || ''}</textarea>
+                    </div>
+                </div>
+                
+                <!-- Media field - visible for ALL layouts -->
+                <div class="aisb-editor-form-group aisb-media-field">
+                    <label class="aisb-editor-form-label">
+                        Featured Image
+                    </label>
+                    ${generateMediaField(content)}
+                </div>
+                
+                <!-- FAQ items repeater -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        FAQ Items
+                        <span class="aisb-editor-form-help">Add questions and answers</span>
+                    </label>
+                    <div id="faq-items" class="aisb-repeater-container">
+                        <!-- FAQ items repeater will be initialized here -->
+                    </div>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Buttons
+                    </label>
+                    <div id="faq-global-blocks" class="aisb-repeater-container">
+                        <!-- Global blocks repeater will be initialized here -->
+                    </div>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="faq-outro-content">
+                        Outro Content (Optional)
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="faq-outro-content" 
                                   name="outro_content" 
                                   class="aisb-editor-wysiwyg">${content.outro_content || ''}</textarea>
                     </div>
@@ -1593,6 +1776,134 @@
     }
     
     /**
+     * Initialize FAQ items repeater field
+     */
+    function initFaqItemsRepeater(content) {
+        var $container = $('#faq-items');
+        if (!$container.length) {
+            return; // Container not found
+        }
+        
+        // Get items from content or empty array
+        var items = content.faq_items || [];
+        
+        // Initialize repeater field
+        var itemsRepeater = $container.aisbRepeaterField({
+            fieldName: 'faq_items',
+            items: items,
+            defaultItem: {
+                question: 'What is your question?',
+                answer: '<p>This is the answer to your question.</p>'
+            },
+            maxItems: 20,
+            minItems: 0,
+            itemLabel: 'FAQ',
+            addButtonText: 'Add FAQ Item',
+            template: function(item, index) {
+                return `
+                    <div class="aisb-repeater-fields">
+                        <div class="aisb-repeater-field-group">
+                            <label>Question</label>
+                            <input type="text" 
+                                   class="aisb-repeater-field aisb-editor-form-input" 
+                                   data-field="question" 
+                                   value="${escapeHtml(item.question || '')}"
+                                   placeholder="e.g., How does your service work?">
+                        </div>
+                        <div class="aisb-repeater-field-group">
+                            <label>Answer</label>
+                            <textarea class="aisb-repeater-field aisb-editor-form-input aisb-faq-answer" 
+                                      data-field="answer" 
+                                      data-index="${index}"
+                                      rows="4"
+                                      placeholder="Provide a detailed answer...">${item.answer || ''}</textarea>
+                        </div>
+                    </div>
+                `;
+            },
+            onUpdate: function(items) {
+                debugLog('FAQ items updated', {
+                    items: items,
+                    currentSection: editorState.currentSection,
+                    sectionType: editorState.currentSection !== null ? editorState.sections[editorState.currentSection].type : null
+                });
+                
+                // Update the content
+                if (editorState.currentSection !== null) {
+                    editorState.sections[editorState.currentSection].content.faq_items = items;
+                    debugLog('Updated section content with FAQ items', {
+                        sectionContent: editorState.sections[editorState.currentSection].content
+                    });
+                    updatePreview();
+                }
+            },
+            onItemAdded: function(item, index) {
+                // WYSIWYG disabled temporarily for debugging
+                // setTimeout(function() {
+                //     initFaqAnswerEditor(index);
+                // }, 100);
+            }
+        });
+        
+        // WYSIWYG disabled temporarily for debugging
+        // items.forEach(function(item, index) {
+        //     setTimeout(function() {
+        //         initFaqAnswerEditor(index);
+        //     }, 100 * (index + 1));
+        // });
+        
+        return itemsRepeater;
+    }
+    
+    /**
+     * Initialize WYSIWYG editor for FAQ answer field
+     */
+    function initFaqAnswerEditor(index) {
+        var editorId = 'faq-answer-' + index;
+        var $textarea = $('.aisb-faq-answer[data-index="' + index + '"]');
+        
+        if (!$textarea.length) {
+            return;
+        }
+        
+        // Set ID for the textarea
+        $textarea.attr('id', editorId);
+        
+        // Destroy existing instance if any
+        if (typeof wp !== 'undefined' && wp.editor) {
+            wp.editor.remove(editorId);
+        }
+        
+        // Initialize TinyMCE
+        if (typeof wp !== 'undefined' && wp.editor && wp.editor.initialize) {
+            wp.editor.initialize(editorId, {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'bold,italic,link,unlink,bullist,numlist',
+                    toolbar2: '',
+                    forced_root_block: 'p',
+                    force_br_newlines: false,
+                    force_p_newlines: true,
+                    height: 120,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save();
+                            // Update the repeater field data
+                            var value = editor.getContent();
+                            $textarea.val(value).trigger('change');
+                        });
+                    }
+                },
+                quicktags: {
+                    buttons: 'strong,em,link'
+                },
+                mediaButtons: false
+            });
+        }
+    }
+    
+    /**
      * Initialize WYSIWYG editors using WordPress TinyMCE
      */
     function initWysiwygEditors() {
@@ -1818,6 +2129,83 @@
             });
         } else {
             console.warn('WordPress editor not available for Checklist section, falling back to textarea');
+        }
+    }
+    
+    /**
+     * Initialize WYSIWYG editors for FAQ section
+     */
+    function initFaqWysiwygEditors() {
+        // Destroy existing instances first (if any)
+        if (typeof wp !== 'undefined' && wp.editor) {
+            wp.editor.remove('faq-content');
+            wp.editor.remove('faq-outro-content');
+        }
+        
+        // Initialize TinyMCE for content fields
+        if (typeof wp !== 'undefined' && wp.editor && wp.editor.initialize) {
+            // Main content editor
+            wp.editor.initialize('faq-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink',
+                    toolbar2: '',
+                    format_tags: 'p;h2;h3;h4',
+                    forced_root_block: 'p',
+                    force_br_newlines: false,
+                    force_p_newlines: true,
+                    remove_linebreaks: false,
+                    convert_newlines_to_brs: false,
+                    paste_as_text: false,
+                    paste_remove_styles: true,
+                    paste_remove_styles_if_webkit: true,
+                    paste_strip_class_attributes: 'all',
+                    height: 200,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save(); // Save to textarea
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: {
+                    buttons: 'strong,em,link'
+                },
+                mediaButtons: false
+            });
+            
+            // Outro content editor
+            wp.editor.initialize('faq-outro-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'bold,italic,link,unlink',
+                    toolbar2: '',
+                    forced_root_block: 'p',
+                    force_br_newlines: false,
+                    force_p_newlines: true,
+                    remove_linebreaks: false,
+                    convert_newlines_to_brs: false,
+                    paste_as_text: false,
+                    paste_remove_styles: true,
+                    paste_remove_styles_if_webkit: true,
+                    paste_strip_class_attributes: 'all',
+                    height: 150,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save(); // Save to textarea
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: {
+                    buttons: 'strong,em,link'
+                },
+                mediaButtons: false
+            });
+        } else {
+            console.warn('WordPress editor not available for FAQ section, falling back to textarea');
         }
     }
     
@@ -2315,6 +2703,13 @@
                 if (typeof tinyMCE !== 'undefined' && tinyMCE.get('checklist-outro-content')) {
                     content.outro_content = tinyMCE.get('checklist-outro-content').getContent();
                 }
+            } else if (sectionType === 'faq') {
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('faq-content')) {
+                    content.content = tinyMCE.get('faq-content').getContent();
+                }
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('faq-outro-content')) {
+                    content.outro_content = tinyMCE.get('faq-outro-content').getContent();
+                }
             }
         }
         
@@ -2347,6 +2742,15 @@
                 debugLog('Preserving checklist items in updatePreview', {
                     items: currentSection.content.items,
                     itemCount: currentSection.content.items.length
+                });
+            }
+            
+            // Preserve FAQ items managed by repeater
+            if (currentSection.content.faq_items) {
+                content.faq_items = currentSection.content.faq_items;
+                debugLog('Preserving FAQ items in updatePreview', {
+                    faq_items: currentSection.content.faq_items,
+                    itemCount: currentSection.content.faq_items.length
                 });
             }
             
@@ -2499,6 +2903,8 @@
             return renderFeaturesSection(section, index);
         } else if (section.type === 'checklist') {
             return renderChecklistSection(section, index);
+        } else if (section.type === 'faq') {
+            return renderFaqSection(section, index);
         }
         return '';
     }
@@ -2514,6 +2920,7 @@
         // Determine media class based on section type (default to hero for backward compatibility)
         var mediaClass = sectionType === 'features' ? 'aisb-features__media' : 
                         sectionType === 'checklist' ? 'aisb-checklist__media' : 
+                        sectionType === 'faq' ? 'aisb-faq__media' :
                         'aisb-hero__media';
         
         debugLog('renderMediaPreview Called', {
@@ -2636,6 +3043,7 @@
                 // Use correct container class based on section type
                 const containerClass = sectionType === 'features' ? 'aisb-features__buttons' :
                                       sectionType === 'checklist' ? 'aisb-checklist__buttons' :
+                                      sectionType === 'faq' ? 'aisb-faq__buttons' :
                                       'aisb-hero__buttons';
                 html += `<div class="${containerClass}">${buttonHtml}</div>`;
             }
@@ -2800,6 +3208,103 @@
         return `
             <section class="${sectionClasses}" data-index="${index}">
                 <div class="aisb-checklist__container">
+                    ${sectionContent}
+                </div>
+            </section>
+        `;
+    }
+    
+    /**
+     * Render FAQ Section for preview
+     */
+    function renderFaqSection(section, index) {
+        var content = section.content || section;
+        
+        debugLog('renderFaqSection called', {
+            section: section,
+            content: content,
+            faq_items: content.faq_items,
+            itemsLength: content.faq_items ? content.faq_items.length : 0
+        });
+        
+        // Build class list based on variants
+        var sectionClasses = [
+            'aisb-section',
+            'aisb-faq',
+            'aisb-section--' + (content.theme_variant || 'light'),
+            'aisb-section--' + (content.layout_variant || 'center')
+        ].join(' ');
+        
+        // Render FAQ items with accordion structure
+        var itemsHtml = '';
+        if (content.faq_items && content.faq_items.length > 0) {
+            itemsHtml = '<div class="aisb-faq__items">';
+            content.faq_items.forEach(function(item, itemIndex) {
+                if (item.question || item.answer) {
+                    itemsHtml += '<div class="aisb-faq__item" data-faq-index="' + itemIndex + '">';
+                    if (item.question) {
+                        itemsHtml += '<h3 class="aisb-faq__item-question" data-faq-toggle="' + itemIndex + '">' + escapeHtml(item.question) + '</h3>';
+                    }
+                    if (item.answer) {
+                        itemsHtml += '<div class="aisb-faq__item-answer" data-faq-content="' + itemIndex + '">';
+                        itemsHtml += '<div class="aisb-faq__item-answer-inner">' + item.answer + '</div>';
+                        itemsHtml += '</div>';
+                    }
+                    itemsHtml += '</div>';
+                }
+            });
+            itemsHtml += '</div>';
+        }
+        
+        // Build the section HTML based on layout
+        var sectionContent = '';
+        
+        if (content.layout_variant === 'center') {
+            // Center layout - single column, with media below content
+            sectionContent = `
+                <div class="aisb-faq__center">
+                    ${content.eyebrow_heading ? `<div class="aisb-faq__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
+                    ${content.heading ? `<h2 class="aisb-faq__heading">${escapeHtml(content.heading)}</h2>` : ''}
+                    ${content.content ? `<div class="aisb-faq__content">${content.content}</div>` : ''}
+                    ${itemsHtml}
+                    ${renderGlobalBlocks(content.global_blocks, 'faq')}
+                    ${content.outro_content ? `<div class="aisb-faq__outro">${content.outro_content}</div>` : ''}
+                    ${renderMediaPreview(content, 'faq')}
+                </div>
+            `;
+        } else {
+            // Two-column layout
+            var contentColumn = `
+                <div class="aisb-faq__content-column">
+                    ${content.eyebrow_heading ? `<div class="aisb-faq__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
+                    ${content.heading ? `<h2 class="aisb-faq__heading">${escapeHtml(content.heading)}</h2>` : ''}
+                    ${content.content ? `<div class="aisb-faq__content">${content.content}</div>` : ''}
+                    ${itemsHtml}
+                    ${renderGlobalBlocks(content.global_blocks, 'faq')}
+                    ${content.outro_content ? `<div class="aisb-faq__outro">${content.outro_content}</div>` : ''}
+                </div>
+            `;
+            
+            var mediaColumn = '';
+            if (content.media_type !== 'none') {
+                mediaColumn = `
+                    <div class="aisb-faq__media-column">
+                        ${renderMediaPreview(content, 'faq')}
+                    </div>
+                `;
+            }
+            
+            sectionContent = `
+                <div class="aisb-faq__columns">
+                    ${contentColumn}
+                    ${mediaColumn}
+                </div>
+            `;
+        }
+        
+        return `
+            <section class="${sectionClasses}" data-index="${index}">
+                <div class="aisb-faq__container">
                     ${sectionContent}
                 </div>
             </section>
