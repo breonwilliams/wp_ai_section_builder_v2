@@ -139,9 +139,13 @@ a.aisb-btn-ghost:active {
 
 /* Button States */
 .aisb-btn:disabled,
-.aisb-btn[disabled] {
+.aisb-btn[disabled],
+button.aisb-btn:disabled,
+button.aisb-btn[disabled],
+a.aisb-btn.disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* Focus Accessibility - Uses context variables */

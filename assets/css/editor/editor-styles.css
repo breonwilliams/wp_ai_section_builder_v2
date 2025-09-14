@@ -1006,13 +1006,19 @@ body.aisb-editor-active .aisb-editor-wrapper {
     letter-spacing: 0.5px;
 }
 
+/* Only target editor UI inputs, NOT preview canvas inputs */
 .aisb-editor-input,
 .aisb-editor-textarea,
-.aisb-editor-wrapper input[type="text"],
-.aisb-editor-wrapper input[type="number"],
-.aisb-editor-wrapper input[type="email"],
-.aisb-editor-wrapper input[type="url"],
-.aisb-editor-wrapper textarea {
+.aisb-editor-panel input[type="text"],
+.aisb-editor-panel input[type="number"],
+.aisb-editor-panel input[type="email"],
+.aisb-editor-panel input[type="url"],
+.aisb-editor-panel textarea,
+.aisb-editor-toolbar input[type="text"],
+.aisb-editor-toolbar input[type="number"],
+.aisb-editor-toolbar input[type="email"],
+.aisb-editor-toolbar input[type="url"],
+.aisb-editor-toolbar textarea {
     width: 100%;
     background: var(--aisb-editor-bg-surface);
     background-color: var(--aisb-editor-bg-surface);
@@ -1040,11 +1046,11 @@ body.aisb-editor-active .aisb-editor-wrapper {
 
 .aisb-editor-input:focus,
 .aisb-editor-textarea:focus,
-.aisb-editor-wrapper input[type="text"]:focus,
-.aisb-editor-wrapper input[type="number"]:focus,
-.aisb-editor-wrapper input[type="email"]:focus,
-.aisb-editor-wrapper input[type="url"]:focus,
-.aisb-editor-wrapper textarea:focus {
+.aisb-editor-panel input[type="text"]:focus,
+.aisb-editor-panel input[type="number"]:focus,
+.aisb-editor-panel input[type="email"]:focus,
+.aisb-editor-panel input[type="url"]:focus,
+.aisb-editor-panel textarea:focus {
     outline: none;
     border-color: var(--aisb-editor-accent);
     box-shadow: 0 0 0 3px var(--aisb-editor-accent-bg);
@@ -1054,8 +1060,8 @@ body.aisb-editor-active .aisb-editor-wrapper {
 
 .aisb-editor-input::placeholder,
 .aisb-editor-textarea::placeholder,
-.aisb-editor-wrapper input::placeholder,
-.aisb-editor-wrapper textarea::placeholder {
+.aisb-editor-panel input::placeholder,
+.aisb-editor-panel textarea::placeholder {
     color: var(--aisb-editor-text-muted);
     opacity: 1;
 }
@@ -1406,7 +1412,7 @@ body.aisb-editor-active .aisb-editor-wrapper {
 
 /* Select dropdown styling */
 .aisb-editor-select,
-.aisb-editor-wrapper select {
+.aisb-editor-panel select {
     width: 100%;
     padding: var(--aisb-editor-space-md) var(--aisb-editor-space-lg);
     background: var(--aisb-editor-bg-surface);
@@ -1430,7 +1436,7 @@ body.aisb-editor-active .aisb-editor-wrapper {
 }
 
 .aisb-editor-select:focus,
-.aisb-editor-wrapper select:focus {
+.aisb-editor-panel select:focus {
     outline: none;
     border-color: var(--aisb-editor-accent);
     box-shadow: 0 0 0 3px var(--aisb-editor-accent-bg);

@@ -1,0 +1,561 @@
+/**
+ * AI Section Builder - Form Normalization & Styling
+ * Single source of truth for ALL form styles (placeholder and real forms)
+ * 
+ * CRITICAL: Universal Form Plugin Compatibility
+ * ============================================
+ * This file provides universal styling for forms from ALL major WordPress form plugins.
+ * We use high-specificity selectors with !important to ensure consistent styling
+ * regardless of which form plugin the user chooses.
+ * 
+ * Supported Form Plugins:
+ * - Contact Form 7 (.wpcf7-submit)
+ * - WPForms (.wpforms-submit, .wpforms-submit-container)
+ * - Gravity Forms (.gform_button, .gform_footer)
+ * - Formidable Forms (.frm_button_submit, .frm_submit)
+ * - Forminator (.forminator-button-submit)
+ * - Everest Forms (.everest-forms-submit)
+ * - Ninja Forms (.ninja-forms-field, .nf-element)
+ * - Fluent Forms (.ff-btn-submit, .ff_submit_btn_wrapper)
+ * - Elementor Forms (.elementor-button, .elementor-field-type-submit)
+ * - Caldera Forms (.caldera-grid .btn)
+ * - Hustle (.hustle-button-submit)
+ * - WS Form (.ws-form-button)
+ * - Generic patterns (button[type="submit"], input[type="submit"])
+ * 
+ * Implementation Strategy:
+ * 1. Target ALL possible button selectors used by form plugins
+ * 2. Use !important to override plugin-specific styles
+ * 3. Apply consistent AISB design system colors and spacing
+ * 4. Ensure styles work in both light and dark themes
+ * 5. Maintain accessibility with proper focus states
+ * 
+ * Testing:
+ * - Test file available at: test-form-patterns.html
+ * - Covers all major form plugin HTML patterns
+ * - Includes both light and dark theme variants
+ * 
+ * @package AISB
+ * @version 2.0.0
+ * @updated January 2025
+ */
+
+/* =========================================
+   Form Container Styles
+   ========================================= */
+
+/* Placeholder form container */
+.aisb-hero-form__form .aisb-form-placeholder {
+    background: var(--section-surface-secondary, var(--aisb-color-secondary));
+    padding: 32px 24px;
+    border-radius: 8px;
+    border: 1px solid var(--section-border, var(--aisb-color-border));
+    box-sizing: border-box;
+}
+
+/* Dark mode for placeholder container */
+.aisb-section--dark .aisb-hero-form__form .aisb-form-placeholder {
+    background: var(--section-surface-secondary, var(--aisb-color-dark-secondary));
+    border-color: var(--section-border, var(--aisb-color-dark-border));
+}
+
+/* =========================================
+   Form Reset & Normalization
+   Based on industry best practices from Normalize.css
+   ========================================= */
+
+/* Target ALL forms within our sections for scoped styling */
+.aisb-hero-form__form form,
+.aisb-hero-form__form .aisb-placeholder-form,
+.aisb-hero-form__form .wpcf7-form, /* Contact Form 7 */
+.aisb-hero-form__form .wpforms-form, /* WPForms */
+.aisb-hero-form__form .gform_wrapper /* Gravity Forms */ {
+    /* Ensure consistent form spacing */
+    margin: 0;
+    padding: 0;
+    text-align: left; /* Forms should always be left-aligned */
+}
+
+/* Placeholder form layout */
+.aisb-hero-form__form .aisb-placeholder-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-sizing: border-box;
+}
+
+/* =========================================
+   Form Field Wrapper
+   ========================================= */
+
+.aisb-hero-form__form .aisb-form-field {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+}
+
+.aisb-hero-form__form .aisb-form-field:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================================
+   Form Element Base Styles
+   Inherit from theme while providing sensible defaults
+   ========================================= */
+
+/* All form inputs should inherit font from parent */
+.aisb-hero-form__form input,
+.aisb-hero-form__form textarea,
+.aisb-hero-form__form select,
+.aisb-hero-form__form button {
+    font-family: inherit;
+    font-size: var(--aisb-text-base, 16px);
+    line-height: var(--aisb-leading-normal, 1.5);
+}
+
+/* Labels - Ensure proper contrast in both themes */
+.aisb-hero-form__form label,
+.aisb-hero-form__form .wpcf7-form-control-wrap label,
+.aisb-hero-form__form .wpforms-field-label,
+.aisb-hero-form__form .gfield_label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: var(--aisb-text-sm, 14px);
+    font-weight: var(--aisb-font-medium, 500);
+    color: var(--section-text, var(--aisb-color-text));
+    text-align: left; /* Ensure labels are always left-aligned */
+    transition: color 200ms ease;
+}
+
+/* Text Inputs, Email, Tel, Number, Date, etc. - Works for ALL forms */
+.aisb-hero-form__form input[type="text"],
+.aisb-hero-form__form input[type="email"],
+.aisb-hero-form__form input[type="tel"],
+.aisb-hero-form__form input[type="number"],
+.aisb-hero-form__form input[type="date"],
+.aisb-hero-form__form input[type="time"],
+.aisb-hero-form__form input[type="url"],
+.aisb-hero-form__form input[type="search"],
+.aisb-hero-form__form input[type="password"],
+.aisb-hero-form__form textarea,
+.aisb-hero-form__form select,
+.aisb-hero-form__form .aisb-form-input,
+.aisb-hero-form__form .aisb-form-textarea {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--section-surface, var(--aisb-color-base));
+    border: 1px solid var(--section-border, var(--aisb-color-border));
+    border-radius: var(--aisb-radius-base, 6px);
+    color: var(--section-text, var(--aisb-color-text));
+    text-align: left; /* Ensure text is left-aligned */
+    transition: all 200ms ease;
+    box-sizing: border-box;
+    appearance: none; /* Remove default browser styling */
+    -webkit-appearance: none;
+}
+
+/* Textarea specific styling */
+.aisb-hero-form__form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Select dropdown arrow */
+.aisb-hero-form__form select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236B7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+/* Placeholder text */
+.aisb-hero-form__form input::placeholder,
+.aisb-hero-form__form textarea::placeholder {
+    color: var(--section-text-secondary, var(--aisb-color-muted));
+    opacity: 0.7;
+}
+
+/* Disabled state for placeholder forms */
+.aisb-hero-form__form input[disabled],
+.aisb-hero-form__form textarea[disabled],
+.aisb-hero-form__form select[disabled],
+.aisb-hero-form__form .aisb-form-input[disabled],
+.aisb-hero-form__form .aisb-form-textarea[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--section-surface-secondary, var(--aisb-color-secondary));
+}
+
+/* Focus states */
+.aisb-hero-form__form input:focus,
+.aisb-hero-form__form textarea:focus,
+.aisb-hero-form__form select:focus {
+    outline: none;
+    border-color: var(--section-link, var(--aisb-color-primary));
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); /* Primary color with opacity */
+}
+
+/* =========================================
+   Checkboxes and Radio Buttons
+   ========================================= */
+
+.aisb-hero-form__form input[type="checkbox"],
+.aisb-hero-form__form input[type="radio"] {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+/* Checkbox and radio labels */
+.aisb-hero-form__form input[type="checkbox"] + label,
+.aisb-hero-form__form input[type="radio"] + label,
+.aisb-hero-form__form .wpcf7-list-item label {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: var(--aisb-font-normal, 400);
+    cursor: pointer;
+}
+
+/* =========================================
+   Submit Buttons - Universal Styles for ALL Form Types
+   Uses high specificity to override form plugin styles
+   ========================================= */
+
+/* Target ALL submit buttons regardless of form plugin */
+.aisb-hero-form__form button[type="submit"],
+.aisb-hero-form__form input[type="submit"],
+.aisb-hero-form__form button.submit,
+.aisb-hero-form__form .submit-button,
+.aisb-hero-form__form .form-submit,
+/* Specific form plugin classes */
+.aisb-hero-form__form .wpcf7-submit,              /* Contact Form 7 */
+.aisb-hero-form__form .wpforms-submit,            /* WPForms */
+.aisb-hero-form__form .wpforms-submit-container button, /* WPForms container pattern */
+.aisb-hero-form__form .gform_button,              /* Gravity Forms */
+.aisb-hero-form__form .gform_footer input[type="submit"], /* Gravity Forms footer */
+.aisb-hero-form__form .frm_button_submit,         /* Formidable Forms */
+.aisb-hero-form__form .frm_submit button,         /* Formidable Forms alternate */
+.aisb-hero-form__form .frm_submit input[type="submit"], /* Formidable Forms input variant */
+.aisb-hero-form__form .forminator-button-submit,  /* Forminator */
+.aisb-hero-form__form .everest-forms-submit,      /* Everest Forms */
+.aisb-hero-form__form .everest-forms-submit-button, /* Everest Forms alternate */
+.aisb-hero-form__form .ninja-forms-field[type="submit"], /* Ninja Forms */
+.aisb-hero-form__form .nf-element[type="submit"],  /* Ninja Forms v3 */
+.aisb-hero-form__form .fl-button,                 /* Fluent Forms */
+.aisb-hero-form__form .fluentform .ff-btn-submit, /* Fluent Forms alternate */
+.aisb-hero-form__form .ff_submit_btn_wrapper button, /* Fluent Forms wrapper pattern */
+.aisb-hero-form__form .elementor-button,          /* Elementor Forms */
+.aisb-hero-form__form .elementor-field-type-submit button, /* Elementor submit field */
+.aisb-hero-form__form .caldera-grid .btn,         /* Caldera Forms */
+.aisb-hero-form__form .hustle-button-submit,      /* Hustle Forms */
+.aisb-hero-form__form .ws-form-button[type="submit"], /* WS Form */
+.aisb-hero-form__form .aisb-btn {                 /* Our placeholder buttons */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 48px !important;
+    padding: 12px 24px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+    border-radius: 6px !important;
+    border: 2px solid transparent !important;
+    cursor: pointer;
+    text-decoration: none !important;
+    transition: all 200ms ease;
+    white-space: nowrap;
+    font-family: inherit !important;
+    box-sizing: border-box !important;
+    
+    /* Primary button colors - use !important to override plugin styles */
+    background-color: var(--section-button-primary, var(--aisb-color-primary)) !important;
+    color: var(--section-button-primary-text, #ffffff) !important;
+    border-color: var(--section-button-primary, var(--aisb-color-primary)) !important;
+}
+
+/* Hover states for all button types */
+.aisb-hero-form__form button[type="submit"]:hover,
+.aisb-hero-form__form input[type="submit"]:hover,
+.aisb-hero-form__form button.submit:hover,
+.aisb-hero-form__form .submit-button:hover,
+.aisb-hero-form__form .form-submit:hover,
+.aisb-hero-form__form .wpcf7-submit:hover,
+.aisb-hero-form__form .wpforms-submit:hover,
+.aisb-hero-form__form .gform_button:hover,
+.aisb-hero-form__form .frm_button_submit:hover,
+.aisb-hero-form__form .frm_submit button:hover,
+.aisb-hero-form__form .forminator-button-submit:hover,
+.aisb-hero-form__form .everest-forms-submit:hover,
+.aisb-hero-form__form .ninja-forms-field[type="submit"]:hover,
+.aisb-hero-form__form .fl-button:hover,
+.aisb-hero-form__form .fluentform .ff-btn-submit:hover,
+.aisb-hero-form__form .wpforms-submit-container button:hover,
+.aisb-hero-form__form .gform_footer input[type="submit"]:hover,
+.aisb-hero-form__form .frm_submit input[type="submit"]:hover,
+.aisb-hero-form__form .everest-forms-submit-button:hover,
+.aisb-hero-form__form .nf-element[type="submit"]:hover,
+.aisb-hero-form__form .ff_submit_btn_wrapper button:hover,
+.aisb-hero-form__form .elementor-button:hover,
+.aisb-hero-form__form .elementor-field-type-submit button:hover,
+.aisb-hero-form__form .caldera-grid .btn:hover,
+.aisb-hero-form__form .hustle-button-submit:hover,
+.aisb-hero-form__form .ws-form-button[type="submit"]:hover,
+.aisb-hero-form__form .aisb-btn:hover {
+    background-color: var(--section-button-primary-hover, var(--aisb-color-primary-hover)) !important;
+    border-color: var(--section-button-primary-hover, var(--aisb-color-primary-hover)) !important;
+    color: var(--section-button-primary-text, #ffffff) !important;
+}
+
+/* Focus states - Extended for all form plugin buttons */
+.aisb-hero-form__form button[type="submit"]:focus-visible,
+.aisb-hero-form__form input[type="submit"]:focus-visible,
+.aisb-hero-form__form button.submit:focus-visible,
+.aisb-hero-form__form .submit-button:focus-visible,
+.aisb-hero-form__form .wpcf7-submit:focus-visible,
+.aisb-hero-form__form .wpforms-submit:focus-visible,
+.aisb-hero-form__form .gform_button:focus-visible,
+.aisb-hero-form__form .frm_button_submit:focus-visible,
+.aisb-hero-form__form .forminator-button-submit:focus-visible,
+.aisb-hero-form__form .elementor-button:focus-visible {
+    outline: 3px solid var(--section-focus-ring, var(--aisb-color-primary)) !important;
+    outline-offset: 2px !important;
+}
+
+/* =========================================
+   Form Field Spacing
+   ========================================= */
+
+.aisb-hero-form__form .form-field,
+.aisb-hero-form__form .wpcf7-form-control-wrap,
+.aisb-hero-form__form .wpforms-field-container,
+.aisb-hero-form__form .gfield {
+    margin-bottom: 20px;
+}
+
+.aisb-hero-form__form .form-field:last-child,
+.aisb-hero-form__form .gfield:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================================
+   Dark Mode Overrides
+   Ensure proper contrast in dark themes
+   ========================================= */
+
+/* Dark mode labels */
+.aisb-section--dark .aisb-hero-form__form label {
+    color: var(--section-text, var(--aisb-color-dark-text));
+}
+
+/* Dark mode inputs */
+.aisb-section--dark .aisb-hero-form__form input[type="text"],
+.aisb-section--dark .aisb-hero-form__form input[type="email"],
+.aisb-section--dark .aisb-hero-form__form input[type="tel"],
+.aisb-section--dark .aisb-hero-form__form input[type="number"],
+.aisb-section--dark .aisb-hero-form__form input[type="date"],
+.aisb-section--dark .aisb-hero-form__form input[type="time"],
+.aisb-section--dark .aisb-hero-form__form input[type="url"],
+.aisb-section--dark .aisb-hero-form__form input[type="search"],
+.aisb-section--dark .aisb-hero-form__form input[type="password"],
+.aisb-section--dark .aisb-hero-form__form textarea,
+.aisb-section--dark .aisb-hero-form__form select,
+.aisb-section--dark .aisb-hero-form__form .aisb-form-input,
+.aisb-section--dark .aisb-hero-form__form .aisb-form-textarea {
+    background: var(--section-surface-secondary, var(--aisb-color-dark-secondary));
+    border-color: var(--section-border, var(--aisb-color-dark-border));
+    color: var(--section-text, var(--aisb-color-dark-text));
+}
+
+/* Dark mode select arrow */
+.aisb-section--dark .aisb-hero-form__form select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239CA3AF' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+}
+
+/* Dark mode placeholders */
+.aisb-section--dark .aisb-hero-form__form input::placeholder,
+.aisb-section--dark .aisb-hero-form__form textarea::placeholder {
+    color: var(--section-text-secondary, var(--aisb-color-dark-muted));
+    opacity: 0.6;
+}
+
+/* Dark mode focus states */
+.aisb-section--dark .aisb-hero-form__form input:focus,
+.aisb-section--dark .aisb-hero-form__form textarea:focus,
+.aisb-section--dark .aisb-hero-form__form select:focus {
+    border-color: var(--section-link, var(--aisb-color-dark-primary));
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1); /* Dark primary with opacity */
+}
+
+/* Dark mode buttons - Apply to ALL form types */
+.aisb-section--dark .aisb-hero-form__form button[type="submit"],
+.aisb-section--dark .aisb-hero-form__form input[type="submit"],
+.aisb-section--dark .aisb-hero-form__form button.submit,
+.aisb-section--dark .aisb-hero-form__form .submit-button,
+.aisb-section--dark .aisb-hero-form__form .form-submit,
+.aisb-section--dark .aisb-hero-form__form .wpcf7-submit,
+.aisb-section--dark .aisb-hero-form__form .wpforms-submit,
+.aisb-section--dark .aisb-hero-form__form .gform_button,
+.aisb-section--dark .aisb-hero-form__form .frm_button_submit,
+.aisb-section--dark .aisb-hero-form__form .frm_submit button,
+.aisb-section--dark .aisb-hero-form__form .forminator-button-submit,
+.aisb-section--dark .aisb-hero-form__form .everest-forms-submit,
+.aisb-section--dark .aisb-hero-form__form .ninja-forms-field[type="submit"],
+.aisb-section--dark .aisb-hero-form__form .fl-button,
+.aisb-section--dark .aisb-hero-form__form .fluentform .ff-btn-submit,
+.aisb-section--dark .aisb-hero-form__form .elementor-button,
+.aisb-section--dark .aisb-hero-form__form .aisb-btn {
+    background-color: var(--section-button-primary, var(--aisb-color-dark-primary)) !important;
+    border-color: var(--section-button-primary, var(--aisb-color-dark-primary)) !important;
+}
+
+.aisb-section--dark .aisb-hero-form__form button[type="submit"]:hover,
+.aisb-section--dark .aisb-hero-form__form input[type="submit"]:hover,
+.aisb-section--dark .aisb-hero-form__form button.submit:hover,
+.aisb-section--dark .aisb-hero-form__form .submit-button:hover,
+.aisb-section--dark .aisb-hero-form__form .form-submit:hover,
+.aisb-section--dark .aisb-hero-form__form .wpcf7-submit:hover,
+.aisb-section--dark .aisb-hero-form__form .wpforms-submit:hover,
+.aisb-section--dark .aisb-hero-form__form .gform_button:hover,
+.aisb-section--dark .aisb-hero-form__form .frm_button_submit:hover,
+.aisb-section--dark .aisb-hero-form__form .frm_submit button:hover,
+.aisb-section--dark .aisb-hero-form__form .forminator-button-submit:hover,
+.aisb-section--dark .aisb-hero-form__form .everest-forms-submit:hover,
+.aisb-section--dark .aisb-hero-form__form .ninja-forms-field[type="submit"]:hover,
+.aisb-section--dark .aisb-hero-form__form .fl-button:hover,
+.aisb-section--dark .aisb-hero-form__form .fluentform .ff-btn-submit:hover,
+.aisb-section--dark .aisb-hero-form__form .elementor-button:hover,
+.aisb-section--dark .aisb-hero-form__form .aisb-btn:hover {
+    background-color: var(--section-button-primary-hover, var(--aisb-color-dark-primary-hover)) !important;
+    border-color: var(--section-button-primary-hover, var(--aisb-color-dark-primary-hover)) !important;
+}
+
+/* =========================================
+   Validation States
+   ========================================= */
+
+/* Error states */
+.aisb-hero-form__form .error,
+.aisb-hero-form__form .wpcf7-not-valid,
+.aisb-hero-form__form .wpforms-error,
+.aisb-hero-form__form .validation_error {
+    border-color: var(--aisb-feedback-error, #ef4444) !important;
+}
+
+/* Error messages */
+.aisb-hero-form__form .error-message,
+.aisb-hero-form__form .wpcf7-not-valid-tip,
+.aisb-hero-form__form .wpforms-error-container,
+.aisb-hero-form__form .validation_message {
+    color: var(--aisb-feedback-error, #ef4444);
+    font-size: var(--aisb-text-sm, 14px);
+    margin-top: 4px;
+}
+
+/* Success states */
+.aisb-hero-form__form .success,
+.aisb-hero-form__form .wpcf7-mail-sent-ok,
+.aisb-hero-form__form .wpforms-confirmation-container {
+    color: var(--aisb-feedback-success, #10b981);
+    padding: 16px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: var(--aisb-radius-base, 6px);
+    margin-top: 20px;
+}
+
+/* =========================================
+   Layout-specific Form Styles
+   ========================================= */
+
+/* Center layout - full width submit button on desktop */
+@media (min-width: 1024px) {
+    .aisb-section--center .aisb-hero-form__form .aisb-btn,
+    .aisb-section--center .aisb-placeholder-form .aisb-btn {
+        width: 100%;
+    }
+}
+
+/* =========================================
+   Responsive Design
+   ========================================= */
+
+@media (max-width: 640px) {
+    /* Ensure touch-friendly sizes on mobile */
+    .aisb-hero-form__form input[type="text"],
+    .aisb-hero-form__form input[type="email"],
+    .aisb-hero-form__form input[type="tel"],
+    .aisb-hero-form__form input[type="number"],
+    .aisb-hero-form__form input[type="date"],
+    .aisb-hero-form__form input[type="time"],
+    .aisb-hero-form__form input[type="url"],
+    .aisb-hero-form__form input[type="search"],
+    .aisb-hero-form__form input[type="password"],
+    .aisb-hero-form__form textarea,
+    .aisb-hero-form__form select,
+    .aisb-hero-form__form button[type="submit"],
+    .aisb-hero-form__form input[type="submit"] {
+        min-height: 44px; /* iOS touch target minimum */
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    /* Full width submit button on mobile */
+    .aisb-hero-form__form button[type="submit"],
+    .aisb-hero-form__form input[type="submit"],
+    .aisb-hero-form__form .wpcf7-submit,
+    .aisb-hero-form__form .wpforms-submit,
+    .aisb-hero-form__form .gform_button {
+        width: 100%;
+    }
+}
+
+/* =========================================
+   Loading States
+   ========================================= */
+
+.aisb-hero-form__form .ajax-loader,
+.aisb-hero-form__form .wpcf7-spinner,
+.aisb-hero-form__form .wpforms-submit-spinner {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+/* Disabled state during submission */
+.aisb-hero-form__form button[type="submit"]:disabled,
+.aisb-hero-form__form input[type="submit"]:disabled,
+.aisb-hero-form__form .submitting {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =========================================
+   Accessibility
+   ========================================= */
+
+/* Required field indicators */
+.aisb-hero-form__form .required,
+.aisb-hero-form__form .wpcf7-required,
+.aisb-hero-form__form .wpforms-required-label,
+.aisb-hero-form__form .gfield_required {
+    color: var(--aisb-feedback-error, #ef4444);
+    margin-left: 4px;
+}
+
+/* Screen reader only text */
+.aisb-hero-form__form .screen-reader-text,
+.aisb-hero-form__form .wpcf7-screen-reader-response {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Focus visible for keyboard navigation */
+.aisb-hero-form__form *:focus-visible {
+    outline: 3px solid var(--section-focus-ring, var(--aisb-color-primary));
+    outline-offset: 2px;
+}

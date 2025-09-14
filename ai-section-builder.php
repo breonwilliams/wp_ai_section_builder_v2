@@ -91,6 +91,7 @@ function aisb_setup() {
     add_action('wp_ajax_aisb_activate_builder', 'aisb_ajax_activate_builder');
     add_action('wp_ajax_aisb_deactivate_builder', 'aisb_ajax_deactivate_builder');
     add_action('wp_ajax_aisb_save_sections', 'aisb_ajax_save_sections');
+    add_action('wp_ajax_aisb_render_form', 'aisb_ajax_render_form');
 }
 
 /**
@@ -1266,6 +1267,7 @@ function aisb_ajax_save_sections() {
         $sections_array = [];
     }
     
+    
     // Debug: Log what we're saving
     if (defined('WP_DEBUG') && WP_DEBUG) {
         error_log('AISB Saving Sections: ' . print_r($sections_array, true));
@@ -1279,6 +1281,61 @@ function aisb_ajax_save_sections() {
     
     wp_send_json_success(['message' => 'Sections saved successfully']);
 }
+
+/**
+ * AJAX handler for rendering form shortcodes
+ */
+function aisb_ajax_render_form() {
+    // Check nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'aisb_editor_nonce')) {
+        wp_send_json_error('Security check failed');
+    }
+    
+    // Check user capabilities
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error('Insufficient permissions');
+    }
+    
+    $form_type = isset($_POST['form_type']) ? sanitize_text_field($_POST['form_type']) : '';
+    $form_shortcode = isset($_POST['form_shortcode']) ? stripslashes($_POST['form_shortcode']) : '';
+    
+    $html = '';
+    
+    if ($form_type === 'shortcode' && !empty($form_shortcode)) {
+        // Process the shortcode - keep original format
+        $html = do_shortcode($form_shortcode);
+    }
+    
+    // If no form content, return placeholder with proper classes
+    if (empty($html)) {
+        ob_start();
+        ?>
+        <div class="aisb-form-placeholder">
+            <form class="aisb-placeholder-form">
+                <div class="aisb-form-field">
+                    <input type="text" placeholder="Name" disabled class="aisb-form-input">
+                </div>
+                <div class="aisb-form-field">
+                    <input type="email" placeholder="Email" disabled class="aisb-form-input">
+                </div>
+                <div class="aisb-form-field">
+                    <input type="tel" placeholder="Phone" disabled class="aisb-form-input">
+                </div>
+                <div class="aisb-form-field">
+                    <textarea placeholder="Message" disabled class="aisb-form-textarea" rows="4"></textarea>
+                </div>
+                <div class="aisb-form-field">
+                    <button type="button" class="aisb-btn aisb-btn-primary" disabled>Submit</button>
+                </div>
+            </form>
+        </div>
+        <?php
+        $html = ob_get_clean();
+    }
+    
+    wp_send_json_success(['html' => $html, 'has_scripts' => strpos($html, '<script') !== false]);
+}
+
 
 /**
  * Override page template when AI Section Builder is active (conflict-aware)
@@ -1680,6 +1737,10 @@ function aisb_render_hero_form_section($section) {
     $content_text = wp_kses_post($content['content'] ?? '');
     $outro_content = wp_kses_post($content['outro_content'] ?? '');
     
+    // Extract form fields
+    $form_type = sanitize_text_field($content['form_type'] ?? 'placeholder');
+    $form_shortcode = $content['form_shortcode'] ?? '';
+    
     // Get variants
     $theme_variant = sanitize_text_field($content['theme_variant'] ?? 'dark');
     $layout_variant = sanitize_text_field($content['layout_variant'] ?? 'content-left');
@@ -1745,7 +1806,38 @@ function aisb_render_hero_form_section($section) {
                         <div class="aisb-hero-form__outro"><?php echo $outro_content; ?></div>
                     <?php endif; ?>
                 </div>
-                <?php // Form column will be added in Phase 2 ?>
+                <div class="aisb-hero-form__form">
+                    <?php 
+                    // Render form based on type
+                    if ($form_type === 'shortcode' && !empty($form_shortcode)) {
+                        // Process shortcode
+                        echo do_shortcode($form_shortcode);
+                    } else {
+                        // Show placeholder form
+                        ?>
+                        <div class="aisb-form-placeholder">
+                            <form class="aisb-placeholder-form">
+                                <div class="aisb-form-field">
+                                    <input type="text" placeholder="Name" disabled class="aisb-form-input">
+                                </div>
+                                <div class="aisb-form-field">
+                                    <input type="email" placeholder="Email" disabled class="aisb-form-input">
+                                </div>
+                                <div class="aisb-form-field">
+                                    <input type="tel" placeholder="Phone" disabled class="aisb-form-input">
+                                </div>
+                                <div class="aisb-form-field">
+                                    <textarea placeholder="Message" disabled class="aisb-form-textarea" rows="4"></textarea>
+                                </div>
+                                <div class="aisb-form-field">
+                                    <button type="button" class="aisb-btn aisb-btn-primary" disabled>Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                        <?php
+                    }
+                    ?>
+                </div>
             </div>
         </div>
     </section>

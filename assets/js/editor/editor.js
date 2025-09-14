@@ -752,7 +752,9 @@
         content: '<p>Fill out the form to get in touch with our team.</p>',
         outro_content: '',
         
-        // No media fields for hero-form
+        // Form fields for hero-form
+        form_type: 'placeholder', // 'placeholder' | 'shortcode'
+        form_shortcode: '', // e.g., '[contact-form-7 id="123"]'
         
         // Global blocks for nested components
         global_blocks: [
@@ -1144,7 +1146,34 @@
                     </div>
                 </div>
                 
-                <!-- No media field for hero-form -->
+                <!-- Form field for hero-form -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Form Settings
+                    </label>
+                    <div class="aisb-form-selector">
+                        <!-- Form Type Selector -->
+                        <div class="aisb-form-type-selector">
+                            <label class="aisb-radio-label">
+                                <input type="radio" name="form_type" value="placeholder" ${content.form_type === 'placeholder' || !content.form_type ? 'checked' : ''}>
+                                <span>Placeholder</span>
+                            </label>
+                            <label class="aisb-radio-label">
+                                <input type="radio" name="form_type" value="shortcode" ${content.form_type === 'shortcode' ? 'checked' : ''}>
+                                <span>Shortcode</span>
+                            </label>
+                        </div>
+                        
+                        <!-- Shortcode Input (shown when form_type is 'shortcode') -->
+                        <div class="aisb-form-shortcode-controls" style="${content.form_type === 'shortcode' ? '' : 'display:none'}">
+                            <textarea name="form_shortcode" 
+                                      class="aisb-editor-input" 
+                                      placeholder="[contact-form-7 id=&quot;123&quot;]"
+                                      rows="2">${escapeHtml(content.form_shortcode || '')}</textarea>
+                            <p class="aisb-editor-form-help">Enter your form shortcode (e.g., Contact Form 7, WPForms, Gravity Forms)</p>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="aisb-editor-form-group">
                     <label class="aisb-editor-form-label">
@@ -1692,6 +1721,11 @@
      * Global block button template (component template)
      */
     function globalBlockButtonTemplate(button, index) {
+        console.log('=== globalBlockButtonTemplate CALLED ===');
+        console.log('1. Button data:', JSON.parse(JSON.stringify(button)));
+        console.log('2. Index:', index);
+        console.log('3. Button text:', button.text);
+        
         var styles = [
             { value: 'primary', label: 'Primary' },
             { value: 'secondary', label: 'Secondary' }
@@ -1703,6 +1737,9 @@
                    style.label + '</option>';
         }).join('');
         
+        var buttonText = button.text || '';
+        console.log('4. Button text to display in input:', buttonText);
+        
         return `
             <div class="aisb-repeater-fields">
                 <div class="aisb-repeater-field-group">
@@ -1710,7 +1747,7 @@
                     <input type="text" 
                            class="aisb-editor-input aisb-repeater-field" 
                            data-field="text" 
-                           value="${escapeHtml(button.text || '')}" 
+                           value="${escapeHtml(buttonText)}" 
                            placeholder="Button text">
                 </div>
                 <div class="aisb-repeater-field-group">
@@ -2669,6 +2706,60 @@
             }
         });
         
+        // Handle form type switching for hero-form
+        // This ONLY toggles form input visibility and updates the preview form area
+        $(document).on('change', 'input[name="form_type"]', function() {
+            var formType = $(this).val();
+            var $selector = $(this).closest('.aisb-form-selector');
+            
+            // Toggle form input visibility in editor panel
+            $selector.find('.aisb-form-shortcode-controls').hide();
+            if (formType === 'shortcode') {
+                $selector.find('.aisb-form-shortcode-controls').show();
+            }
+            
+            // Update state and preview form area ONLY
+            if (editorState.currentSection !== null && editorState.sections[editorState.currentSection]) {
+                var section = editorState.sections[editorState.currentSection];
+                if (section.content) {
+                    // Update form type in state
+                    section.content.form_type = formType;
+                    editorState.isDirty = true;
+                    
+                    // Update the preview to reflect the form type change
+                    updatePreview();
+                    
+                    updateSaveStatus('unsaved');
+                }
+            }
+        });
+        
+        // Handle form shortcode input changes
+        // Debounced to prevent rapid updates
+        var shortcodeTimer;
+        $(document).on('input', 'textarea[name="form_shortcode"]', function() {
+            var shortcode = $(this).val();
+            
+            // Clear previous timer
+            clearTimeout(shortcodeTimer);
+            
+            // Debounce the update
+            shortcodeTimer = setTimeout(function() {
+                if (editorState.currentSection !== null) {
+                    var section = editorState.sections[editorState.currentSection];
+                    if (section && section.content) {
+                        section.content.form_shortcode = shortcode;
+                        editorState.isDirty = true;
+                        
+                        // Update the preview
+                        updatePreview();
+                        updateSaveStatus('unsaved');
+                    }
+                }
+            }, 500); // Wait 500ms after user stops typing
+        });
+        
+        
         // Handle video URL input changes
         $(document).on('input', 'input[name="video_url"]', function() {
             var videoUrl = $(this).val();
@@ -3315,23 +3406,151 @@
     }
     
     /**
+     * Render form placeholder for hero-form section
+     */
+    function renderFormPlaceholder() {
+        return `
+            <div class="aisb-form-placeholder">
+                <form class="aisb-placeholder-form">
+                    <div class="aisb-form-field">
+                        <input type="text" placeholder="Name" disabled class="aisb-form-input">
+                    </div>
+                    <div class="aisb-form-field">
+                        <input type="email" placeholder="Email" disabled class="aisb-form-input">
+                    </div>
+                    <div class="aisb-form-field">
+                        <input type="tel" placeholder="Phone" disabled class="aisb-form-input">
+                    </div>
+                    <div class="aisb-form-field">
+                        <textarea placeholder="Message" disabled class="aisb-form-textarea" rows="4"></textarea>
+                    </div>
+                    <div class="aisb-form-field">
+                        <button type="button" class="aisb-btn aisb-btn-primary" disabled>Submit</button>
+                    </div>
+                </form>
+            </div>
+        `;
+    }
+    
+    /**
+     * Execute scripts within HTML content
+     * This is necessary for forms that include JavaScript
+     * Follows the pattern used by WordPress core and form plugins
+     */
+    function executeScripts(container) {
+        // Find all script elements
+        var scripts = container.querySelectorAll('script');
+        
+        scripts.forEach(function(oldScript) {
+            // Create a new script element
+            var newScript = document.createElement('script');
+            
+            // Copy attributes
+            Array.from(oldScript.attributes).forEach(function(attr) {
+                newScript.setAttribute(attr.name, attr.value);
+            });
+            
+            // Copy content if inline script
+            if (!oldScript.src) {
+                newScript.textContent = oldScript.textContent;
+            }
+            
+            // Replace old script with new one to execute it
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+    }
+    
+    /**
+     * Update ONLY the form area without affecting other preview elements
+     * This prevents form changes from corrupting button or other UI data
+     */
+    
+    /**
+     * Render form area for hero-form section
+     * IMPORTANT: This function should ONLY update the form display area
+     * It should NOT affect any other editor elements or trigger preview updates
+     */
+    function renderFormArea(content) {
+        var formType = content.form_type || 'placeholder';
+        var formId = 'form-container-' + Date.now();
+        
+        // Validate and sanitize shortcode input
+        if (formType === 'shortcode' && content.form_shortcode && content.form_shortcode.trim() !== '') {
+            // Only make AJAX call if we have actual content
+            // Use a longer delay to prevent conflicts with other updates
+            setTimeout(function() {
+                // Check if the container still exists (user might have switched sections)
+                var container = document.getElementById(formId);
+                if (!container) return;
+                
+                $.ajax({
+                    url: aisbEditor.ajaxUrl,
+                    type: 'POST',
+                    data: {
+                        action: 'aisb_render_form',
+                        nonce: aisbEditor.nonce,
+                        form_type: formType,
+                        form_shortcode: content.form_shortcode
+                    },
+                    success: function(response) {
+                        // Only update the specific form container, not the entire preview
+                        var targetContainer = document.getElementById(formId);
+                        if (targetContainer && response.success && response.data.html) {
+                            targetContainer.innerHTML = response.data.html;
+                            // Execute any scripts in the rendered form
+                            if (response.data.has_scripts) {
+                                executeScripts(targetContainer);
+                            }
+                        }
+                    },
+                    error: function() {
+                        console.warn('AISB: Failed to render form shortcode');
+                    }
+                });
+            }, 200); // Increased delay to avoid race conditions
+            
+            // Return placeholder with ID for AJAX to update
+            return `<div id="${formId}" class="aisb-form-container">${renderFormPlaceholder()}</div>`;
+            
+        } else {
+            // Show placeholder for empty or placeholder type
+            return renderFormPlaceholder();
+        }
+    }
+    
+    /**
      * Render global blocks (buttons, cards, etc.)
      */
     function renderGlobalBlocks(blocks, sectionType = 'hero') {
-        if (!blocks || !blocks.length) return '';
+        console.log('=== renderGlobalBlocks DEBUG ===');
+        console.log('1. Blocks received:', JSON.parse(JSON.stringify(blocks)));
+        console.log('2. Section type:', sectionType);
+        
+        if (!blocks || !blocks.length) {
+            console.log('3. No blocks to render, returning empty');
+            return '';
+        }
         
         var html = '';
         var buttons = blocks.filter(function(block) { return block.type === 'button'; });
         
+        console.log('4. Buttons filtered:', JSON.parse(JSON.stringify(buttons)));
+        
         // Render buttons if any
         if (buttons.length) {
-            var buttonHtml = buttons.map(function(button) {
-                if (!button.text) return '';
+            var buttonHtml = buttons.map(function(button, idx) {
+                console.log(`5. Button ${idx} text:`, button.text);
+                if (!button.text) {
+                    console.log(`6. Button ${idx} has no text, skipping`);
+                    return '';
+                }
                 var styleClass = 'aisb-btn-' + (button.style || 'primary');
                 
                 // In preview, render as button tags (not links) to avoid styling issues
                 return `<button class="aisb-btn ${styleClass}" type="button">${escapeHtml(button.text)}</button>`;
             }).join('');
+            
+            console.log('7. Button HTML generated:', buttonHtml);
             
             if (buttonHtml) {
                 // Use correct container class based on section type
@@ -3343,6 +3562,9 @@
                 html += `<div class="${containerClass}">${buttonHtml}</div>`;
             }
         }
+        
+        console.log('8. Final HTML:', html);
+        console.log('=== END renderGlobalBlocks DEBUG ===');
         
         // Future: Add rendering for other block types (cards, lists, etc.)
         
@@ -3388,7 +3610,14 @@
      * Render Hero Form section - Exactly like Hero but without media
      */
     function renderHeroFormSection(section, index) {
+        console.log('=== renderHeroFormSection CALLED ===');
+        console.log('1. Section data:', JSON.parse(JSON.stringify(section)));
+        console.log('2. Index:', index);
+        
         var content = migrateOldFieldNames(section.content || section);
+        
+        console.log('3. Content after migration:', JSON.parse(JSON.stringify(content)));
+        console.log('4. Global blocks being rendered:', JSON.parse(JSON.stringify(content.global_blocks)));
         
         // Build class list based on variants
         var sectionClasses = [
@@ -3397,6 +3626,9 @@
             'aisb-section--' + (content.theme_variant || 'dark'),
             'aisb-section--' + (content.layout_variant || 'content-left')
         ].join(' ');
+        
+        var buttonsHtml = renderGlobalBlocks(content.global_blocks, 'hero-form');
+        console.log('5. Buttons HTML generated:', buttonsHtml);
         
         return `
             <div class="${sectionClasses}" data-index="${index}">
@@ -3407,10 +3639,12 @@
                                 ${content.eyebrow_heading ? `<div class="aisb-hero-form__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
                                 <h1 class="aisb-hero-form__heading">${escapeHtml(content.heading || 'Your Headline Here')}</h1>
                                 <div class="aisb-hero-form__body">${content.content || '<p>Your compelling message goes here</p>'}</div>
-                                ${renderGlobalBlocks(content.global_blocks, 'hero-form')}
+                                ${buttonsHtml}
                                 ${content.outro_content ? `<div class="aisb-hero-form__outro">${content.outro_content}</div>` : ''}
                             </div>
-                            <!-- Form area will be added in Phase 2 -->
+                            <div class="aisb-hero-form__form">
+                                ${renderFormArea(content)}
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -3963,6 +4197,10 @@
      * Update section list in right panel
      */
     function updateSectionList(skipSortableReinit) {
+        console.log('=== updateSectionList CALLED ===');
+        console.log('1. Skip sortable reinit:', skipSortableReinit);
+        console.log('2. Current sections:', JSON.parse(JSON.stringify(editorState.sections)));
+        
         var $list = $('#aisb-section-list');
         var $empty = $('.aisb-structure-empty');
         
