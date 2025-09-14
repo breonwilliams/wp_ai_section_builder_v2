@@ -205,11 +205,12 @@
     color: var(--section-text);
 }
 
-/* Paragraphs and lists */
-.aisb-section p,
+/* Lists inherit section text color */
 .aisb-section li {
     color: var(--section-text);
 }
+
+/* Paragraphs removed - components handle their own paragraph colors for proper inheritance */
 
 /* Links automatically adapt */
 .aisb-section a {

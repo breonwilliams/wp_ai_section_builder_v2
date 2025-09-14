@@ -78,6 +78,7 @@
     margin: 0 0 16px 0;
     font-size: inherit;
     line-height: inherit;
+    color: inherit; /* Ensure proper color inheritance */
 }
 
 .aisb-features__intro p:last-child {
@@ -204,6 +205,7 @@
     margin: 0 0 16px 0;
     font-size: inherit;
     line-height: inherit;
+    color: inherit; /* Ensure proper color inheritance */
 }
 
 .aisb-features__outro p:last-child {
@@ -502,21 +504,152 @@
 /* =========================================
    Light Theme Styles
    ========================================= */
+.aisb-section--light.aisb-features {
+    background: var(--aisb-color-base);
+    color: var(--aisb-color-text);
+}
+
+.aisb-section--light .aisb-features__eyebrow {
+    color: var(--section-link, var(--aisb-color-primary));
+}
+
+.aisb-section--light .aisb-features__heading {
+    color: var(--section-text, var(--aisb-color-text));
+}
+
+.aisb-section--light .aisb-features__intro {
+    color: var(--section-text-secondary, var(--aisb-color-muted));
+}
+
+.aisb-section--light .aisb-features__item {
+    background: var(--section-surface-secondary, var(--aisb-color-secondary));
+    border-color: var(--section-border, var(--aisb-color-border));
+}
+
+.aisb-section--light .aisb-features__item-title {
+    color: var(--section-text, var(--aisb-color-text));
+}
+
 .aisb-section--light .aisb-features__item-description {
     color: var(--section-text-secondary, var(--aisb-color-muted));
+}
+
+.aisb-section--light .aisb-features__item-link {
+    color: var(--section-link, var(--aisb-color-primary));
+}
+
+.aisb-section--light .aisb-features__item-link:hover {
+    color: var(--section-link-hover, var(--aisb-color-primary-hover));
+}
+
+.aisb-section--light .aisb-features__outro {
+    color: var(--section-text-secondary, var(--aisb-color-muted));
+}
+
+/* Light mode links in content */
+.aisb-section--light .aisb-features__intro a,
+.aisb-section--light .aisb-features__outro a {
+    color: var(--section-link, var(--aisb-color-primary));
+}
+
+.aisb-section--light .aisb-features__intro a:hover,
+.aisb-section--light .aisb-features__outro a:hover {
+    color: var(--section-link-hover, var(--aisb-color-primary-hover));
 }
 
 /* =========================================
    Dark Theme Styles  
    ========================================= */
+.aisb-section--dark.aisb-features {
+    background: var(--aisb-color-dark-base);
+    color: var(--aisb-color-dark-text);
+}
+
+.aisb-section--dark .aisb-features__eyebrow {
+    color: var(--section-link, var(--aisb-color-dark-primary));
+}
+
+.aisb-section--dark .aisb-features__heading {
+    color: var(--section-text, var(--aisb-color-dark-text));
+}
+
+.aisb-section--dark .aisb-features__intro {
+    color: var(--section-text-secondary, var(--aisb-color-dark-muted));
+}
+
+.aisb-section--dark .aisb-features__item {
+    background: var(--section-surface-secondary, var(--aisb-color-dark-secondary));
+    border-color: var(--section-border, var(--aisb-color-dark-border));
+}
+
+.aisb-section--dark .aisb-features__item-title {
+    color: var(--section-text, var(--aisb-color-dark-text));
+}
+
 .aisb-section--dark .aisb-features__item-description {
     color: var(--section-text-secondary, var(--aisb-color-dark-muted));
+}
+
+.aisb-section--dark .aisb-features__item-link {
+    color: var(--section-link, var(--aisb-color-dark-primary));
+}
+
+.aisb-section--dark .aisb-features__item-link:hover {
+    color: var(--section-link-hover, var(--aisb-color-dark-primary-hover));
+}
+
+.aisb-section--dark .aisb-features__outro {
+    color: var(--section-text-secondary, var(--aisb-color-dark-muted));
+}
+
+/* Dark mode links in content */
+.aisb-section--dark .aisb-features__intro a,
+.aisb-section--dark .aisb-features__outro a {
+    color: var(--section-link, var(--aisb-color-dark-primary));
+}
+
+.aisb-section--dark .aisb-features__intro a:hover,
+.aisb-section--dark .aisb-features__outro a:hover {
+    color: var(--section-link-hover, var(--aisb-color-dark-primary-hover));
 }
 
 /* =========================================
    Default Theme (no explicit theme class)
    ========================================= */
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-features__eyebrow {
+    color: var(--section-link, var(--aisb-color-primary));
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-features__heading {
+    color: var(--section-text, var(--aisb-color-text));
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-features__intro {
+    color: var(--section-text-secondary, var(--aisb-color-muted));
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-features__item {
+    background: var(--section-surface-secondary, var(--aisb-color-secondary));
+    border-color: var(--section-border, var(--aisb-color-border));
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-features__item-title {
+    color: var(--section-text, var(--aisb-color-text));
+}
+
 .aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-features__item-description {
+    color: var(--section-text-secondary, var(--aisb-color-muted));
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-features__item-link {
+    color: var(--section-link, var(--aisb-color-primary));
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-features__item-link:hover {
+    color: var(--section-link-hover, var(--aisb-color-primary-hover));
+}
+
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-features__outro {
     color: var(--section-text-secondary, var(--aisb-color-muted));
 }
 

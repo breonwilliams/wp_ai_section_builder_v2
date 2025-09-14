@@ -19,13 +19,13 @@ button.aisb-btn {
     justify-content: center;
     min-height: 48px;
     padding: 12px 24px;
-    font-size: 16px !important; /* Explicit to override editor inheritance */
+    font-size: 16px; /* Standard button font size */
     font-weight: 500;
     line-height: 1.2;
     border-radius: 6px;
     border: 2px solid transparent;
     cursor: pointer;
-    text-decoration: none !important;
+    text-decoration: none;
     transition: all 200ms ease;
     white-space: nowrap;
     font-family: inherit;
@@ -83,17 +83,17 @@ button.aisb-btn-secondary:hover,
 button.aisb-btn-secondary:focus,
 a.aisb-btn-secondary:hover,
 a.aisb-btn-secondary:focus {
-    background-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary)) !important;
-    color: var(--section-button-secondary-hover-text, #ffffff) !important;
-    border-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary)) !important;
+    background-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary));
+    color: var(--section-button-secondary-hover-text, #ffffff);
+    border-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary));
 }
 
 .aisb-btn-secondary:active,
 button.aisb-btn-secondary:active,
 a.aisb-btn-secondary:active {
-    background-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary)) !important;
-    color: var(--section-button-secondary-hover-text, #ffffff) !important;
-    border-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary)) !important;
+    background-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary));
+    color: var(--section-button-secondary-hover-text, #ffffff);
+    border-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary));
     opacity: 0.9;
 }
 
@@ -128,13 +128,13 @@ a.aisb-btn-ghost:active {
 .aisb-btn-sm {
     min-height: 36px;
     padding: 8px 16px;
-    font-size: 14px !important;
+    font-size: 14px;
 }
 
 .aisb-btn-lg {
     min-height: 56px;
     padding: 16px 32px;
-    font-size: 18px !important;
+    font-size: 18px;
 }
 
 /* Button States */
