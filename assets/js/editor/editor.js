@@ -1150,7 +1150,7 @@
                     <label class="aisb-editor-form-label">
                         Global Blocks
                     </label>
-                    <div id="hero-global-blocks" class="aisb-repeater-container">
+                    <div id="hero-form-global-blocks" class="aisb-repeater-container">
                         <!-- Global blocks repeater will be initialized here -->
                     </div>
                 </div>
@@ -3338,6 +3338,7 @@
                 const containerClass = sectionType === 'features' ? 'aisb-features__buttons' :
                                       sectionType === 'checklist' ? 'aisb-checklist__buttons' :
                                       sectionType === 'faq' ? 'aisb-faq__buttons' :
+                                      sectionType === 'hero-form' ? 'aisb-hero-form__buttons' :
                                       'aisb-hero__buttons';
                 html += `<div class="${containerClass}">${buttonHtml}</div>`;
             }

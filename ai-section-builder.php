@@ -2543,6 +2543,13 @@ function aisb_enqueue_admin_styles($hook) {
         );
         
         wp_enqueue_style(
+            'aisb-section-hero-form',
+            AISB_PLUGIN_URL . 'assets/css/sections/hero-form.css',
+            ['aisb-utilities'],
+            AISB_VERSION
+        );
+        
+        wp_enqueue_style(
             'aisb-section-features',
             AISB_PLUGIN_URL . 'assets/css/sections/features.css',
             ['aisb-utilities'],
