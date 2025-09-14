@@ -509,6 +509,13 @@ function aisb_render_editor_page() {
                                 <div class="aisb-section-type__label">Hero Section</div>
                                 <div class="aisb-section-type__description">Eye-catching opener with headline and CTA</div>
                             </button>
+                            <button class="aisb-section-type" data-type="hero-form">
+                                <div class="aisb-section-type__icon">
+                                    <span class="dashicons dashicons-feedback"></span>
+                                </div>
+                                <div class="aisb-section-type__label">Hero with Form</div>
+                                <div class="aisb-section-type__description">Hero section with form area</div>
+                            </button>
                             <button class="aisb-section-type" data-type="features">
                                 <div class="aisb-section-type__icon">
                                     <span class="dashicons dashicons-screenoptions"></span>
@@ -1404,6 +1411,8 @@ $sections = aisb_get_sections($post_id);
             // Render section based on type
             if ($section['type'] === 'hero') {
                 echo aisb_render_hero_section($section);
+            } elseif ($section['type'] === 'hero-form') {
+                echo aisb_render_hero_form_section($section);
             } elseif ($section['type'] === 'features') {
                 echo aisb_render_features_section($section);
             } elseif ($section['type'] === 'checklist') {
@@ -1642,6 +1651,101 @@ function aisb_render_hero_section($section) {
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
+            </div>
+        </div>
+    </section>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Render Hero Form Section
+ * Exactly like hero section but without media
+ */
+function aisb_render_hero_form_section($section) {
+    // Handle both old and new section structure
+    $content = isset($section['content']) ? $section['content'] : $section;
+    
+    // Migrate old field names to new structure
+    $content = aisb_migrate_field_names($content);
+    
+    // Debug: Log what we're getting (only in debug mode)
+    if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+        error_log('AISB Hero Form Section Content: ' . print_r($content, true));
+    }
+    
+    // Extract standardized fields
+    $eyebrow_heading = esc_html($content['eyebrow_heading'] ?? '');
+    $heading = esc_html($content['heading'] ?? '');
+    $content_text = wp_kses_post($content['content'] ?? '');
+    $outro_content = wp_kses_post($content['outro_content'] ?? '');
+    
+    // Get variants
+    $theme_variant = sanitize_text_field($content['theme_variant'] ?? 'dark');
+    $layout_variant = sanitize_text_field($content['layout_variant'] ?? 'content-left');
+    
+    // Get global blocks (buttons for now)
+    $global_blocks = isset($content['global_blocks']) ? $content['global_blocks'] : array();
+    
+    // Build section classes based on variants
+    $section_classes = array(
+        'aisb-section',  // Base class required for theme inheritance
+        'aisb-hero-form',
+        'aisb-section--' . $theme_variant,
+        'aisb-section--' . $layout_variant
+    );
+    
+    ob_start();
+    ?>
+    <section class="<?php echo esc_attr(implode(' ', $section_classes)); ?>">
+        <div class="aisb-hero-form__container">
+            <div class="aisb-hero-form__grid">
+                <div class="aisb-hero-form__content">
+                    <?php if ($eyebrow_heading): ?>
+                        <div class="aisb-hero-form__eyebrow"><?php echo $eyebrow_heading; ?></div>
+                    <?php endif; ?>
+                    
+                    <?php if ($heading): ?>
+                        <h1 class="aisb-hero-form__heading"><?php echo $heading; ?></h1>
+                    <?php endif; ?>
+                    
+                    <?php if ($content_text): ?>
+                        <div class="aisb-hero-form__body"><?php echo $content_text; ?></div>
+                    <?php endif; ?>
+                    
+                    <?php 
+                    // Render global blocks (buttons for now)
+                    $buttons = array_filter($global_blocks, function($block) {
+                        return isset($block['type']) && $block['type'] === 'button';
+                    });
+                    
+                    if (!empty($buttons)): ?>
+                        <div class="aisb-hero-form__buttons">
+                            <?php foreach ($buttons as $button): ?>
+                                <?php if (!empty($button['text'])): ?>
+                                    <?php 
+                                    $btn_text = esc_html($button['text']);
+                                    $btn_url = esc_url($button['url'] ?? '#');
+                                    $btn_style = esc_attr($button['style'] ?? 'primary');
+                                    $btn_target = isset($button['target']) && $button['target'] === '_blank' ? '_blank' : '_self';
+                                    $btn_rel = $btn_target === '_blank' ? 'noopener noreferrer' : '';
+                                    ?>
+                                    <a href="<?php echo $btn_url; ?>" 
+                                       class="aisb-btn aisb-btn-<?php echo $btn_style; ?>"
+                                       target="<?php echo esc_attr($btn_target); ?>"
+                                       <?php if ($btn_rel): ?>rel="<?php echo esc_attr($btn_rel); ?>"<?php endif; ?>>
+                                        <?php echo $btn_text; ?>
+                                    </a>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if ($outro_content): ?>
+                        <div class="aisb-hero-form__outro"><?php echo $outro_content; ?></div>
+                    <?php endif; ?>
+                </div>
+                <?php // Form column will be added in Phase 2 ?>
             </div>
         </div>
     </section>
@@ -2342,6 +2446,14 @@ function aisb_enqueue_styles() {
     wp_enqueue_style(
         'aisb-section-hero',
         AISB_PLUGIN_URL . 'assets/css/sections/hero.css',
+        array('aisb-utilities'),
+        AISB_VERSION
+    );
+    
+    // Load hero-form section styles
+    wp_enqueue_style(
+        'aisb-section-hero-form',
+        AISB_PLUGIN_URL . 'assets/css/sections/hero-form.css',
         array('aisb-utilities'),
         AISB_VERSION
     );

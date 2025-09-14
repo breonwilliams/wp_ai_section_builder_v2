@@ -399,6 +399,8 @@
             var sectionDefaults;
             if (sectionType === 'hero') {
                 sectionDefaults = heroDefaults;
+            } else if (sectionType === 'hero-form') {
+                sectionDefaults = heroFormDefaults;
             } else if (sectionType === 'features') {
                 sectionDefaults = featuresDefaults;
             } else if (sectionType === 'checklist') {
@@ -508,6 +510,8 @@
         
         if (sectionType === 'hero') {
             formHtml = generateHeroForm(sectionContent);
+        } else if (sectionType === 'hero-form') {
+            formHtml = generateHeroFormForm(sectionContent);
         } else if (sectionType === 'features') {
             formHtml = generateFeaturesForm(sectionContent);
         } else if (sectionType === 'checklist') {
@@ -534,6 +538,8 @@
         setTimeout(function() {
             if (sectionType === 'hero') {
                 initWysiwygEditors();
+            } else if (sectionType === 'hero-form') {
+                initWysiwygEditors(); // Hero-form uses same editors as hero
             } else if (sectionType === 'features') {
                 initFeaturesWysiwygEditors();
             } else if (sectionType === 'checklist') {
@@ -547,6 +553,15 @@
         if (sectionType === 'hero') {
             // Use sectionContent if editing, otherwise use defaults
             var content = sectionContent || heroDefaults;
+            // Migrate old structure if needed
+            content = migrateOldFieldNames(content);
+            // Small delay to ensure DOM is ready
+            setTimeout(function() {
+                initGlobalBlocksRepeater(content, sectionType);
+            }, 50);
+        } else if (sectionType === 'hero-form') {
+            // Use sectionContent if editing, otherwise use defaults
+            var content = sectionContent || heroFormDefaults;
             // Migrate old structure if needed
             content = migrateOldFieldNames(content);
             // Small delay to ensure DOM is ready
@@ -712,6 +727,45 @@
                 id: 'btn_default_2',
                 text: 'Learn More',
                 url: '#about',
+                style: 'secondary'
+            }
+        ],
+        
+        // Variant fields
+        theme_variant: 'dark',  // 'light' | 'dark'
+        layout_variant: 'content-left',  // 'content-left' | 'content-right' | 'center'
+        
+        // CTA fields (for future use)
+        primary_cta_label: '',
+        primary_cta_url: '',
+        secondary_cta_label: '',
+        secondary_cta_url: ''
+    };
+    
+    /**
+     * Hero Form section field defaults - Exactly like Hero but without media
+     */
+    var heroFormDefaults = {
+        // Standard content fields
+        eyebrow_heading: 'Get Started Today',
+        heading: 'Contact Us',
+        content: '<p>Fill out the form to get in touch with our team.</p>',
+        outro_content: '',
+        
+        // No media fields for hero-form
+        
+        // Global blocks for nested components
+        global_blocks: [
+            {
+                type: 'button',
+                text: 'Learn More',
+                url: '#',
+                style: 'primary'
+            },
+            {
+                type: 'button',
+                text: 'View Pricing',
+                url: '#',
                 style: 'secondary'
             }
         ],
@@ -983,6 +1037,114 @@
                     </label>
                     ${generateMediaField(content)}
                 </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Global Blocks
+                    </label>
+                    <div id="hero-global-blocks" class="aisb-repeater-container">
+                        <!-- Global blocks repeater will be initialized here -->
+                    </div>
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="hero-outro-content">
+                        Outro Content (Optional)
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="hero-outro-content" 
+                                  name="outro_content" 
+                                  class="aisb-editor-wysiwyg">${content.outro_content || ''}</textarea>
+                    </div>
+                </div>
+            </form>
+        `;
+    }
+    
+    /**
+     * Generate Hero Form section form - Exactly like Hero but without media
+     */
+    function generateHeroFormForm(content) {
+        // Use existing content or defaults
+        content = content || heroFormDefaults;
+        
+        // Migrate old field names if present
+        content = migrateOldFieldNames(content);
+        
+        return `
+            <form id="aisb-section-form">
+                <!-- Variant Controls -->
+                <div class="aisb-editor-form-group aisb-variant-controls">
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Theme</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'light' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="light">
+                                <span class="dashicons dashicons-sun"></span> Light
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'dark' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="dark">
+                                <span class="dashicons dashicons-moon"></span> Dark
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Layout</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-left' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-left">
+                                <span class="dashicons dashicons-align-left"></span> Left
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'center' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="center">
+                                <span class="dashicons dashicons-align-center"></span> Center
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-right' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-right">
+                                <span class="dashicons dashicons-align-right"></span> Right
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content Fields -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="hero-eyebrow-heading">
+                        Eyebrow Heading
+                    </label>
+                    <input type="text" 
+                           id="hero-eyebrow-heading" 
+                           name="eyebrow_heading" 
+                           class="aisb-editor-input" 
+                           value="${escapeHtml(content.eyebrow_heading || '')}" 
+                           placeholder="Welcome to the Future">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="hero-heading">
+                        Heading
+                    </label>
+                    <input type="text" 
+                           id="hero-heading" 
+                           name="heading" 
+                           class="aisb-editor-input" 
+                           value="${escapeHtml(content.heading || '')}" 
+                           placeholder="Enter your main heading">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="hero-content">
+                        Content
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="hero-content" 
+                                  name="content" 
+                                  class="aisb-editor-wysiwyg">${content.content || ''}</textarea>
+                    </div>
+                </div>
+                
+                <!-- No media field for hero-form -->
                 
                 <div class="aisb-editor-form-group">
                     <label class="aisb-editor-form-label">
@@ -2800,6 +2962,14 @@
                 if (typeof tinyMCE !== 'undefined' && tinyMCE.get('hero-outro-content')) {
                     content.outro_content = tinyMCE.get('hero-outro-content').getContent();
                 }
+            } else if (sectionType === 'hero-form') {
+                // Hero-form uses same editor IDs as hero
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('hero-content')) {
+                    content.content = tinyMCE.get('hero-content').getContent();
+                }
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('hero-outro-content')) {
+                    content.outro_content = tinyMCE.get('hero-outro-content').getContent();
+                }
             } else if (sectionType === 'features') {
                 if (typeof tinyMCE !== 'undefined' && tinyMCE.get('features-content')) {
                     content.content = tinyMCE.get('features-content').getContent();
@@ -3021,6 +3191,8 @@
         }
         if (section.type === 'hero') {
             return renderHeroSection(section, index);
+        } else if (section.type === 'hero-form') {
+            return renderHeroFormSection(section, index);
         } else if (section.type === 'features') {
             return renderFeaturesSection(section, index);
         } else if (section.type === 'checklist') {
@@ -3204,6 +3376,40 @@
                                 ${content.outro_content ? `<div class="aisb-hero__outro">${content.outro_content}</div>` : ''}
                             </div>
                             ${renderMediaPreview(content, 'hero')}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        `;
+    }
+    
+    /**
+     * Render Hero Form section - Exactly like Hero but without media
+     */
+    function renderHeroFormSection(section, index) {
+        var content = migrateOldFieldNames(section.content || section);
+        
+        // Build class list based on variants
+        var sectionClasses = [
+            'aisb-section',
+            'aisb-section-hero-form',
+            'aisb-section--' + (content.theme_variant || 'dark'),
+            'aisb-section--' + (content.layout_variant || 'content-left')
+        ].join(' ');
+        
+        return `
+            <div class="${sectionClasses}" data-index="${index}">
+                <section class="aisb-hero-form">
+                    <div class="aisb-hero-form__container">
+                        <div class="aisb-hero-form__grid">
+                            <div class="aisb-hero-form__content">
+                                ${content.eyebrow_heading ? `<div class="aisb-hero-form__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
+                                <h1 class="aisb-hero-form__heading">${escapeHtml(content.heading || 'Your Headline Here')}</h1>
+                                <div class="aisb-hero-form__body">${content.content || '<p>Your compelling message goes here</p>'}</div>
+                                ${renderGlobalBlocks(content.global_blocks, 'hero-form')}
+                                ${content.outro_content ? `<div class="aisb-hero-form__outro">${content.outro_content}</div>` : ''}
+                            </div>
+                            <!-- Form area will be added in Phase 2 -->
                         </div>
                     </div>
                 </section>
