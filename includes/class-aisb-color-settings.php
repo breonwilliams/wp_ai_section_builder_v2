@@ -38,6 +38,16 @@ class Color_Settings {
     private $default_primary = '#2563eb';
     
     /**
+     * Default base background color for light mode
+     */
+    private $default_base_light = '#ffffff';
+    
+    /**
+     * Default base background color for dark mode
+     */
+    private $default_base_dark = '#1a1a1a';
+    
+    /**
      * Default text color for light mode
      */
     private $default_text_light = '#1a1a1a';
@@ -66,6 +76,16 @@ class Color_Settings {
      * Default border color for dark mode
      */
     private $default_border_dark = '#4b5563';
+    
+    /**
+     * Default muted text color for light mode
+     */
+    private $default_muted_light = '#64748b';
+    
+    /**
+     * Default muted text color for dark mode
+     */
+    private $default_muted_dark = '#9ca3af';
     
     /**
      * Get singleton instance
@@ -99,6 +119,9 @@ class Color_Settings {
         add_action('wp_ajax_aisb_reset_primary_color', [$this, 'ajax_reset_primary_color']);
         add_action('wp_ajax_aisb_save_text_colors', [$this, 'ajax_save_text_colors']);
         add_action('wp_ajax_aisb_reset_text_colors', [$this, 'ajax_reset_text_colors']);
+        // Base background color handlers
+        add_action('wp_ajax_aisb_save_base_colors', [$this, 'ajax_save_base_colors']);
+        add_action('wp_ajax_aisb_reset_base_colors', [$this, 'ajax_reset_base_colors']);
         // Secondary background color handlers
         add_action('wp_ajax_aisb_save_secondary_colors', [$this, 'ajax_save_secondary_colors']);
         add_action('wp_ajax_aisb_reset_secondary_colors', [$this, 'ajax_reset_secondary_colors']);
@@ -115,6 +138,22 @@ class Color_Settings {
     public function get_primary_color() {
         $settings = get_option(self::OPTION_NAME, []);
         return isset($settings['primary_color']) ? $settings['primary_color'] : $this->default_primary;
+    }
+    
+    /**
+     * Get the base background color for light mode (saved or default)
+     */
+    public function get_base_light_color() {
+        $settings = get_option(self::OPTION_NAME, []);
+        return isset($settings['base_light_color']) ? $settings['base_light_color'] : $this->default_base_light;
+    }
+    
+    /**
+     * Get the base background color for dark mode (saved or default)
+     */
+    public function get_base_dark_color() {
+        $settings = get_option(self::OPTION_NAME, []);
+        return isset($settings['base_dark_color']) ? $settings['base_dark_color'] : $this->default_base_dark;
     }
     
     /**
@@ -163,6 +202,22 @@ class Color_Settings {
     public function get_border_dark_color() {
         $settings = get_option(self::OPTION_NAME, []);
         return isset($settings['border_dark_color']) ? $settings['border_dark_color'] : $this->default_border_dark;
+    }
+    
+    /**
+     * Get the muted text color for light mode (saved or default)
+     */
+    public function get_muted_light_color() {
+        $settings = get_option(self::OPTION_NAME, []);
+        return isset($settings['muted_light_color']) ? $settings['muted_light_color'] : $this->default_muted_light;
+    }
+    
+    /**
+     * Get the muted text color for dark mode (saved or default)
+     */
+    public function get_muted_dark_color() {
+        $settings = get_option(self::OPTION_NAME, []);
+        return isset($settings['muted_dark_color']) ? $settings['muted_dark_color'] : $this->default_muted_dark;
     }
     
     /**
@@ -309,6 +364,82 @@ class Color_Settings {
             'message' => __('Text colors reset to defaults', 'ai-section-builder'),
             'text_light' => $this->default_text_light,
             'text_dark' => $this->default_text_dark
+        ]);
+    }
+    
+    /**
+     * AJAX handler to save base background colors
+     */
+    public function ajax_save_base_colors() {
+        // Check nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'aisb_color_settings')) {
+            wp_send_json_error(['message' => __('Security check failed', 'ai-section-builder')]);
+        }
+        
+        // Check capabilities
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Permission denied', 'ai-section-builder')]);
+        }
+        
+        // Validate colors
+        $base_light = isset($_POST['base_light_color']) ? sanitize_hex_color($_POST['base_light_color']) : '';
+        $base_dark = isset($_POST['base_dark_color']) ? sanitize_hex_color($_POST['base_dark_color']) : '';
+        
+        if (empty($base_light) || empty($base_dark)) {
+            wp_send_json_error(['message' => __('Invalid color format', 'ai-section-builder')]);
+        }
+        
+        // Get existing settings
+        $settings = get_option(self::OPTION_NAME, []);
+        
+        // Update base colors
+        $settings['base_light_color'] = $base_light;
+        $settings['base_dark_color'] = $base_dark;
+        $settings['version'] = self::VERSION;
+        $settings['last_updated'] = current_time('mysql');
+        
+        // Save to database
+        update_option(self::OPTION_NAME, $settings);
+        
+        // Return success
+        wp_send_json_success([
+            'base_light_color' => $base_light,
+            'base_dark_color' => $base_dark,
+            'message' => __('Background colors saved successfully', 'ai-section-builder')
+        ]);
+    }
+    
+    /**
+     * AJAX handler to reset base background colors to defaults
+     */
+    public function ajax_reset_base_colors() {
+        // Check nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'aisb_color_settings')) {
+            wp_send_json_error(['message' => __('Security check failed', 'ai-section-builder')]);
+        }
+        
+        // Check capabilities
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Permission denied', 'ai-section-builder')]);
+        }
+        
+        // Get existing settings
+        $settings = get_option(self::OPTION_NAME, []);
+        
+        // Reset to defaults
+        $settings['base_light_color'] = $this->default_base_light;
+        $settings['base_dark_color'] = $this->default_base_dark;
+        $settings['version'] = self::VERSION;
+        $settings['last_updated'] = current_time('mysql');
+        
+        // Save to database
+        update_option(self::OPTION_NAME, $settings);
+        
+        // Return defaults
+        wp_send_json_success([
+            'base_light_color' => $this->default_base_light,
+            'base_dark_color' => $this->default_base_dark,
+            'message' => __('Background colors reset to defaults', 'ai-section-builder')
         ]);
     }
     
@@ -489,6 +620,20 @@ class Color_Settings {
             }
         }
         
+        if (isset($_POST['base_light_color'])) {
+            $base_light = sanitize_hex_color($_POST['base_light_color']);
+            if ($base_light) {
+                $settings['base_light_color'] = $base_light;
+            }
+        }
+        
+        if (isset($_POST['base_dark_color'])) {
+            $base_dark = sanitize_hex_color($_POST['base_dark_color']);
+            if ($base_dark) {
+                $settings['base_dark_color'] = $base_dark;
+            }
+        }
+        
         if (isset($_POST['text_light_color'])) {
             $text_light = sanitize_hex_color($_POST['text_light_color']);
             if ($text_light) {
@@ -531,6 +676,20 @@ class Color_Settings {
             }
         }
         
+        if (isset($_POST['muted_light_color'])) {
+            $muted_light = sanitize_hex_color($_POST['muted_light_color']);
+            if ($muted_light) {
+                $settings['muted_light_color'] = $muted_light;
+            }
+        }
+        
+        if (isset($_POST['muted_dark_color'])) {
+            $muted_dark = sanitize_hex_color($_POST['muted_dark_color']);
+            if ($muted_dark) {
+                $settings['muted_dark_color'] = $muted_dark;
+            }
+        }
+        
         // Update metadata
         $settings['version'] = self::VERSION;
         $settings['last_updated'] = current_time('mysql');
@@ -543,12 +702,16 @@ class Color_Settings {
             'message' => __('Colors saved successfully', 'ai-section-builder'),
             'colors' => [
                 'primary' => $settings['primary_color'] ?? $this->default_primary,
+                'base_light' => $settings['base_light_color'] ?? $this->default_base_light,
+                'base_dark' => $settings['base_dark_color'] ?? $this->default_base_dark,
                 'text_light' => $settings['text_light_color'] ?? $this->default_text_light,
                 'text_dark' => $settings['text_dark_color'] ?? $this->default_text_dark,
                 'secondary_light' => $settings['secondary_light_color'] ?? $this->default_secondary_light,
                 'secondary_dark' => $settings['secondary_dark_color'] ?? $this->default_secondary_dark,
                 'border_light' => $settings['border_light_color'] ?? $this->default_border_light,
-                'border_dark' => $settings['border_dark_color'] ?? $this->default_border_dark
+                'border_dark' => $settings['border_dark_color'] ?? $this->default_border_dark,
+                'muted_light' => $settings['muted_light_color'] ?? $this->default_muted_light,
+                'muted_dark' => $settings['muted_dark_color'] ?? $this->default_muted_dark
             ]
         ]);
     }
@@ -559,6 +722,10 @@ class Color_Settings {
     public function output_css_variables() {
         $primary_color = $this->get_primary_color();
         $primary_hover = $this->darken_color($primary_color, 10);
+        
+        // Get saved base background colors
+        $base_light_color = $this->get_base_light_color();
+        $base_dark_color = $this->get_base_dark_color();
         
         // Get saved text colors
         $text_light_color = $this->get_text_light_color();
@@ -572,11 +739,15 @@ class Color_Settings {
         $border_light_color = $this->get_border_light_color();
         $border_dark_color = $this->get_border_dark_color();
         
+        // Get saved muted text colors
+        $muted_light_color = $this->get_muted_light_color();
+        $muted_dark_color = $this->get_muted_dark_color();
+        
         // Light mode defaults (use saved colors where applicable)
         $light_defaults = [
-            'base' => '#ffffff',
+            'base' => $base_light_color,  // Use saved base color
             'text' => $text_light_color,  // Use saved text color
-            'muted' => '#64748b',
+            'muted' => $muted_light_color,  // Use saved muted color
             'secondary' => $secondary_light_color,  // Use saved secondary color
             'border' => $border_light_color,  // Use saved border color
             'success' => '#10b981',
@@ -585,9 +756,9 @@ class Color_Settings {
         
         // Dark mode defaults (use saved colors where applicable)
         $dark_defaults = [
-            'dark_base' => '#1a1a1a',
+            'dark_base' => $base_dark_color,  // Use saved base color
             'dark_text' => $text_dark_color,  // Use saved text color
-            'dark_muted' => '#9ca3af',
+            'dark_muted' => $muted_dark_color,  // Use saved muted color
             'dark_secondary' => $secondary_dark_color,  // Use saved secondary color
             'dark_border' => $border_dark_color  // Use saved border color
         ];

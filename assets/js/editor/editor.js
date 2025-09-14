@@ -732,9 +732,9 @@
      */
     var featuresDefaults = {
         // Standard content fields (SAME field names as Hero for AI consistency)
-        eyebrow_heading: '',
-        heading: 'Our Features',
-        content: '<p>Discover what makes us different</p>',
+        eyebrow_heading: 'Features',
+        heading: 'Everything You Need to Succeed',
+        content: '<p>Our comprehensive platform provides all the tools and features you need to achieve your goals.</p>',
         outro_content: '',
         
         // Media fields (for future use, keeping structure consistent)
@@ -742,8 +742,36 @@
         featured_image: '',
         video_url: '',
         
-        // Cards array for feature cards
-        cards: [],
+        // Cards array with sample feature cards
+        cards: [
+            {
+                id: 'feature_1',
+                image: '',
+                heading: 'Lightning Fast',
+                content: 'Experience blazing fast performance with our optimized infrastructure and cutting-edge technology.',
+                link: '',
+                link_text: 'Learn More',
+                link_target: '_self'
+            },
+            {
+                id: 'feature_2',
+                image: '',
+                heading: 'Secure & Reliable',
+                content: 'Your data is protected with enterprise-grade security and 99.9% uptime guarantee.',
+                link: '',
+                link_text: 'Learn More',
+                link_target: '_self'
+            },
+            {
+                id: 'feature_3',
+                image: '',
+                heading: 'Easy Integration',
+                content: 'Get up and running in minutes with our simple setup process and comprehensive documentation.',
+                link: '',
+                link_text: 'Learn More',
+                link_target: '_self'
+            }
+        ],
         
         // Global blocks for buttons (matching Hero structure)
         global_blocks: [],
@@ -767,7 +795,7 @@
         // Standard content fields (SAME field names as Features)
         eyebrow_heading: 'Why Choose Us',
         heading: 'Everything You Need',
-        content: '<p>Our comprehensive solution includes:</p>',
+        content: '<p>Our comprehensive solution provides everything you need to succeed, with features designed to help you achieve your goals.</p>',
         outro_content: '',
         
         // Media fields (same as Features)
@@ -775,8 +803,29 @@
         featured_image: '',
         video_url: '',
         
-        // Items array (empty for Phase 1, will be populated in Phase 2)
-        items: [],
+        // Items array with sample checklist items
+        items: [
+            {
+                id: 'checklist_1',
+                heading: 'Professional Design',
+                content: 'Custom layouts and designs tailored to match your brand identity and vision.'
+            },
+            {
+                id: 'checklist_2',
+                heading: 'Mobile Responsive',
+                content: 'Looks perfect on all devices, from desktop computers to smartphones and tablets.'
+            },
+            {
+                id: 'checklist_3',
+                heading: 'SEO Optimized',
+                content: 'Built with search engines in mind to help you rank higher and reach more customers.'
+            },
+            {
+                id: 'checklist_4',
+                heading: '24/7 Support',
+                content: 'Our dedicated support team is here to help you whenever you need assistance.'
+            }
+        ],
         
         // Global blocks for buttons (same as Features)
         global_blocks: [],
@@ -799,16 +848,37 @@
         // Standard content fields (SAME field names as Checklist)
         eyebrow_heading: 'FAQs',
         heading: 'Frequently Asked Questions',
-        content: '<p>Find answers to common questions about our services.</p>',
-        outro_content: '',
+        content: '<p>Find answers to common questions about our products and services.</p>',
+        outro_content: '<p>Still have questions? <a href="#contact">Contact our support team</a> for personalized assistance.</p>',
         
         // Media fields (same as Checklist)
         media_type: 'none',
         featured_image: '',
         video_url: '',
         
-        // FAQ items array (empty for Phase 1, will be populated in Phase 2)
-        faq_items: [],
+        // FAQ items array with sample questions and answers
+        faq_items: [
+            {
+                id: 'faq_1',
+                question: 'How do I get started?',
+                answer: '<p>Getting started is easy! Simply sign up for an account, choose your plan, and follow our step-by-step setup guide. Our onboarding process takes less than 5 minutes, and you\'ll have access to all features immediately.</p>'
+            },
+            {
+                id: 'faq_2',
+                question: 'What\'s included in the package?',
+                answer: '<p>Our package includes access to all core features, regular updates, comprehensive documentation, and email support. Premium plans also include priority support, advanced features, and custom integrations.</p>'
+            },
+            {
+                id: 'faq_3',
+                question: 'Do you offer customer support?',
+                answer: '<p>Yes! We provide comprehensive customer support through multiple channels. All plans include email support with 24-48 hour response times. Premium plans receive priority support with faster response times and access to live chat.</p>'
+            },
+            {
+                id: 'faq_4',
+                question: 'Can I cancel my subscription anytime?',
+                answer: '<p>Absolutely! You can cancel your subscription at any time from your account dashboard. There are no cancellation fees, and you\'ll continue to have access until the end of your current billing period.</p>'
+            }
+        ],
         
         // Global blocks for buttons (same as Checklist)
         global_blocks: [],
@@ -1800,8 +1870,8 @@
             itemLabel: 'FAQ',
             addButtonText: 'Add FAQ Item',
             template: function(item, index) {
-                // Generate unique ID for WYSIWYG
-                var editorId = 'faq-answer-' + Date.now() + '-' + index;
+                // Use a consistent ID pattern for WYSIWYG
+                var editorId = 'faq-answer-' + index;
                 return `
                     <div class="aisb-repeater-fields">
                         <div class="aisb-repeater-field-group">
@@ -1844,6 +1914,13 @@
                         sectionContent: editorState.sections[editorState.currentSection].content
                     });
                     updatePreview();
+                    
+                    // Re-initialize WYSIWYG editors for all items after DOM update
+                    setTimeout(function() {
+                        items.forEach(function(item, index) {
+                            initFaqAnswerEditor(index);
+                        });
+                    }, 300);
                 }
             },
             onItemAdded: function(item, index) {
@@ -1854,11 +1931,11 @@
             }
         });
         
-        // Initialize WYSIWYG for existing items
+        // Initialize WYSIWYG for existing items with more delay
         items.forEach(function(item, index) {
             setTimeout(function() {
                 initFaqAnswerEditor(index);
-            }, 100 * (index + 1));
+            }, 200 + (100 * index));
         });
         
         return itemsRepeater;
@@ -1871,17 +1948,25 @@
         var editorId = 'faq-answer-' + index;
         var $textarea = $('.aisb-faq-answer-wysiwyg[data-index="' + index + '"]');
         
+        // Also check by ID directly
+        if (!$textarea.length) {
+            $textarea = $('#' + editorId);
+        }
+        
         // Also check for the old class name for compatibility
         if (!$textarea.length) {
             $textarea = $('.aisb-faq-answer[data-index="' + index + '"]');
         }
         
         if (!$textarea.length) {
+            console.log('FAQ answer textarea not found for index:', index);
             return;
         }
         
-        // Set ID for the textarea
-        $textarea.attr('id', editorId);
+        // Make sure the textarea has the correct ID
+        if ($textarea.attr('id') !== editorId) {
+            $textarea.attr('id', editorId);
+        }
         
         // Destroy existing instance if any
         if (typeof wp !== 'undefined' && wp.editor) {
@@ -1890,30 +1975,37 @@
         
         // Initialize TinyMCE
         if (typeof wp !== 'undefined' && wp.editor && wp.editor.initialize) {
-            wp.editor.initialize(editorId, {
-                tinymce: {
-                    wpautop: true,
-                    plugins: 'lists,link,wordpress,wplink,paste',
-                    toolbar1: 'bold,italic,link,unlink,bullist,numlist',
-                    toolbar2: '',
-                    forced_root_block: 'p',
-                    force_br_newlines: false,
-                    force_p_newlines: true,
-                    height: 120,
-                    setup: function(editor) {
-                        editor.on('change keyup', function() {
-                            editor.save();
-                            // Update the repeater field data
-                            var value = editor.getContent();
-                            $textarea.val(value).trigger('change');
-                        });
-                    }
-                },
-                quicktags: {
-                    buttons: 'strong,em,link'
-                },
-                mediaButtons: false
-            });
+            try {
+                wp.editor.initialize(editorId, {
+                    tinymce: {
+                        wpautop: true,
+                        plugins: 'lists,link,wordpress,wplink,paste',
+                        toolbar1: 'bold,italic,link,unlink,bullist,numlist',
+                        toolbar2: '',
+                        forced_root_block: 'p',
+                        force_br_newlines: false,
+                        force_p_newlines: true,
+                        height: 120,
+                        init_instance_callback: function(editor) {
+                            console.log('FAQ answer editor initialized for index:', index);
+                        },
+                        setup: function(editor) {
+                            editor.on('change keyup', function() {
+                                editor.save();
+                                // Update the repeater field data
+                                var value = editor.getContent();
+                                $textarea.val(value).trigger('change');
+                            });
+                        }
+                    },
+                    quicktags: {
+                        buttons: 'strong,em,link'
+                    },
+                    mediaButtons: false
+                });
+            } catch (e) {
+                console.error('Error initializing FAQ answer editor:', e);
+            }
         }
     }
     
@@ -3499,8 +3591,12 @@
             
             // Get all color values
             var primaryColor = $('#aisb-gs-primary').val();
+            var baseLightColor = $('#aisb-gs-base-light').val() || '#ffffff';
+            var baseDarkColor = $('#aisb-gs-base-dark').val() || '#1a1a1a';
             var textLightColor = $('#aisb-gs-text-light').val() || '#1a1a1a';
             var textDarkColor = $('#aisb-gs-text-dark').val() || '#fafafa';
+            var mutedLightColor = $('#aisb-gs-muted-light').val() || '#64748b';
+            var mutedDarkColor = $('#aisb-gs-muted-dark').val() || '#9ca3af';
             var secondaryLightColor = $('#aisb-gs-secondary-light').val() || '#f1f5f9';
             var secondaryDarkColor = $('#aisb-gs-secondary-dark').val() || '#374151';
             var borderLightColor = $('#aisb-gs-border-light').val() || '#e2e8f0';
@@ -3513,8 +3609,12 @@
                 data: {
                     action: 'aisb_save_all_colors',
                     primary_color: primaryColor,
+                    base_light_color: baseLightColor,
+                    base_dark_color: baseDarkColor,
                     text_light_color: textLightColor,
                     text_dark_color: textDarkColor,
+                    muted_light_color: mutedLightColor,
+                    muted_dark_color: mutedDarkColor,
                     secondary_light_color: secondaryLightColor,
                     secondary_dark_color: secondaryDarkColor,
                     border_light_color: borderLightColor,

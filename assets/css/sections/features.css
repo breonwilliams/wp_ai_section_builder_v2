@@ -499,4 +499,25 @@
     align-self: center; /* Center align the link */
 }
 
+/* =========================================
+   Light Theme Styles
+   ========================================= */
+.aisb-section--light .aisb-features__item-description {
+    color: var(--section-text-secondary, var(--aisb-color-muted));
+}
+
+/* =========================================
+   Dark Theme Styles  
+   ========================================= */
+.aisb-section--dark .aisb-features__item-description {
+    color: var(--section-text-secondary, var(--aisb-color-dark-muted));
+}
+
+/* =========================================
+   Default Theme (no explicit theme class)
+   ========================================= */
+.aisb-section:not(.aisb-section--light):not(.aisb-section--dark) .aisb-features__item-description {
+    color: var(--section-text-secondary, var(--aisb-color-muted));
+}
+
 /* Button styles are inherited from core/02-utilities.css for consistency */

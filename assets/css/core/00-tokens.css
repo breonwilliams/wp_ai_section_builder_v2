@@ -54,7 +54,6 @@
     --aisb-content-inverse: var(--aisb-color-base);
     --aisb-content-link: var(--aisb-color-primary);
     --aisb-content-link-hover: var(--aisb-color-primary-hover);
-    --aisb-content-link-visited: var(--aisb-color-muted);
     
     /* Surface & Backgrounds - Default to light mode */
     --aisb-surface-primary: var(--aisb-color-base);

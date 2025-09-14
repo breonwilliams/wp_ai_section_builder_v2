@@ -59,6 +59,15 @@ a.aisb-btn-primary:focus {
     color: var(--section-button-primary-text, #ffffff);
 }
 
+.aisb-btn-primary:active,
+button.aisb-btn-primary:active,
+a.aisb-btn-primary:active {
+    background-color: var(--section-button-primary-hover, var(--aisb-color-primary-hover));
+    border-color: var(--section-button-primary-hover, var(--aisb-color-primary-hover));
+    color: var(--section-button-primary-text, #ffffff);
+    opacity: 0.9;
+}
+
 /* Secondary Button - Uses context variables, adapts to theme automatically */
 .aisb-btn-secondary,
 button.aisb-btn-secondary,
@@ -73,12 +82,19 @@ a.aisb-btn-secondary {
 button.aisb-btn-secondary:hover,
 button.aisb-btn-secondary:focus,
 a.aisb-btn-secondary:hover,
-a.aisb-btn-secondary:focus,
-.aisb-btn-secondary:visited:hover,
-a.aisb-btn-secondary:visited:hover {
+a.aisb-btn-secondary:focus {
     background-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary)) !important;
     color: var(--section-button-secondary-hover-text, #ffffff) !important;
     border-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary)) !important;
+}
+
+.aisb-btn-secondary:active,
+button.aisb-btn-secondary:active,
+a.aisb-btn-secondary:active {
+    background-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary)) !important;
+    color: var(--section-button-secondary-hover-text, #ffffff) !important;
+    border-color: var(--section-button-secondary-hover-bg, var(--aisb-color-primary)) !important;
+    opacity: 0.9;
 }
 
 /* Ghost Button - Uses context variables, adapts to theme automatically */
@@ -98,6 +114,14 @@ a.aisb-btn-ghost:hover,
 a.aisb-btn-ghost:focus {
     background-color: var(--section-button-ghost-hover-bg, var(--aisb-color-secondary));
     color: var(--section-button-ghost-hover-text, var(--aisb-color-text));
+}
+
+.aisb-btn-ghost:active,
+button.aisb-btn-ghost:active,
+a.aisb-btn-ghost:active {
+    background-color: var(--section-button-ghost-hover-bg, var(--aisb-color-secondary));
+    color: var(--section-button-ghost-hover-text, var(--aisb-color-text));
+    opacity: 0.9;
 }
 
 /* Button Sizes */
@@ -124,29 +148,6 @@ a.aisb-btn-ghost:focus {
 .aisb-btn:focus-visible {
     outline: 3px solid var(--section-focus-ring, var(--aisb-color-primary));
     outline-offset: 2px;
-}
-
-/**
- * IMPORTANT: Button visited states must be defined here
- * to override generic link:visited rules from base.css
- * This ensures buttons maintain their intended colors
- */
-
-/* Ensure buttons maintain their colors when visited */
-/* This must come AFTER button variant definitions for proper cascade */
-.aisb-btn-primary:visited,
-a.aisb-btn-primary:visited {
-    color: var(--section-button-primary-text, #ffffff) !important;
-}
-
-.aisb-btn-secondary:visited,
-a.aisb-btn-secondary:visited {
-    color: var(--section-button-secondary-text, var(--aisb-color-primary)) !important;
-}
-
-.aisb-btn-ghost:visited,
-a.aisb-btn-ghost:visited {
-    color: var(--section-button-ghost-text, var(--aisb-color-muted)) !important;
 }
 
 /* =========================================

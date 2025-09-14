@@ -275,9 +275,7 @@
 
 /* Light mode links */
 .aisb-section--light .aisb-checklist__content a,
-.aisb-section--light .aisb-checklist__content a:visited,
-.aisb-section--light .aisb-checklist__outro a,
-.aisb-section--light .aisb-checklist__outro a:visited {
+.aisb-section--light .aisb-checklist__outro a {
     color: var(--section-link, var(--aisb-color-primary));
 }
 
@@ -325,9 +323,7 @@
 
 /* Dark mode links */
 .aisb-section--dark .aisb-checklist__content a,
-.aisb-section--dark .aisb-checklist__content a:visited,
-.aisb-section--dark .aisb-checklist__outro a,
-.aisb-section--dark .aisb-checklist__outro a:visited {
+.aisb-section--dark .aisb-checklist__outro a {
     color: var(--section-link, var(--aisb-color-dark-primary));
 }
 

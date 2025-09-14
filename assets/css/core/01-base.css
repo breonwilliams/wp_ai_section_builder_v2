@@ -22,7 +22,6 @@
     /* Interactive Elements */
     --section-link: var(--aisb-content-link);
     --section-link-hover: var(--aisb-content-link-hover);
-    --section-link-visited: var(--aisb-content-link-visited);
     --section-button-primary: var(--aisb-interactive-primary);
     --section-button-primary-hover: var(--aisb-interactive-primary-hover);
     --section-button-primary-text: var(--aisb-interactive-primary-text);
@@ -61,7 +60,6 @@
     /* Links */
     --section-link: var(--aisb-color-primary);
     --section-link-hover: var(--aisb-color-primary-hover);
-    --section-link-visited: var(--aisb-color-muted);
     
     /* Buttons - Primary */
     --section-button-primary: var(--aisb-color-primary);
@@ -107,7 +105,6 @@
     /* Links */
     --section-link: var(--aisb-color-dark-primary);
     --section-link-hover: var(--aisb-color-dark-primary-hover);
-    --section-link-visited: var(--aisb-color-dark-muted);
     
     /* Buttons - Primary */
     --section-button-primary: var(--aisb-color-dark-primary);

@@ -26,10 +26,26 @@
         }
         
         // Initialize each FAQ item
-        items.forEach(function(item) {
+        items.forEach(function(item, index) {
             const question = item.querySelector('.aisb-faq__item-question');
+            const answer = item.querySelector('.aisb-faq__item-answer');
             
-            if (!question) return;
+            if (!question || !answer) return;
+            
+            // Generate unique IDs for ARIA
+            const questionId = 'aisb-faq-question-' + index;
+            const answerId = 'aisb-faq-answer-' + index;
+            
+            // Add ARIA attributes
+            question.setAttribute('id', questionId);
+            question.setAttribute('aria-controls', answerId);
+            question.setAttribute('aria-expanded', 'false');
+            question.setAttribute('role', 'button');
+            question.setAttribute('tabindex', '0');
+            
+            answer.setAttribute('id', answerId);
+            answer.setAttribute('aria-labelledby', questionId);
+            answer.setAttribute('role', 'region');
             
             // Ensure initial state is collapsed
             item.classList.remove('aisb-faq__item--expanded');
@@ -40,6 +56,16 @@
                 e.stopPropagation();
                 
                 toggleFAQItem(item);
+            });
+            
+            // Add keyboard support (Enter and Space keys)
+            question.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    toggleFAQItem(item);
+                }
             });
         });
         
@@ -52,13 +78,20 @@
      */
     function toggleFAQItem(item) {
         const isExpanded = item.classList.contains('aisb-faq__item--expanded');
+        const question = item.querySelector('.aisb-faq__item-question');
         
         if (isExpanded) {
             // Collapse
             item.classList.remove('aisb-faq__item--expanded');
+            if (question) {
+                question.setAttribute('aria-expanded', 'false');
+            }
         } else {
             // Expand
             item.classList.add('aisb-faq__item--expanded');
+            if (question) {
+                question.setAttribute('aria-expanded', 'true');
+            }
         }
     }
     
