@@ -129,6 +129,27 @@
     transition: color 200ms ease;
 }
 
+/* Exception: Radio and checkbox labels should be inline with their inputs */
+.aisb-hero-form__form [class*="radio"] label,
+.aisb-hero-form__form [class*="checkbox"] label,
+.aisb-hero-form__form label:has(input[type="radio"]),
+.aisb-hero-form__form label:has(input[type="checkbox"]) {
+    display: inline-flex !important;
+    align-items: center;
+    margin-bottom: 0;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+/* Inputs inside labels need proper spacing */
+.aisb-hero-form__form label input[type="radio"],
+.aisb-hero-form__form label input[type="checkbox"] {
+    margin-right: 8px;
+    margin-top: 0;
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
 /* Text Inputs, Email, Tel, Number, Date, etc. - Works for ALL forms */
 .aisb-hero-form__form input[type="text"],
 .aisb-hero-form__form input[type="email"],
@@ -620,7 +641,33 @@
 .aisb-hero-form__form [id*="hidden_field"],
 .aisb-hero-form__form .frm_hidden_container,
 .aisb-hero-form__form .gform_hidden,
-.aisb-hero-form__form .wpforms-field-hidden {
+.aisb-hero-form__form .wpforms-field-hidden,
+.aisb-hero-form__form .frm_verify,
+.aisb-hero-form__form [class*="frm_verify"] {
+    display: none !important;
+    visibility: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+    height: 0 !important;
+    width: 0 !important;
+}
+
+/* Hide spam/verification field labels and containers */
+.aisb-hero-form__form label[for*="verify"],
+.aisb-hero-form__form label[for*="honeypot"],
+.aisb-hero-form__form label[for*="spam"],
+.aisb-hero-form__form label[for*="bot"],
+.aisb-hero-form__form [id*="frm_verify"],
+.aisb-hero-form__form [id*="honeypot"],
+.aisb-hero-form__form [id*="spam_check"] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Hide any container with verification field inside */
+.aisb-hero-form__form div:has(.frm_verify),
+.aisb-hero-form__form div:has([name*="verify"]),
+.aisb-hero-form__form div:has([name*="honeypot"]) {
     display: none !important;
     visibility: hidden !important;
 }
@@ -675,18 +722,21 @@
     gap: 8px;
 }
 
-/* Individual radio/checkbox items */
-.aisb-hero-form__form [class*="radio"],
-.aisb-hero-form__form [class*="checkbox"] {
-    display: flex;
-    align-items: center;
+/* Individual radio/checkbox item containers - just spacing, no flex */
+.aisb-hero-form__form .frm_radio,
+.aisb-hero-form__form .frm_checkbox,
+.aisb-hero-form__form [id*="radio"],
+.aisb-hero-form__form [id*="checkbox"] {
     margin-bottom: 8px;
+    line-height: 1.5;
 }
 
-/* Ensure inline labels for radio/checkbox don't break */
+/* Labels that are siblings of radio/checkbox (when not wrapped) */
 .aisb-hero-form__form input[type="radio"] + label,
 .aisb-hero-form__form input[type="checkbox"] + label {
     display: inline-block;
     margin-bottom: 0;
     margin-left: 8px;
+    font-weight: normal;
+    cursor: pointer;
 }
