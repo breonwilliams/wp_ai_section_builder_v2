@@ -113,11 +113,13 @@
     line-height: var(--aisb-leading-normal, 1.5);
 }
 
-/* Labels - Ensure proper contrast in both themes */
+/* Universal Label Styling - Target ALL label elements regardless of class */
 .aisb-hero-form__form label,
-.aisb-hero-form__form .wpcf7-form-control-wrap label,
-.aisb-hero-form__form .wpforms-field-label,
-.aisb-hero-form__form .gfield_label {
+.aisb-hero-form__form > * label,
+.aisb-hero-form__form * > label,
+.aisb-hero-form__form div label,
+.aisb-hero-form__form fieldset label,
+.aisb-hero-form__form legend {
     display: block;
     margin-bottom: 8px;
     font-size: var(--aisb-text-sm, 14px);
@@ -161,11 +163,14 @@
     resize: vertical;
 }
 
-/* Select dropdown arrow */
+/* Select dropdown arrow - Fixed to prevent repeating */
 .aisb-hero-form__form select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236B7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
+    /* Custom dropdown arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236B7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    background-size: 12px 8px !important; /* Constrain arrow size */
+    background-attachment: scroll !important;
     padding-right: 36px;
 }
 
@@ -346,9 +351,28 @@
    Ensure proper contrast in dark themes
    ========================================= */
 
-/* Dark mode labels */
-.aisb-section--dark .aisb-hero-form__form label {
+/* Dark mode labels - Universal coverage for ALL label elements */
+.aisb-section--dark .aisb-hero-form__form label,
+.aisb-section--dark .aisb-hero-form__form > * label,
+.aisb-section--dark .aisb-hero-form__form * > label,
+.aisb-section--dark .aisb-hero-form__form div label,
+.aisb-section--dark .aisb-hero-form__form fieldset label,
+.aisb-section--dark .aisb-hero-form__form legend {
+    color: var(--section-text, var(--aisb-color-dark-text)) !important;
+}
+
+/* Dark mode text elements - Ensure all text is visible */
+.aisb-section--dark .aisb-hero-form__form,
+.aisb-section--dark .aisb-hero-form__form * {
     color: var(--section-text, var(--aisb-color-dark-text));
+}
+
+/* Dark mode descriptions and help text */
+.aisb-section--dark .aisb-hero-form__form small,
+.aisb-section--dark .aisb-hero-form__form .description,
+.aisb-section--dark .aisb-hero-form__form [class*="description"],
+.aisb-section--dark .aisb-hero-form__form [class*="help"] {
+    color: var(--section-text-secondary, var(--aisb-color-dark-muted));
 }
 
 /* Dark mode inputs */
@@ -370,9 +394,12 @@
     color: var(--section-text, var(--aisb-color-dark-text));
 }
 
-/* Dark mode select arrow */
+/* Dark mode select arrow - Fixed with proper constraints */
 .aisb-section--dark .aisb-hero-form__form select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239CA3AF' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239CA3AF' d='M6 8L0 0h12z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    background-size: 12px 8px !important;
 }
 
 /* Dark mode placeholders */
@@ -534,13 +561,15 @@
    Accessibility
    ========================================= */
 
-/* Required field indicators */
+/* Required field indicators - Universal targeting */
 .aisb-hero-form__form .required,
-.aisb-hero-form__form .wpcf7-required,
-.aisb-hero-form__form .wpforms-required-label,
-.aisb-hero-form__form .gfield_required {
+.aisb-hero-form__form [class*="required"]:not([type="hidden"]),
+.aisb-hero-form__form [aria-required="true"]::after,
+.aisb-hero-form__form span[class*="required"] {
     color: var(--aisb-feedback-error, #ef4444);
     margin-left: 4px;
+    display: inline;
+    visibility: visible;
 }
 
 /* Screen reader only text */
@@ -558,4 +587,106 @@
 .aisb-hero-form__form *:focus-visible {
     outline: 3px solid var(--section-focus-ring, var(--aisb-color-primary));
     outline-offset: 2px;
+}
+
+/* =========================================
+   Hidden Elements - Universal Handling
+   Ensure consistency between preview and frontend
+   ========================================= */
+
+/* Hide all elements that should be hidden */
+.aisb-hero-form__form [hidden],
+.aisb-hero-form__form [type="hidden"],
+.aisb-hero-form__form [style*="display: none"],
+.aisb-hero-form__form [style*="display:none"],
+.aisb-hero-form__form [style*="visibility: hidden"],
+.aisb-hero-form__form [style*="visibility:hidden"],
+.aisb-hero-form__form .hidden,
+.aisb-hero-form__form [class*="_hidden"] {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Special handling for specific form plugin hidden containers */
+.aisb-hero-form__form [class*="hidden_container"],
+.aisb-hero-form__form [class*="hidden-container"],
+.aisb-hero-form__form [class*="_hidden_"],
+.aisb-hero-form__form [id*="hidden_field"],
+.aisb-hero-form__form .frm_hidden_container,
+.aisb-hero-form__form .gform_hidden,
+.aisb-hero-form__form .wpforms-field-hidden {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Exception: Don't hide required indicators even if they have 'hidden' in class */
+.aisb-hero-form__form [class*="required"]:not([type="hidden"]) {
+    display: initial;
+    visibility: visible;
+    opacity: 1;
+}
+
+/* =========================================
+   Additional Universal Element Styling
+   ========================================= */
+
+/* Fieldset and legend styling */
+.aisb-hero-form__form fieldset {
+    border: 1px solid var(--section-border, var(--aisb-color-border));
+    border-radius: var(--aisb-radius-base, 6px);
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.aisb-hero-form__form legend {
+    padding: 0 8px;
+    font-weight: var(--aisb-font-semibold, 600);
+    font-size: var(--aisb-text-base, 16px);
+}
+
+/* Description text under fields */
+.aisb-hero-form__form small,
+.aisb-hero-form__form .description,
+.aisb-hero-form__form [id*="desc"],
+.aisb-hero-form__form [class*="description"],
+.aisb-hero-form__form [class*="help-text"],
+.aisb-hero-form__form [class*="field-description"] {
+    display: block;
+    margin-top: 4px;
+    font-size: var(--aisb-text-xs, 12px);
+    color: var(--section-text-secondary, var(--aisb-color-muted));
+    line-height: 1.4;
+}
+
+/* Radio and checkbox group containers */
+.aisb-hero-form__form [role="group"],
+.aisb-hero-form__form [role="radiogroup"],
+.aisb-hero-form__form [class*="checkbox-group"],
+.aisb-hero-form__form [class*="radio-group"],
+.aisb-hero-form__form [class*="opt_container"] {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Individual radio/checkbox items */
+.aisb-hero-form__form [class*="radio"],
+.aisb-hero-form__form [class*="checkbox"] {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+/* Ensure inline labels for radio/checkbox don't break */
+.aisb-hero-form__form input[type="radio"] + label,
+.aisb-hero-form__form input[type="checkbox"] + label {
+    display: inline-block;
+    margin-bottom: 0;
+    margin-left: 8px;
 }
