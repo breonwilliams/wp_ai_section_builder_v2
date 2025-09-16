@@ -184,7 +184,7 @@
     resize: vertical;
 }
 
-/* Select dropdown arrow - Fixed to prevent repeating */
+/* Select dropdown - Fixed padding and line-height to prevent text cutoff */
 .aisb-hero-form__form select {
     /* Custom dropdown arrow */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236B7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E") !important;
@@ -193,6 +193,11 @@
     background-size: 12px 8px !important; /* Constrain arrow size */
     background-attachment: scroll !important;
     padding-right: 36px;
+    padding-top: 14px; /* Increased top padding */
+    padding-bottom: 14px; /* Increased bottom padding */
+    line-height: 1.4; /* Proper line height for text */
+    height: auto; /* Allow height to adjust to content */
+    min-height: 48px; /* Minimum height for usability */
 }
 
 /* Placeholder text */
@@ -296,6 +301,7 @@
     white-space: nowrap;
     font-family: inherit !important;
     box-sizing: border-box !important;
+    box-shadow: none !important; /* Remove any box shadows from form plugin styles */
     
     /* Primary button colors - use !important to override plugin styles */
     background-color: var(--section-button-primary, var(--aisb-color-primary)) !important;
@@ -582,101 +588,19 @@
    Accessibility
    ========================================= */
 
-/* Required field indicators - Universal targeting */
+/* Required field indicators - Visual styling only */
 .aisb-hero-form__form .required,
 .aisb-hero-form__form [class*="required"]:not([type="hidden"]),
 .aisb-hero-form__form [aria-required="true"]::after,
 .aisb-hero-form__form span[class*="required"] {
     color: var(--aisb-feedback-error, #ef4444);
     margin-left: 4px;
-    display: inline;
-    visibility: visible;
 }
 
-/* Screen reader only text */
-.aisb-hero-form__form .screen-reader-text,
-.aisb-hero-form__form .wpcf7-screen-reader-response {
-    position: absolute;
-    left: -10000px;
-    top: auto;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-}
-
-/* Focus visible for keyboard navigation */
+/* Focus visible for keyboard navigation - Pure visual styling */
 .aisb-hero-form__form *:focus-visible {
     outline: 3px solid var(--section-focus-ring, var(--aisb-color-primary));
     outline-offset: 2px;
-}
-
-/* =========================================
-   Hidden Elements - Universal Handling
-   Ensure consistency between preview and frontend
-   ========================================= */
-
-/* Hide all elements that should be hidden */
-.aisb-hero-form__form [hidden],
-.aisb-hero-form__form [type="hidden"],
-.aisb-hero-form__form [style*="display: none"],
-.aisb-hero-form__form [style*="display:none"],
-.aisb-hero-form__form [style*="visibility: hidden"],
-.aisb-hero-form__form [style*="visibility:hidden"],
-.aisb-hero-form__form .hidden,
-.aisb-hero-form__form [class*="_hidden"] {
-    display: none !important;
-    visibility: hidden !important;
-    height: 0 !important;
-    width: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
-
-/* Special handling for specific form plugin hidden containers */
-.aisb-hero-form__form [class*="hidden_container"],
-.aisb-hero-form__form [class*="hidden-container"],
-.aisb-hero-form__form [class*="_hidden_"],
-.aisb-hero-form__form [id*="hidden_field"],
-.aisb-hero-form__form .frm_hidden_container,
-.aisb-hero-form__form .gform_hidden,
-.aisb-hero-form__form .wpforms-field-hidden,
-.aisb-hero-form__form .frm_verify,
-.aisb-hero-form__form [class*="frm_verify"] {
-    display: none !important;
-    visibility: hidden !important;
-    position: absolute !important;
-    left: -9999px !important;
-    height: 0 !important;
-    width: 0 !important;
-}
-
-/* Hide spam/verification field labels and containers */
-.aisb-hero-form__form label[for*="verify"],
-.aisb-hero-form__form label[for*="honeypot"],
-.aisb-hero-form__form label[for*="spam"],
-.aisb-hero-form__form label[for*="bot"],
-.aisb-hero-form__form [id*="frm_verify"],
-.aisb-hero-form__form [id*="honeypot"],
-.aisb-hero-form__form [id*="spam_check"] {
-    display: none !important;
-    visibility: hidden !important;
-}
-
-/* Hide any container with verification field inside */
-.aisb-hero-form__form div:has(.frm_verify),
-.aisb-hero-form__form div:has([name*="verify"]),
-.aisb-hero-form__form div:has([name*="honeypot"]) {
-    display: none !important;
-    visibility: hidden !important;
-}
-
-/* Exception: Don't hide required indicators even if they have 'hidden' in class */
-.aisb-hero-form__form [class*="required"]:not([type="hidden"]) {
-    display: initial;
-    visibility: visible;
-    opacity: 1;
 }
 
 /* =========================================
