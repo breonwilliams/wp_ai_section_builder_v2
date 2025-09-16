@@ -329,5 +329,33 @@ grep -r "\.aisb-hero\|\.aisb-features" assets/css/editor/
 
 ---
 
+## 🔴 CRITICAL: Form Handling Strategy
+
+### Forms in Hero-Form Section - SHORTCODES ONLY
+
+**Decision Date: December 2024**
+
+After experiencing issues with embedded form scripts interfering with the editor UI, we've established this policy:
+
+#### ✅ APPROVED: Shortcode Forms Only
+- Users MUST use shortcodes for forms (e.g., `[contact-form-7 id="123"]`)
+- Shortcodes are the WordPress standard for form embedding
+- This approach prevents script conflicts with the editor
+- Supported form plugins: Contact Form 7, WPForms, Gravity Forms, Formidable, Forminator, etc.
+
+#### ❌ REJECTED: Direct Form Embedding
+- Do NOT implement direct HTML form embedding
+- Do NOT use iframes for form isolation (adds unnecessary complexity)
+- Do NOT load form scripts in the editor preview
+
+#### Implementation Details
+The hero-form section has two form modes:
+1. **Placeholder**: Shows a styled placeholder form for design purposes
+2. **Shortcode**: Renders the actual form using WordPress shortcodes
+
+This is a permanent architectural decision to maintain stability and simplicity.
+
+---
+
 Last Updated: December 2024
 Critical for: All future development sessions
