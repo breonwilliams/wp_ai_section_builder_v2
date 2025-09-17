@@ -409,6 +409,8 @@
                 sectionDefaults = faqDefaults;
             } else if (sectionType === 'stats') {
                 sectionDefaults = statsDefaults;
+            } else if (sectionType === 'testimonials') {
+                sectionDefaults = testimonialsDefaults;
             } else {
                 // Fallback to hero defaults for unknown types
                 sectionDefaults = heroDefaults;
@@ -522,6 +524,8 @@
             formHtml = generateFaqForm(sectionContent);
         } else if (sectionType === 'stats') {
             formHtml = generateStatsForm(sectionContent);
+        } else if (sectionType === 'testimonials') {
+            formHtml = generateTestimonialsForm(sectionContent);
         }
         
         // Switch to edit mode in left panel
@@ -552,6 +556,8 @@
                 initFaqWysiwygEditors();
             } else if (sectionType === 'stats') {
                 initStatsWysiwygEditors();
+            } else if (sectionType === 'testimonials') {
+                initTestimonialsWysiwygEditors();
             }
         }, 100);
         
@@ -606,6 +612,14 @@
             setTimeout(function() {
                 initStatsRepeater(content);
                 initGlobalBlocksRepeater(content, 'stats');
+            }, 50);
+        } else if (sectionType === 'testimonials') {
+            // Use sectionContent if editing, otherwise use defaults
+            var content = sectionContent || testimonialsDefaults;
+            // Initialize global blocks (Phase 2 will add testimonials repeater)
+            setTimeout(function() {
+                initGlobalBlocksRepeater(content, 'testimonials');
+                initTestimonialsRepeater(content);
             }, 50);
         }
     }
@@ -1019,6 +1033,54 @@
         primary_cta_url: '',
         secondary_cta_label: '',
         secondary_cta_url: ''
+    };
+    
+    /**
+     * Testimonials section defaults
+     */
+    var testimonialsDefaults = {
+        // Standard content fields (SAME as Features for consistency)
+        eyebrow_heading: 'Testimonials',
+        heading: 'What Our Customers Say',
+        content: '<p>Hear from real people who have achieved amazing results with our solution.</p>',
+        outro_content: '',
+        
+        // Media fields (SAME as Features)
+        media_type: 'none',
+        featured_image: '',
+        video_url: '',
+        
+        // Testimonials array with sample items
+        testimonials: [
+            {
+                rating: 5, // 1-5 star rating
+                content: 'This product has completely transformed our workflow. The results speak for themselves - we\'ve seen a 40% increase in productivity.',
+                author_name: 'Sarah Johnson',
+                author_title: 'CEO, TechStart Inc.',
+                author_image: '' // Optional author image
+            },
+            {
+                rating: 5,
+                content: 'Outstanding service and support. The team went above and beyond to ensure our success. Highly recommended!',
+                author_name: 'Michael Chen',
+                author_title: 'Marketing Director, Growth Co.',
+                author_image: ''
+            },
+            {
+                rating: 5,
+                content: 'We\'ve tried many solutions, but this is by far the best. Easy to use, powerful features, and excellent ROI.',
+                author_name: 'Emily Rodriguez',
+                author_title: 'Founder, Digital Agency',
+                author_image: ''
+            }
+        ],
+        
+        // Variants (default to center for testimonials)
+        theme_variant: 'light',
+        layout_variant: 'center',
+        
+        // Global blocks for buttons
+        global_blocks: []
     };
     
     /**
@@ -1766,6 +1828,283 @@
     }
     
     /**
+     * Generate Testimonials section form
+     */
+    function generateTestimonialsForm(content) {
+        // Use existing content or defaults
+        content = content || testimonialsDefaults;
+        
+        return `
+            <form id="aisb-section-form" class="aisb-editor-form">
+                <!-- Variant Controls -->
+                <div class="aisb-editor-form-group aisb-variant-controls">
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Theme</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'light' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="light">
+                                <span class="dashicons dashicons-sun"></span> Light
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'dark' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="dark">
+                                <span class="dashicons dashicons-moon"></span> Dark
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Layout</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-left' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-left">
+                                <span class="dashicons dashicons-align-left"></span> Left
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'center' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="center">
+                                <span class="dashicons dashicons-align-center"></span> Center
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-right' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-right">
+                                <span class="dashicons dashicons-align-right"></span> Right
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Basic Fields -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="testimonials-eyebrow">Eyebrow Text (Optional)</label>
+                    <input type="text" 
+                           id="testimonials-eyebrow" 
+                           name="eyebrow_heading" 
+                           value="${escapeHtml(content.eyebrow_heading || '')}" 
+                           class="aisb-editor-input"
+                           placeholder="Optional text above heading">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="testimonials-heading">Heading</label>
+                    <input type="text" 
+                           id="testimonials-heading" 
+                           name="heading" 
+                           value="${escapeHtml(content.heading || '')}" 
+                           class="aisb-editor-input" 
+                           placeholder="Section heading">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="testimonials-content">
+                        Intro Content
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="testimonials-content" 
+                                  name="content" 
+                                  class="aisb-editor-wysiwyg">${content.content || ''}</textarea>
+                    </div>
+                </div>
+                
+                <!-- Media Field -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Featured Image
+                    </label>
+                    ${generateMediaField(content)}
+                </div>
+                
+                <!-- Testimonials Repeater -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">Testimonials</label>
+                    <div id="testimonials-items" class="aisb-repeater-container">
+                        <!-- Testimonials repeater will be initialized here -->
+                    </div>
+                </div>
+                
+                <!-- Global Blocks (Buttons) -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">Buttons</label>
+                    <div id="testimonials-global-blocks" class="aisb-repeater-container">
+                        <!-- Global blocks repeater will be initialized here -->
+                    </div>
+                </div>
+                
+                <!-- Outro Content -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="testimonials-outro-content">
+                        Outro Content (Optional)
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="testimonials-outro-content" 
+                                  name="outro_content" 
+                                  class="aisb-editor-wysiwyg">${content.outro_content || ''}</textarea>
+                    </div>
+                </div>
+            </form>
+        `;
+    }
+    
+    /**
+     * Initialize Testimonials WYSIWYG editors
+     */
+    function initTestimonialsWysiwygEditors() {
+        // Destroy existing instances first (if any)
+        if (typeof wp !== 'undefined' && wp.editor) {
+            wp.editor.remove('testimonials-content');
+            wp.editor.remove('testimonials-outro-content');
+        }
+        
+        // Initialize TinyMCE for content fields
+        if (typeof wp !== 'undefined' && wp.editor && wp.editor.initialize) {
+            // Main content editor
+            wp.editor.initialize('testimonials-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink',
+                    toolbar2: '',
+                    format_tags: 'p;h2;h3;h4',
+                    forced_root_block: 'p',
+                    force_br_newlines: false,
+                    force_p_newlines: true,
+                    remove_linebreaks: false,
+                    convert_newlines_to_brs: false,
+                    height: 150,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save();
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: true,
+                mediaButtons: false
+            });
+            
+            // Outro content editor
+            wp.editor.initialize('testimonials-outro-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink',
+                    toolbar2: '',
+                    format_tags: 'p;h3;h4',
+                    forced_root_block: 'p',
+                    force_br_newlines: false,
+                    force_p_newlines: true,
+                    remove_linebreaks: false,
+                    convert_newlines_to_brs: false,
+                    height: 120,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save();
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: true,
+                mediaButtons: false
+            });
+        } else {
+            // Fallback to plain textarea behavior
+            $('#testimonials-content, #testimonials-outro-content').on('input', function() {
+                updatePreview();
+            });
+        }
+    }
+    
+    /**
+     * Initialize testimonials repeater field
+     */
+    function initTestimonialsRepeater(content) {
+        var $container = $('#testimonials-items');
+        
+        if (!$container.length) {
+            return; // Container not found
+        }
+        
+        // Get testimonials from content or use defaults
+        var testimonials = content.testimonials || [];
+        
+        // Initialize repeater field
+        var testimonialsRepeater = $container.aisbRepeaterField({
+            fieldName: 'testimonials',
+            items: testimonials,
+            defaultItem: {
+                rating: 5,
+                content: 'This is an amazing product that has helped us achieve great results.',
+                author_name: 'John Doe',
+                author_title: 'CEO, Example Company',
+                author_image: ''
+            },
+            maxItems: 12,
+            minItems: 0,
+            itemLabel: 'Testimonial',
+            addButtonText: 'Add Testimonial',
+            template: function(item, index) {
+                // Generate star rating options
+                var ratingOptions = '';
+                for (var i = 1; i <= 5; i++) {
+                    var selected = (item.rating == i) ? 'selected' : '';
+                    var stars = '★'.repeat(i) + '☆'.repeat(5-i);
+                    ratingOptions += `<option value="${i}" ${selected}>${stars}</option>`;
+                }
+                
+                return `
+                    <div class="aisb-repeater-fields">
+                        <div class="aisb-repeater-field-group">
+                            <label>Star Rating</label>
+                            <select class="aisb-repeater-field aisb-editor-form-input" 
+                                    data-field="rating">
+                                ${ratingOptions}
+                            </select>
+                        </div>
+                        <div class="aisb-repeater-field-group">
+                            <label>Testimonial Content</label>
+                            <textarea class="aisb-repeater-field aisb-editor-form-input" 
+                                      data-field="content" 
+                                      rows="4"
+                                      placeholder="Share your customer's experience...">${escapeHtml(item.content || '')}</textarea>
+                        </div>
+                        <div class="aisb-repeater-field-group">
+                            <label>Author Name</label>
+                            <input type="text" 
+                                   class="aisb-repeater-field aisb-editor-form-input" 
+                                   data-field="author_name" 
+                                   value="${escapeHtml(item.author_name || '')}"
+                                   placeholder="e.g., Jane Smith">
+                        </div>
+                        <div class="aisb-repeater-field-group">
+                            <label>Author Title/Position</label>
+                            <input type="text" 
+                                   class="aisb-repeater-field aisb-editor-form-input" 
+                                   data-field="author_title" 
+                                   value="${escapeHtml(item.author_title || '')}"
+                                   placeholder="e.g., Marketing Director, Tech Corp">
+                        </div>
+                    </div>
+                `;
+            },
+            onUpdate: function(testimonials) {
+                debugLog('Testimonials updated', {
+                    testimonials: testimonials,
+                    currentSection: editorState.currentSection,
+                    sectionType: editorState.currentSection !== null ? editorState.sections[editorState.currentSection].type : null
+                });
+                
+                // Update the content
+                if (editorState.currentSection !== null) {
+                    editorState.sections[editorState.currentSection].content.testimonials = testimonials;
+                    debugLog('Updated section content with testimonials', {
+                        sectionContent: editorState.sections[editorState.currentSection].content
+                    });
+                    updatePreview();
+                }
+            }
+        });
+        
+        return testimonialsRepeater;
+    }
+    
+    /**
      * Generate media field with support for images and videos
      */
     function generateMediaField(content) {
@@ -2095,6 +2434,65 @@
         }).join('');
         
         return `<div class="aisb-stats__grid">${statsHtml}</div>`;
+    }
+    
+    /**
+     * Render testimonial items for Testimonials section
+     */
+    function renderTestimonialItems(testimonials) {
+        if (!testimonials || !Array.isArray(testimonials) || testimonials.length === 0) {
+            // Return placeholder message
+            return `
+                <div class="aisb-testimonials__grid">
+                    <div class="aisb-testimonials__placeholder">
+                        <p>Testimonials coming soon! Add your first testimonial to get started.</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        var testimonialsHtml = testimonials.map(function(item) {
+            // Generate star rating HTML
+            var starsHtml = '';
+            var rating = parseInt(item.rating) || 5;
+            for (var i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    starsHtml += '<span class="aisb-testimonials__star aisb-testimonials__star--filled">★</span>';
+                } else {
+                    starsHtml += '<span class="aisb-testimonials__star">☆</span>';
+                }
+            }
+            
+            return `
+                <div class="aisb-testimonials__item">
+                    <div class="aisb-testimonials__rating">
+                        ${starsHtml}
+                    </div>
+                    <div class="aisb-testimonials__quote">
+                        "${escapeHtml(item.content || 'Great experience!')}"
+                    </div>
+                    <div class="aisb-testimonials__author">
+                        ${item.author_image ? `
+                            <img src="${escapeHtml(item.author_image)}" 
+                                 alt="${escapeHtml(item.author_name || 'Author')}" 
+                                 class="aisb-testimonials__author-image">
+                        ` : ''}
+                        <div class="aisb-testimonials__author-info">
+                            <div class="aisb-testimonials__author-name">
+                                ${escapeHtml(item.author_name || 'Anonymous')}
+                            </div>
+                            ${item.author_title ? `
+                                <div class="aisb-testimonials__author-title">
+                                    ${escapeHtml(item.author_title)}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        return `<div class="aisb-testimonials__grid">${testimonialsHtml}</div>`;
     }
     
     /**
@@ -3483,6 +3881,13 @@
                 if (typeof tinyMCE !== 'undefined' && tinyMCE.get('stats-outro-content')) {
                     content.outro_content = tinyMCE.get('stats-outro-content').getContent();
                 }
+            } else if (sectionType === 'testimonials') {
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('testimonials-content')) {
+                    content.content = tinyMCE.get('testimonials-content').getContent();
+                }
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('testimonials-outro-content')) {
+                    content.outro_content = tinyMCE.get('testimonials-outro-content').getContent();
+                }
             }
         }
         
@@ -3533,6 +3938,15 @@
                 debugLog('Preserving stats items in updatePreview', {
                     stats: currentSection.content.stats,
                     itemCount: currentSection.content.stats ? currentSection.content.stats.length : 0
+                });
+            }
+            
+            // Preserve testimonials managed by repeater
+            if (currentSection.content.testimonials) {
+                content.testimonials = currentSection.content.testimonials;
+                debugLog('Preserving testimonials in updatePreview', {
+                    testimonials: currentSection.content.testimonials,
+                    itemCount: currentSection.content.testimonials ? currentSection.content.testimonials.length : 0
                 });
             }
             
@@ -3691,6 +4105,8 @@
             return renderFaqSection(section, index);
         } else if (section.type === 'stats') {
             return renderStatsSection(section, index);
+        } else if (section.type === 'testimonials') {
+            return renderTestimonialsSection(section, index);
         }
         return '';
     }
@@ -3708,6 +4124,7 @@
                         sectionType === 'checklist' ? 'aisb-checklist__media' : 
                         sectionType === 'faq' ? 'aisb-faq__media' :
                         sectionType === 'stats' ? 'aisb-stats__media' :
+                        sectionType === 'testimonials' ? 'aisb-testimonials__media' :
                         'aisb-hero__media';
         
         debugLog('renderMediaPreview Called', {
@@ -3762,6 +4179,7 @@
                     var videoClass = sectionType === 'features' ? 'aisb-features__video' : 
                                     sectionType === 'checklist' ? 'aisb-checklist__video' :
                                     sectionType === 'stats' ? 'aisb-stats__video' :
+                                    sectionType === 'testimonials' ? 'aisb-testimonials__video' :
                                     'aisb-hero__video';
                     return `
                         <div class="${mediaClass}">
@@ -3778,6 +4196,7 @@
                     var videoClass = sectionType === 'features' ? 'aisb-features__video' : 
                                     sectionType === 'checklist' ? 'aisb-checklist__video' :
                                     sectionType === 'stats' ? 'aisb-stats__video' :
+                                    sectionType === 'testimonials' ? 'aisb-testimonials__video' :
                                     'aisb-hero__video';
                     return `
                         <div class="${mediaClass}">
@@ -3962,6 +4381,7 @@
                                       sectionType === 'checklist' ? 'aisb-checklist__buttons' :
                                       sectionType === 'faq' ? 'aisb-faq__buttons' :
                                       sectionType === 'stats' ? 'aisb-stats__buttons' :
+                                      sectionType === 'testimonials' ? 'aisb-testimonials__buttons' :
                                       sectionType === 'hero-form' ? 'aisb-hero-form__buttons' :
                                       'aisb-hero__buttons';
                 html += `<div class="${containerClass}">${buttonHtml}</div>`;
@@ -4317,6 +4737,49 @@
                     
                     <!-- Outro Content -->
                     ${content.outro_content ? `<div class="aisb-stats__outro">${content.outro_content}</div>` : ''}
+                </div>
+            </section>
+        `;
+    }
+    
+    /**
+     * Render Testimonials section in preview
+     */
+    function renderTestimonialsSection(section, index) {
+        var content = section.content || section;
+        
+        // Build section classes matching PHP implementation
+        var themeVariant = content.theme_variant || 'light';
+        var layoutVariant = content.layout_variant || 'center';
+        
+        var sectionClasses = [
+            'aisb-section',
+            'aisb-testimonials',
+            'aisb-section--' + themeVariant,
+            'aisb-section--' + layoutVariant
+        ].join(' ');
+        
+        return `
+            <section class="${sectionClasses}" data-index="${index}">
+                <div class="aisb-testimonials__container">
+                    <!-- Top section with content and media -->
+                    <div class="aisb-testimonials__top">
+                        <div class="aisb-testimonials__content">
+                            ${content.eyebrow_heading ? `<div class="aisb-testimonials__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
+                            <h2 class="aisb-testimonials__heading">${escapeHtml(content.heading || 'What Our Customers Say')}</h2>
+                            <div class="aisb-testimonials__intro">${content.content || '<p>Hear from real people who have achieved amazing results with our solution.</p>'}</div>
+                        </div>
+                        ${renderMediaPreview(content, 'testimonials')}
+                    </div>
+                    
+                    <!-- Testimonials Grid -->
+                    ${renderTestimonialItems(content.testimonials)}
+                    
+                    <!-- Buttons -->
+                    ${renderGlobalBlocks(content.global_blocks, 'testimonials')}
+                    
+                    <!-- Outro Content -->
+                    ${content.outro_content ? `<div class="aisb-testimonials__outro">${content.outro_content}</div>` : ''}
                 </div>
             </section>
         `;
