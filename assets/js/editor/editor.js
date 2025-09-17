@@ -407,6 +407,8 @@
                 sectionDefaults = checklistDefaults;
             } else if (sectionType === 'faq') {
                 sectionDefaults = faqDefaults;
+            } else if (sectionType === 'stats') {
+                sectionDefaults = statsDefaults;
             } else {
                 // Fallback to hero defaults for unknown types
                 sectionDefaults = heroDefaults;
@@ -518,6 +520,8 @@
             formHtml = generateChecklistForm(sectionContent);
         } else if (sectionType === 'faq') {
             formHtml = generateFaqForm(sectionContent);
+        } else if (sectionType === 'stats') {
+            formHtml = generateStatsForm(sectionContent);
         }
         
         // Switch to edit mode in left panel
@@ -546,6 +550,8 @@
                 initChecklistWysiwygEditors();
             } else if (sectionType === 'faq') {
                 initFaqWysiwygEditors();
+            } else if (sectionType === 'stats') {
+                initStatsWysiwygEditors();
             }
         }, 100);
         
@@ -592,6 +598,14 @@
             setTimeout(function() {
                 initGlobalBlocksRepeater(content, 'faq');
                 initFaqItemsRepeater(content);
+            }, 50);
+        } else if (sectionType === 'stats') {
+            // Use sectionContent if editing, otherwise use defaults
+            var content = sectionContent || statsDefaults;
+            // Initialize both stats repeater and global blocks
+            setTimeout(function() {
+                initStatsRepeater(content);
+                initGlobalBlocksRepeater(content, 'stats');
             }, 50);
         }
     }
@@ -944,6 +958,63 @@
         layout_variant: 'center',  // 'content-left' | 'center' | 'content-right'
         
         // CTA fields (for future use, same as Checklist)
+        primary_cta_label: '',
+        primary_cta_url: '',
+        secondary_cta_label: '',
+        secondary_cta_url: ''
+    };
+    
+    /**
+     * Stats section field defaults - Phase 1: Core structure without items
+     */
+    var statsDefaults = {
+        // Standard content fields (SAME field names as Features)
+        eyebrow_heading: '',
+        heading: 'By the Numbers',
+        content: '<p>Our impact and achievements</p>',
+        outro_content: '',
+        
+        // Media fields (SAME as Features)
+        media_type: 'none',  // 'none' | 'image' | 'video'
+        featured_image: '',
+        video_url: '',
+        
+        // Stats items array with sample stats
+        stats: [
+            {
+                id: 'stat_1',
+                number: '99%',
+                label: 'Customer Satisfaction',
+                description: 'Based on 10,000+ reviews'
+            },
+            {
+                id: 'stat_2',
+                number: '50M+',
+                label: 'Active Users',
+                description: 'Across 120 countries'
+            },
+            {
+                id: 'stat_3',
+                number: '24/7',
+                label: 'Support Available',
+                description: 'Expert help when you need it'
+            },
+            {
+                id: 'stat_4',
+                number: '5★',
+                label: 'Average Rating',
+                description: 'On all major platforms'
+            }
+        ],
+        
+        // Global blocks support (for buttons)
+        global_blocks: [],
+        
+        // Display options (same as Features)
+        theme_variant: 'light',  // 'light' | 'dark'
+        layout_variant: 'center',  // 'content-left' | 'center' | 'content-right'
+        
+        // CTA fields (for future use, same as Features)
         primary_cta_label: '',
         primary_cta_url: '',
         secondary_cta_label: '',
@@ -1580,6 +1651,121 @@
     }
     
     /**
+     * Generate Stats section form - Phase 1: Core structure
+     */
+    function generateStatsForm(content) {
+        // Use existing content or defaults
+        content = content || statsDefaults;
+        
+        return `
+            <form id="aisb-section-form">
+                <!-- Variant Controls -->
+                <div class="aisb-editor-form-group aisb-variant-controls">
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Theme</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'light' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="light">
+                                <span class="dashicons dashicons-sun"></span> Light
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.theme_variant === 'dark' ? 'active' : ''}" 
+                                    data-variant-type="theme" data-variant-value="dark">
+                                <span class="dashicons dashicons-moon"></span> Dark
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="aisb-variant-group">
+                        <label class="aisb-editor-form-label">Layout</label>
+                        <div class="aisb-toggle-group">
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-left' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-left">
+                                <span class="dashicons dashicons-align-left"></span> Left
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'center' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="center">
+                                <span class="dashicons dashicons-align-center"></span> Center
+                            </button>
+                            <button type="button" class="aisb-toggle-btn ${content.layout_variant === 'content-right' ? 'active' : ''}" 
+                                    data-variant-type="layout" data-variant-value="content-right">
+                                <span class="dashicons dashicons-align-right"></span> Right
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Basic Fields -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="stats-eyebrow">Eyebrow Text (Optional)</label>
+                    <input type="text" 
+                           id="stats-eyebrow" 
+                           name="eyebrow_heading" 
+                           value="${escapeHtml(content.eyebrow_heading || '')}" 
+                           class="aisb-editor-input"
+                           placeholder="Optional text above heading">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="stats-heading">Heading</label>
+                    <input type="text" 
+                           id="stats-heading" 
+                           name="heading" 
+                           value="${escapeHtml(content.heading || '')}" 
+                           class="aisb-editor-input" 
+                           placeholder="Section heading">
+                </div>
+                
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="stats-content">
+                        Intro Content
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="stats-content" 
+                                  name="content" 
+                                  class="aisb-editor-wysiwyg">${content.content || ''}</textarea>
+                    </div>
+                </div>
+                
+                <!-- Media Field -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">
+                        Featured Image
+                    </label>
+                    ${generateMediaField(content)}
+                </div>
+                
+                <!-- Stats Items Repeater -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">Stats Items</label>
+                    <div id="stats-items" class="aisb-repeater-container">
+                        <!-- Stats repeater will be initialized here -->
+                    </div>
+                </div>
+                
+                <!-- Global Blocks (Buttons) -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label">Buttons</label>
+                    <div id="stats-global-blocks" class="aisb-repeater-container">
+                        <!-- Global blocks repeater will be initialized here -->
+                    </div>
+                </div>
+                
+                <!-- Outro Content -->
+                <div class="aisb-editor-form-group">
+                    <label class="aisb-editor-form-label" for="stats-outro-content">
+                        Outro Content (Optional)
+                    </label>
+                    <div class="aisb-editor-wysiwyg-container">
+                        <textarea id="stats-outro-content" 
+                                  name="outro_content" 
+                                  class="aisb-editor-wysiwyg">${content.outro_content || ''}</textarea>
+                    </div>
+                </div>
+            </form>
+        `;
+    }
+    
+    /**
      * Generate media field with support for images and videos
      */
     function generateMediaField(content) {
@@ -1860,6 +2046,55 @@
         }).join('');
         
         return `<div class="aisb-features__grid">${cardsHtml}</div>`;
+    }
+    
+    /**
+     * Render stat items for Stats section
+     */
+    function renderStatItems(stats) {
+        if (!stats || !Array.isArray(stats) || stats.length === 0) {
+            // Return placeholder stats to show what the section will look like
+            return `
+                <div class="aisb-stats__grid">
+                    <div class="aisb-stats__item">
+                        <div class="aisb-stats__item-number">99%</div>
+                        <div class="aisb-stats__item-label">Customer Satisfaction</div>
+                        <div class="aisb-stats__item-description">Based on 10,000+ reviews</div>
+                    </div>
+                    <div class="aisb-stats__item">
+                        <div class="aisb-stats__item-number">50M+</div>
+                        <div class="aisb-stats__item-label">Active Users</div>
+                        <div class="aisb-stats__item-description">Across 120 countries</div>
+                    </div>
+                    <div class="aisb-stats__item">
+                        <div class="aisb-stats__item-number">24/7</div>
+                        <div class="aisb-stats__item-label">Support Available</div>
+                        <div class="aisb-stats__item-description">Always here to help</div>
+                    </div>
+                    <div class="aisb-stats__item">
+                        <div class="aisb-stats__item-number">4.9★</div>
+                        <div class="aisb-stats__item-label">Average Rating</div>
+                        <div class="aisb-stats__item-description">From industry experts</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        var statsHtml = stats.map(function(stat) {
+            var statNumber = escapeHtml(stat.number || '0');
+            var statLabel = escapeHtml(stat.label || 'Stat Label');
+            var statDescription = stat.description ? `<p class="aisb-stats__item-description">${escapeHtml(stat.description)}</p>` : '';
+            
+            return `
+                <div class="aisb-stats__item">
+                    <div class="aisb-stats__item-number">${statNumber}</div>
+                    <div class="aisb-stats__item-label">${statLabel}</div>
+                    ${statDescription}
+                </div>
+            `;
+        }).join('');
+        
+        return `<div class="aisb-stats__grid">${statsHtml}</div>`;
     }
     
     /**
@@ -2285,6 +2520,76 @@
     }
     
     /**
+     * Initialize stats repeater for Stats sections
+     */
+    function initStatsRepeater(content) {
+        var $container = $('#stats-items');
+        if (!$container.length) {
+            return; // Container not found
+        }
+        
+        // Get stats from content or empty array
+        var stats = content.stats || [];
+        
+        // Initialize repeater field
+        var statsRepeater = $container.aisbRepeaterField({
+            fieldName: 'stats',
+            items: stats,
+            defaultItem: {
+                number: '100',
+                label: 'Stat Label',
+                description: 'Optional description'
+            },
+            maxItems: 8,
+            minItems: 0,
+            itemLabel: 'Stat',
+            addButtonText: 'Add Stat',
+            template: function(item, index) {
+                return `
+                    <div class="aisb-repeater-fields">
+                        <div class="aisb-repeater-field-group">
+                            <label>Number/Value</label>
+                            <input type="text" class="aisb-repeater-field" data-field="number" 
+                                   value="${escapeHtml(item.number || '')}" 
+                                   placeholder="e.g. 99%, 50M+, 24/7">
+                        </div>
+                        <div class="aisb-repeater-field-group">
+                            <label>Label</label>
+                            <input type="text" class="aisb-repeater-field" data-field="label" 
+                                   value="${escapeHtml(item.label || '')}" 
+                                   placeholder="What this stat represents">
+                        </div>
+                        <div class="aisb-repeater-field-group">
+                            <label>Description (Optional)</label>
+                            <input type="text" class="aisb-repeater-field" data-field="description" 
+                                   value="${escapeHtml(item.description || '')}" 
+                                   placeholder="Additional context">
+                        </div>
+                    </div>
+                `;
+            },
+            onUpdate: function(items) {
+                // Update the section content with stats data
+                if (editorState.currentSection !== null && editorState.sections[editorState.currentSection]) {
+                    editorState.sections[editorState.currentSection].content.stats = items;
+                    editorState.isDirty = true;
+                    
+                    // Re-render the preview section
+                    var section = editorState.sections[editorState.currentSection];
+                    var sectionHtml = renderSection(section, editorState.currentSection);
+                    $('.aisb-section[data-index="' + editorState.currentSection + '"]').replaceWith(sectionHtml);
+                    
+                    // Update save status
+                    updateSaveStatus('unsaved');
+                }
+            }
+        });
+        
+        // Store repeater instance
+        editorState.statsRepeater = statsRepeater;
+    }
+    
+    /**
      * Initialize WYSIWYG editors for Features section
      */
     function initFeaturesWysiwygEditors() {
@@ -2516,6 +2821,84 @@
             });
         } else {
             console.warn('WordPress editor not available for FAQ section, falling back to textarea');
+        }
+    }
+    
+    /**
+     * Initialize WYSIWYG editors for Stats section
+     */
+    function initStatsWysiwygEditors() {
+        // Destroy existing instances first (if any)
+        if (typeof wp !== 'undefined' && wp.editor) {
+            wp.editor.remove('stats-content');
+            wp.editor.remove('stats-outro-content');
+        }
+        
+        // Initialize TinyMCE for content fields
+        if (typeof wp !== 'undefined' && wp.editor && wp.editor.initialize) {
+            // Main content editor
+            wp.editor.initialize('stats-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink',
+                    toolbar2: '',
+                    format_tags: 'p;h2;h3;h4',
+                    forced_root_block: 'p',
+                    force_br_newlines: false,
+                    force_p_newlines: true,
+                    remove_linebreaks: false,
+                    convert_newlines_to_brs: false,
+                    paste_as_text: false,
+                    paste_remove_styles: true,
+                    paste_remove_styles_if_webkit: true,
+                    paste_strip_class_attributes: 'all',
+                    height: 150,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save(); // Save to textarea
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: {
+                    buttons: 'strong,em,link'
+                },
+                mediaButtons: false
+            });
+            
+            // Outro content editor
+            wp.editor.initialize('stats-outro-content', {
+                tinymce: {
+                    wpautop: true,
+                    plugins: 'lists,link,wordpress,wplink,paste',
+                    toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink',
+                    toolbar2: '',
+                    format_tags: 'p;h2;h3;h4',
+                    forced_root_block: 'p',
+                    force_br_newlines: false,
+                    force_p_newlines: true,
+                    remove_linebreaks: false,
+                    convert_newlines_to_brs: false,
+                    paste_as_text: false,
+                    paste_remove_styles: true,
+                    paste_remove_styles_if_webkit: true,
+                    paste_strip_class_attributes: 'all',
+                    height: 150,
+                    setup: function(editor) {
+                        editor.on('change keyup', function() {
+                            editor.save(); // Save to textarea
+                            updatePreview();
+                        });
+                    }
+                },
+                quicktags: {
+                    buttons: 'strong,em,link'
+                },
+                mediaButtons: false
+            });
+        } else {
+            console.warn('WordPress editor not available for Stats section, falling back to textarea');
         }
     }
     
@@ -3093,6 +3476,13 @@
                 if (typeof tinyMCE !== 'undefined' && tinyMCE.get('faq-outro-content')) {
                     content.outro_content = tinyMCE.get('faq-outro-content').getContent();
                 }
+            } else if (sectionType === 'stats') {
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('stats-content')) {
+                    content.content = tinyMCE.get('stats-content').getContent();
+                }
+                if (typeof tinyMCE !== 'undefined' && tinyMCE.get('stats-outro-content')) {
+                    content.outro_content = tinyMCE.get('stats-outro-content').getContent();
+                }
             }
         }
         
@@ -3134,6 +3524,15 @@
                 debugLog('Preserving FAQ items in updatePreview', {
                     faq_items: currentSection.content.faq_items,
                     itemCount: currentSection.content.faq_items.length
+                });
+            }
+            
+            // Preserve stats items managed by repeater
+            if (currentSection.content.stats) {
+                content.stats = currentSection.content.stats;
+                debugLog('Preserving stats items in updatePreview', {
+                    stats: currentSection.content.stats,
+                    itemCount: currentSection.content.stats ? currentSection.content.stats.length : 0
                 });
             }
             
@@ -3290,6 +3689,8 @@
             return renderChecklistSection(section, index);
         } else if (section.type === 'faq') {
             return renderFaqSection(section, index);
+        } else if (section.type === 'stats') {
+            return renderStatsSection(section, index);
         }
         return '';
     }
@@ -3306,6 +3707,7 @@
         var mediaClass = sectionType === 'features' ? 'aisb-features__media' : 
                         sectionType === 'checklist' ? 'aisb-checklist__media' : 
                         sectionType === 'faq' ? 'aisb-faq__media' :
+                        sectionType === 'stats' ? 'aisb-stats__media' :
                         'aisb-hero__media';
         
         debugLog('renderMediaPreview Called', {
@@ -3359,6 +3761,7 @@
                     debugLog('renderMediaPreview - YouTube Video Detected', youtubeMatch[1]);
                     var videoClass = sectionType === 'features' ? 'aisb-features__video' : 
                                     sectionType === 'checklist' ? 'aisb-checklist__video' :
+                                    sectionType === 'stats' ? 'aisb-stats__video' :
                                     'aisb-hero__video';
                     return `
                         <div class="${mediaClass}">
@@ -3374,6 +3777,7 @@
                     // Self-hosted video
                     var videoClass = sectionType === 'features' ? 'aisb-features__video' : 
                                     sectionType === 'checklist' ? 'aisb-checklist__video' :
+                                    sectionType === 'stats' ? 'aisb-stats__video' :
                                     'aisb-hero__video';
                     return `
                         <div class="${mediaClass}">
@@ -3557,6 +3961,7 @@
                 const containerClass = sectionType === 'features' ? 'aisb-features__buttons' :
                                       sectionType === 'checklist' ? 'aisb-checklist__buttons' :
                                       sectionType === 'faq' ? 'aisb-faq__buttons' :
+                                      sectionType === 'stats' ? 'aisb-stats__buttons' :
                                       sectionType === 'hero-form' ? 'aisb-hero-form__buttons' :
                                       'aisb-hero__buttons';
                 html += `<div class="${containerClass}">${buttonHtml}</div>`;
@@ -3869,6 +4274,49 @@
             <section class="${sectionClasses}" data-index="${index}">
                 <div class="aisb-faq__container">
                     ${sectionContent}
+                </div>
+            </section>
+        `;
+    }
+    
+    /**
+     * Render Stats section preview - Phase 1: Core structure
+     */
+    function renderStatsSection(section, index) {
+        var content = section.content || section;
+        
+        // Build section classes matching PHP implementation
+        var themeVariant = content.theme_variant || 'light';
+        var layoutVariant = content.layout_variant || 'center';
+        
+        var sectionClasses = [
+            'aisb-section',
+            'aisb-stats',
+            'aisb-section--' + themeVariant,
+            'aisb-section--' + layoutVariant
+        ].join(' ');
+        
+        return `
+            <section class="${sectionClasses}" data-index="${index}">
+                <div class="aisb-stats__container">
+                    <!-- Top section with content and media (using shared renderMediaPreview like Features) -->
+                    <div class="aisb-stats__top">
+                        <div class="aisb-stats__content">
+                            ${content.eyebrow_heading ? `<div class="aisb-stats__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
+                            <h2 class="aisb-stats__heading">${escapeHtml(content.heading || 'By the Numbers')}</h2>
+                            <div class="aisb-stats__intro">${content.content || '<p>Our impact and achievements</p>'}</div>
+                        </div>
+                        ${renderMediaPreview(content, 'stats')}
+                    </div>
+                    
+                    <!-- Stats Items Grid -->
+                    ${renderStatItems(content.stats)}
+                    
+                    <!-- Buttons -->
+                    ${renderGlobalBlocks(content.global_blocks, 'stats')}
+                    
+                    <!-- Outro Content -->
+                    ${content.outro_content ? `<div class="aisb-stats__outro">${content.outro_content}</div>` : ''}
                 </div>
             </section>
         `;
@@ -4237,7 +4685,13 @@
                         <span class="dashicons dashicons-menu" aria-hidden="true"></span>
                     </div>
                     <div class="aisb-section-item__icon" aria-hidden="true">
-                        <span class="dashicons ${section.type === 'features' ? 'dashicons-screenoptions' : 'dashicons-megaphone'}"></span>
+                        <span class="dashicons ${
+                            section.type === 'features' ? 'dashicons-screenoptions' : 
+                            section.type === 'stats' ? 'dashicons-chart-bar' :
+                            section.type === 'faq' ? 'dashicons-editor-help' :
+                            section.type === 'checklist' ? 'dashicons-yes-alt' :
+                            'dashicons-megaphone'
+                        }"></span>
                     </div>
                     <div class="aisb-section-item__content">
                         <div class="aisb-section-item__title">${title}</div>
