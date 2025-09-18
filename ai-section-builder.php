@@ -116,129 +116,93 @@ function aisb_add_admin_menu() {
         30
     );
     
-    // Add editor submenu
+    // Add editor submenu - points to the real working editor
     add_submenu_page(
         'ai-section-builder',
         __('Section Editor', 'ai-section-builder'),
         __('Section Editor', 'ai-section-builder'),
         'edit_posts',
         'ai-section-builder-editor',
-        'aisb_editor_page'
+        'aisb_render_editor_page'
+    );
+    
+    // Add AI Settings submenu
+    add_submenu_page(
+        'ai-section-builder',
+        __('AI Settings', 'ai-section-builder'),
+        __('AI Settings', 'ai-section-builder'),
+        'manage_options',
+        'ai-section-builder-settings',
+        'aisb_render_ai_settings_page'
     );
 }
 
 /**
- * Simple admin page
+ * Main admin dashboard page
  */
 function aisb_admin_page() {
-    // Handle cleanup action
-    $cleanup_message = '';
-    if (isset($_POST['aisb_cleanup_nonce']) && wp_verify_nonce($_POST['aisb_cleanup_nonce'], 'aisb_cleanup_action')) {
-        if (isset($_POST['cleanup_post_id']) && !empty($_POST['cleanup_post_id'])) {
-            $post_id = intval($_POST['cleanup_post_id']);
-            
-            // Clean up all AISB meta data for this post
-            delete_post_meta($post_id, '_aisb_enabled');
-            delete_post_meta($post_id, '_aisb_sections');
-            delete_post_meta($post_id, '_aisb_original_content');
-            delete_post_meta($post_id, '_aisb_switched_from');
-            
-            // Clear cache
-            wp_cache_delete('aisb_sections_' . $post_id, 'aisb');
-            wp_cache_delete('aisb_enabled_' . $post_id, 'aisb');
-            
-            $cleanup_message = '<div class="aisb-notice aisb-notice-success"><p>Successfully cleaned up AISB data for post ID ' . $post_id . '</p></div>';
-        } elseif (isset($_POST['cleanup_all'])) {
-            // Clean up all AISB data globally
-            global $wpdb;
-            $wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE meta_key LIKE '_aisb_%'");
-            
-            // Clear all cache
-            wp_cache_flush();
-            
-            $cleanup_message = '<div class="aisb-notice aisb-notice-success"><p>Successfully cleaned up all AISB data from database.</p></div>';
-        }
-    }
     ?>
     <div class="aisb-admin-wrap">
         <div class="aisb-admin-header">
             <h1 class="aisb-admin-header__title"><?php _e('AI Section Builder Pro', 'ai-section-builder'); ?></h1>
-            <p class="aisb-admin-header__subtitle"><?php _e('Professional Section Builder for WordPress', 'ai-section-builder'); ?></p>
+            <p class="aisb-admin-header__subtitle"><?php _e('Create Beautiful Page Sections with Visual Editor', 'ai-section-builder'); ?></p>
         </div>
         
-        <?php echo $cleanup_message; ?>
-        
+        <!-- Welcome Section -->
         <div class="aisb-section-card">
             <div class="aisb-section-card__header">
                 <div class="aisb-section-card__icon">
-                    <span class="dashicons dashicons-rocket"></span>
+                    <span class="dashicons dashicons-admin-home"></span>
                 </div>
-                <h2 class="aisb-section-card__title">Phase 1B: Professional Foundation</h2>
+                <h2 class="aisb-section-card__title">Welcome to AI Section Builder</h2>
             </div>
             <div class="aisb-section-card__content">
-                <p><strong>Current Status:</strong> Page builder conflict detection and activation system</p>
-            
-                <h3>Features Implemented:</h3>
+                <p>Create stunning page sections with our intuitive visual editor. Build professional layouts without writing code.</p>
+                
+                <h3>Available Section Types:</h3>
                 <ul>
-                <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> Smart page builder detection (6 major builders)</li>
-                <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> Conflict-aware activation system</li>
-                <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> Safe template override with priority 999</li>
-                <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> Content backup and restoration</li>
-                <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> Professional meta box interface</li>
-                <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> Database performance optimizations</li>
+                    <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> <strong>Hero Sections</strong> - Eye-catching headers with multiple layouts</li>
+                    <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> <strong>Hero with Form</strong> - Hero section with integrated form area</li>
+                    <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> <strong>Features Grid</strong> - Showcase your services or products</li>
+                    <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> <strong>Testimonials</strong> - Display customer reviews and feedback</li>
+                    <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> <strong>FAQ Sections</strong> - Answer common questions</li>
+                    <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> <strong>Statistics</strong> - Show impressive numbers and metrics</li>
+                    <li><span class="dashicons dashicons-yes" style="color: #00a32a;"></span> <strong>Checklists</strong> - Present information in organized lists</li>
                 </ul>
                 
-                <div class="aisb-status-card aisb-status-warning">
-                    <div class="aisb-status-card__header">
-                        <span class="aisb-status-card__icon">
-                            <span class="dashicons dashicons-warning"></span>
-                        </span>
-                        <span>Important</span>
-                    </div>
-                    <div class="aisb-status-card__content">
-                        Phase 1B focuses on infrastructure. Visual editor coming in Phase 2.
-                    </div>
+                <div style="margin-top: 20px;">
+                    <p><strong>Ready to get started?</strong> Edit any page or post and click "Activate AI Section Builder" to begin creating beautiful sections.</p>
                 </div>
             </div>
         </div>
         
-        <!-- Manual Cleanup Tool -->
+        <!-- Quick Actions -->
         <div class="aisb-section-card">
             <div class="aisb-section-card__header">
                 <div class="aisb-section-card__icon">
-                    <span class="dashicons dashicons-trash"></span>
+                    <span class="dashicons dashicons-performance"></span>
                 </div>
-                <h2 class="aisb-section-card__title">Manual Cleanup Tool</h2>
+                <h2 class="aisb-section-card__title">Quick Actions</h2>
             </div>
             <div class="aisb-section-card__content">
-                <p>Use this tool to manually remove AISB data if the deactivate button isn't working properly.</p>
-            
-            <form method="post" action="">
-                <?php wp_nonce_field('aisb_cleanup_action', 'aisb_cleanup_nonce'); ?>
-                
-                <h3>Clean Specific Post</h3>
-                <table class="aisb-form-table">
-                    <tr>
-                        <th><label for="cleanup_post_id">Post/Page ID:</label></th>
-                        <td>
-                            <input type="number" name="cleanup_post_id" id="cleanup_post_id" placeholder="Enter post ID" />
-                            <button type="submit" class="aisb-btn aisb-btn-secondary">Clean This Post</button>
-                            <p class="aisb-form-description">Enter the ID of the post/page to clean up AISB data.</p>
-                        </td>
-                    </tr>
-                </table>
-                
-                <h3>Clean All Data</h3>
-                <p class="aisb-text-danger"><strong>Warning:</strong> This will remove ALL AI Section Builder data from all posts!</p>
-                <button type="submit" name="cleanup_all" value="1" class="aisb-btn aisb-btn-danger" 
-                        onclick="return confirm('Are you sure you want to remove ALL AI Section Builder data? This cannot be undone!');">
-                    Clean All AISB Data
-                </button>
-            </form>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="<?php echo admin_url('admin.php?page=ai-section-builder-editor'); ?>" class="button button-primary">
+                        <span class="dashicons dashicons-edit" style="margin-right: 5px; margin-top: 3px;"></span>
+                        Open Section Editor
+                    </a>
+                    <a href="<?php echo admin_url('edit.php?post_type=page'); ?>" class="button">
+                        <span class="dashicons dashicons-admin-page" style="margin-right: 5px; margin-top: 3px;"></span>
+                        View Pages
+                    </a>
+                    <a href="<?php echo admin_url('edit.php'); ?>" class="button">
+                        <span class="dashicons dashicons-admin-post" style="margin-right: 5px; margin-top: 3px;"></span>
+                        View Posts
+                    </a>
+                </div>
             </div>
         </div>
         
-        <!-- Debug Information -->
+        <!-- Usage Statistics -->
         <div class="aisb-section-card">
             <div class="aisb-section-card__header">
                 <div class="aisb-section-card__icon">
@@ -268,8 +232,433 @@ function aisb_admin_page() {
 }
 
 /**
- * Placeholder editor page - Phase 1B
+ * Render AI Settings page
  */
+function aisb_render_ai_settings_page() {
+    // Get current settings
+    $settings = get_option('aisb_ai_settings', array(
+        'provider' => '',
+        'api_key' => '',
+        'model' => '',
+        'verified' => false,
+        'last_verified' => 0
+    ));
+    
+    // Decrypt API key for display (show last 4 characters only)
+    $api_key_display = '';
+    if (!empty($settings['api_key'])) {
+        $decrypted = aisb_decrypt_api_key($settings['api_key']);
+        if ($decrypted && strlen($decrypted) > 4) {
+            $api_key_display = str_repeat('•', strlen($decrypted) - 4) . substr($decrypted, -4);
+        }
+    }
+    
+    // Model options based on provider
+    $model_options = array(
+        'openai' => array(
+            'gpt-4' => 'GPT-4',
+            'gpt-4-turbo-preview' => 'GPT-4 Turbo',
+            'gpt-3.5-turbo' => 'GPT-3.5 Turbo'
+        ),
+        'anthropic' => array(
+            'claude-3-opus-20240229' => 'Claude 3 Opus',
+            'claude-3-5-sonnet-20241022' => 'Claude 3.5 Sonnet (Latest)',
+            'claude-3-5-sonnet-20240620' => 'Claude 3.5 Sonnet',
+            'claude-3-haiku-20240307' => 'Claude 3 Haiku'
+        )
+    );
+    ?>
+    <div class="wrap">
+        <h1><?php _e('AI Settings', 'ai-section-builder'); ?></h1>
+        
+        <div class="notice notice-info" style="margin-top: 20px;">
+            <p><?php _e('Configure your AI provider settings to enable content generation features.', 'ai-section-builder'); ?></p>
+            <p><strong><?php _e('Setup Steps:', 'ai-section-builder'); ?></strong></p>
+            <ol style="margin: 0 0 0 20px;">
+                <li><?php _e('Select your AI provider (OpenAI or Anthropic)', 'ai-section-builder'); ?></li>
+                <li><?php _e('Enter your API key', 'ai-section-builder'); ?></li>
+                <li><?php _e('Choose a model', 'ai-section-builder'); ?></li>
+                <li><?php _e('Click "Test Connection" to verify', 'ai-section-builder'); ?></li>
+                <li><?php _e('Click "Save Settings" once verified', 'ai-section-builder'); ?></li>
+            </ol>
+        </div>
+        
+        <form method="post" id="aisb-ai-settings-form">
+            <?php wp_nonce_field('aisb_ai_settings', 'aisb_ai_settings_nonce'); ?>
+            
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><?php _e('AI Provider', 'ai-section-builder'); ?></th>
+                    <td>
+                        <fieldset>
+                            <label>
+                                <input type="radio" name="aisb_provider" value="openai" <?php checked(isset($settings['provider']) ? $settings['provider'] : '', 'openai'); ?> />
+                                <span><?php _e('OpenAI', 'ai-section-builder'); ?></span>
+                            </label>
+                            <br>
+                            <label>
+                                <input type="radio" name="aisb_provider" value="anthropic" <?php checked(isset($settings['provider']) ? $settings['provider'] : '', 'anthropic'); ?> />
+                                <span><?php _e('Anthropic (Claude)', 'ai-section-builder'); ?></span>
+                            </label>
+                        </fieldset>
+                        <p class="description"><?php _e('Select your preferred AI service provider.', 'ai-section-builder'); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row">
+                        <label for="aisb_api_key"><?php _e('API Key', 'ai-section-builder'); ?></label>
+                    </th>
+                    <td>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="password" 
+                                   id="aisb_api_key" 
+                                   name="aisb_api_key" 
+                                   class="regular-text" 
+                                   placeholder="<?php echo esc_attr($api_key_display ?: __('Enter your API key', 'ai-section-builder')); ?>"
+                                   autocomplete="off" 
+                                   data-has-saved-key="<?php echo !empty($settings['api_key']) ? 'true' : 'false'; ?>" />
+                            <input type="hidden" 
+                                   id="aisb_keep_existing_key" 
+                                   name="aisb_keep_existing_key" 
+                                   value="<?php echo !empty($settings['api_key']) ? '1' : '0'; ?>" />
+                            <button type="button" 
+                                    id="aisb-toggle-api-key" 
+                                    class="button button-secondary">
+                                <?php _e('Show', 'ai-section-builder'); ?>
+                            </button>
+                        </div>
+                        <p class="description">
+                            <?php _e('Your API key will be encrypted before storage.', 'ai-section-builder'); ?>
+                            <span id="aisb-provider-help" style="display: none;">
+                                <br>
+                                <span class="openai-help" style="display: none;">
+                                    <?php printf(__('Get your API key from %s', 'ai-section-builder'), '<a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>'); ?>
+                                </span>
+                                <span class="anthropic-help" style="display: none;">
+                                    <?php printf(__('Get your API key from %s', 'ai-section-builder'), '<a href="https://console.anthropic.com/api-keys" target="_blank">Anthropic Console</a>'); ?>
+                                </span>
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr id="aisb-model-row" style="<?php echo empty($settings['provider']) ? 'display: none;' : ''; ?>">
+                    <th scope="row">
+                        <label for="aisb_model"><?php _e('Model', 'ai-section-builder'); ?></label>
+                    </th>
+                    <td>
+                        <select id="aisb_model" name="aisb_model" class="regular-text">
+                            <option value=""><?php _e('Select a model', 'ai-section-builder'); ?></option>
+                            <?php
+                            if (!empty($settings['provider']) && isset($model_options[$settings['provider']])) {
+                                foreach ($model_options[$settings['provider']] as $value => $label) {
+                                    printf(
+                                        '<option value="%s" %s>%s</option>',
+                                        esc_attr($value),
+                                        selected($settings['model'], $value, false),
+                                        esc_html($label)
+                                    );
+                                }
+                            }
+                            ?>
+                        </select>
+                        <p class="description"><?php _e('Select the AI model to use for content generation.', 'ai-section-builder'); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('Connection Status', 'ai-section-builder'); ?></th>
+                    <td>
+                        <div id="aisb-connection-status">
+                            <?php 
+                            // Only show connected if we have all required settings
+                            $is_connected = !empty($settings['verified']) && 
+                                          !empty($settings['provider']) && 
+                                          !empty($settings['api_key']) &&
+                                          !empty($settings['model']);
+                            
+                            if ($is_connected): ?>
+                                <span style="color: #00a32a;">
+                                    <span class="dashicons dashicons-yes-alt"></span>
+                                    <?php _e('Connected', 'ai-section-builder'); ?>
+                                    <?php if (!empty($settings['last_verified'])): ?>
+                                        <small>(<?php printf(__('Last verified: %s', 'ai-section-builder'), human_time_diff($settings['last_verified'], current_time('timestamp')) . ' ago'); ?>)</small>
+                                    <?php endif; ?>
+                                </span>
+                            <?php else: ?>
+                                <span style="color: #666;">
+                                    <span class="dashicons dashicons-minus"></span>
+                                    <?php _e('Not connected', 'ai-section-builder'); ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            
+            <p class="submit">
+                <button type="button" 
+                        id="aisb-test-connection" 
+                        class="button button-secondary"
+                        <?php echo empty($settings['provider']) ? 'disabled' : ''; ?>>
+                    <?php _e('Test Connection', 'ai-section-builder'); ?>
+                </button>
+                <button type="submit" 
+                        name="submit" 
+                        id="submit" 
+                        class="button button-primary">
+                    <?php _e('Save Settings', 'ai-section-builder'); ?>
+                </button>
+                <span class="spinner" style="float: none;"></span>
+            </p>
+        </form>
+        
+        <div id="aisb-settings-message" style="display: none; margin-top: 20px;"></div>
+    </div>
+    
+    <script type="text/javascript">
+    jQuery(document).ready(function($) {
+        // Model options data
+        var modelOptions = <?php echo json_encode($model_options); ?>;
+        // Check if already verified from PHP
+        var connectionVerified = <?php echo ($is_connected ? 'true' : 'false'); ?>;
+        
+        // Toggle API key visibility
+        $('#aisb-toggle-api-key').on('click', function() {
+            var $input = $('#aisb_api_key');
+            var $button = $(this);
+            
+            if ($input.attr('type') === 'password') {
+                $input.attr('type', 'text');
+                $button.text('<?php _e('Hide', 'ai-section-builder'); ?>');
+            } else {
+                $input.attr('type', 'password');
+                $button.text('<?php _e('Show', 'ai-section-builder'); ?>');
+            }
+        });
+        
+        // Update model dropdown and help text when provider changes
+        $('input[name="aisb_provider"]').on('change', function() {
+            var provider = $(this).val();
+            var $modelSelect = $('#aisb_model');
+            var $modelRow = $('#aisb-model-row');
+            var $testButton = $('#aisb-test-connection');
+            var $providerHelp = $('#aisb-provider-help');
+            
+            // Clear and update model dropdown
+            $modelSelect.empty().append('<option value=""><?php _e('Select a model', 'ai-section-builder'); ?></option>');
+            
+            if (provider && modelOptions[provider]) {
+                $modelRow.show();
+                $testButton.prop('disabled', false);
+                
+                $.each(modelOptions[provider], function(value, label) {
+                    $modelSelect.append($('<option>', {
+                        value: value,
+                        text: label
+                    }));
+                });
+                
+                // Show appropriate help text
+                $providerHelp.show();
+                $('.openai-help, .anthropic-help').hide();
+                $('.' + provider + '-help').show();
+            } else {
+                $modelRow.hide();
+                $testButton.prop('disabled', true);
+                $providerHelp.hide();
+            }
+        });
+        
+        // Function to update button states
+        function updateButtonStates() {
+            var provider = $('input[name="aisb_provider"]:checked').val();
+            var apiKey = $('#aisb_api_key').val();
+            var hasSavedKey = $('#aisb_api_key').data('has-saved-key') === 'true';
+            var model = $('#aisb_model').val();
+            
+            // Enable test button if we have provider and either new or saved key
+            var canTest = provider && (apiKey || hasSavedKey);
+            $('#aisb-test-connection').prop('disabled', !canTest);
+            
+            // Enable save button only after successful verification
+            $('#submit').prop('disabled', !connectionVerified);
+            
+            // Update save button text based on state
+            if (connectionVerified) {
+                $('#submit').removeClass('button-secondary').addClass('button-primary');
+            } else {
+                $('#submit').removeClass('button-primary').addClass('button-secondary');
+            }
+        }
+        
+        // Initial button state
+        updateButtonStates();
+        
+        // Update button states on input changes
+        $('input[name="aisb_provider"]').on('change', function() {
+            connectionVerified = false;
+            $('#aisb_keep_existing_key').val('0'); // Reset if provider changes
+            updateButtonStates();
+        });
+        
+        $('#aisb_api_key').on('input', function() {
+            connectionVerified = false;
+            $('#aisb_keep_existing_key').val('0'); // New key entered
+            updateButtonStates();
+        });
+        
+        $('#aisb_model').on('change', function() {
+            connectionVerified = false;
+            updateButtonStates();
+        });
+        
+        // Test connection
+        $('#aisb-test-connection').on('click', function() {
+            var $button = $(this);
+            var $spinner = $('.spinner');
+            var $message = $('#aisb-settings-message');
+            
+            var provider = $('input[name="aisb_provider"]:checked').val();
+            var apiKey = $('#aisb_api_key').val();
+            var hasSavedKey = $('#aisb_api_key').data('has-saved-key') === 'true';
+            var model = $('#aisb_model').val();
+            
+            if (!provider) {
+                alert('<?php _e('Please select an AI provider.', 'ai-section-builder'); ?>');
+                return;
+            }
+            
+            if (!apiKey && !hasSavedKey) {
+                alert('<?php _e('Please enter an API key.', 'ai-section-builder'); ?>');
+                return;
+            }
+            
+            $button.prop('disabled', true);
+            $spinner.addClass('is-active');
+            $message.hide();
+            
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'aisb_test_ai_connection',
+                    provider: provider,
+                    api_key: apiKey,
+                    model: model,
+                    nonce: $('#aisb_ai_settings_nonce').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $message.removeClass('notice-error').addClass('notice-success notice')
+                            .html('<p><strong><?php _e('Success!', 'ai-section-builder'); ?></strong> ' + response.data.message + '</p>')
+                            .show();
+                        
+                        $('#aisb-connection-status').html(
+                            '<span style="color: #00a32a;">' +
+                            '<span class="dashicons dashicons-yes-alt"></span> ' +
+                            '<?php _e('Connected', 'ai-section-builder'); ?>' +
+                            '</span>'
+                        );
+                        
+                        // Mark connection as verified and enable save button
+                        connectionVerified = true;
+                        updateButtonStates();
+                    } else {
+                        $message.removeClass('notice-success').addClass('notice-error notice')
+                            .html('<p><strong><?php _e('Error:', 'ai-section-builder'); ?></strong> ' + response.data + '</p>')
+                            .show();
+                        
+                        // Mark connection as not verified
+                        connectionVerified = false;
+                        updateButtonStates();
+                    }
+                },
+                error: function() {
+                    $message.removeClass('notice-success').addClass('notice-error')
+                        .html('<p><strong><?php _e('Error:', 'ai-section-builder'); ?></strong> <?php _e('Connection test failed. Please check your settings.', 'ai-section-builder'); ?></p>')
+                        .show();
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
+                    $spinner.removeClass('is-active');
+                }
+            });
+        });
+        
+        // Save settings
+        $('#aisb-ai-settings-form').on('submit', function(e) {
+            e.preventDefault();
+            
+            var $form = $(this);
+            var $spinner = $('.spinner');
+            var $message = $('#aisb-settings-message');
+            var $submitButton = $('#submit');
+            
+            $submitButton.prop('disabled', true);
+            $spinner.addClass('is-active');
+            $message.hide();
+            
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'aisb_save_ai_settings',
+                    provider: $('input[name="aisb_provider"]:checked').val(),
+                    api_key: $('#aisb_api_key').val(),
+                    keep_existing_key: $('#aisb_keep_existing_key').val(),
+                    model: $('#aisb_model').val(),
+                    nonce: $('#aisb_ai_settings_nonce').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $message.removeClass('notice-error').addClass('notice-success notice')
+                            .html('<p>' + response.data.message + '</p>')
+                            .show();
+                        
+                        // Update connection status if verified
+                        if (response.data.verified) {
+                            $('#aisb-connection-status').html(
+                                '<span style="color: #00a32a;">' +
+                                '<span class="dashicons dashicons-yes-alt"></span> ' +
+                                '<?php _e('Connected', 'ai-section-builder'); ?>' +
+                                '</span>'
+                            );
+                        }
+                        
+                        // Clear API key field and update placeholder
+                        if (response.data.masked_key) {
+                            $('#aisb_api_key').val('').attr('placeholder', response.data.masked_key);
+                        }
+                    } else {
+                        $message.removeClass('notice-success').addClass('notice-error notice')
+                            .html('<p><strong><?php _e('Error:', 'ai-section-builder'); ?></strong> ' + response.data + '</p>')
+                            .show();
+                    }
+                },
+                error: function() {
+                    $message.removeClass('notice-success').addClass('notice-error notice')
+                        .html('<p><strong><?php _e('Error:', 'ai-section-builder'); ?></strong> <?php _e('Failed to save settings.', 'ai-section-builder'); ?></p>')
+                        .show();
+                },
+                complete: function() {
+                    $submitButton.prop('disabled', false);
+                    $spinner.removeClass('is-active');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+}
+
+/**
+ * Placeholder editor page - Phase 1B
+ * DEPRECATED: This function is no longer used. The submenu now points to aisb_render_editor_page()
+ * Keeping this commented out for reference only
+ */
+/*
 function aisb_editor_page() {
     // Get post ID if provided
     $post_id = isset($_GET['post_id']) ? intval($_GET['post_id']) : 0;
@@ -392,6 +781,7 @@ function aisb_editor_page() {
     </div>
     <?php
 }
+*/
 
 /**
  * Add hidden editor page for visual builder
@@ -433,7 +823,34 @@ function aisb_render_editor_page() {
     $post_id = isset($_GET['post_id']) ? intval($_GET['post_id']) : 0;
     
     if (!$post_id) {
-        wp_die(__('No post selected for editing.', 'ai-section-builder'));
+        ?>
+        <div class="wrap">
+            <h1><?php _e('AI Section Builder - Visual Editor', 'ai-section-builder'); ?></h1>
+            <div style="background: #fff3cd; border: 1px solid #dba617; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h2 style="margin-top: 0;"><span class="dashicons dashicons-warning" style="color: #dba617;"></span> <?php _e('No Post Selected', 'ai-section-builder'); ?></h2>
+                <p><?php _e('The Section Editor requires a specific page or post to edit. To use the visual editor:', 'ai-section-builder'); ?></p>
+                <ol style="margin-left: 20px;">
+                    <li><?php _e('Go to any page or post in WordPress', 'ai-section-builder'); ?></li>
+                    <li><?php _e('Look for the "AI Section Builder" meta box in the editor sidebar', 'ai-section-builder'); ?></li>
+                    <li><?php _e('Click "Build with AI Section Builder" to activate the plugin for that page', 'ai-section-builder'); ?></li>
+                    <li><?php _e('Then click "Edit with AI Section Builder" to open the visual editor', 'ai-section-builder'); ?></li>
+                </ol>
+                
+                <div style="margin-top: 20px;">
+                    <a href="<?php echo admin_url('edit.php?post_type=page'); ?>" class="button button-primary">
+                        <span class="dashicons dashicons-admin-page" style="margin-right: 5px;"></span>
+                        <?php _e('Go to Pages', 'ai-section-builder'); ?>
+                    </a>
+                    
+                    <a href="<?php echo admin_url('edit.php'); ?>" class="button" style="margin-left: 10px;">
+                        <span class="dashicons dashicons-admin-post" style="margin-right: 5px;"></span>
+                        <?php _e('Go to Posts', 'ai-section-builder'); ?>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <?php
+        return;
     }
     
     $post = get_post($post_id);
@@ -3835,6 +4252,270 @@ function aisb_activate() {
     update_option('aisb_activated', current_time('timestamp'));
     
     // Future: Create database tables if needed for advanced features
+}
+
+/**
+ * Encrypt API key for secure storage
+ */
+function aisb_encrypt_api_key($api_key) {
+    if (empty($api_key)) {
+        return '';
+    }
+    
+    // Check if encryption constants are defined
+    if (!defined('AISB_ENCRYPTION_KEY') || !defined('AISB_ENCRYPTION_SALT')) {
+        // If not defined, store in plain text with warning (for development only)
+        // In production, these constants should always be defined
+        return base64_encode($api_key);
+    }
+    
+    $method = 'aes-256-cbc';
+    $key = substr(hash('sha256', AISB_ENCRYPTION_KEY), 0, 32);
+    $iv = substr(hash('sha256', AISB_ENCRYPTION_SALT), 0, 16);
+    
+    return base64_encode(openssl_encrypt($api_key, $method, $key, 0, $iv));
+}
+
+/**
+ * Decrypt API key for use
+ */
+function aisb_decrypt_api_key($encrypted_key) {
+    if (empty($encrypted_key)) {
+        return '';
+    }
+    
+    // Check if encryption constants are defined
+    if (!defined('AISB_ENCRYPTION_KEY') || !defined('AISB_ENCRYPTION_SALT')) {
+        // If not defined, assume it was stored as base64 only
+        return base64_decode($encrypted_key);
+    }
+    
+    $method = 'aes-256-cbc';
+    $key = substr(hash('sha256', AISB_ENCRYPTION_KEY), 0, 32);
+    $iv = substr(hash('sha256', AISB_ENCRYPTION_SALT), 0, 16);
+    
+    return openssl_decrypt(base64_decode($encrypted_key), $method, $key, 0, $iv);
+}
+
+/**
+ * AJAX handler for saving AI settings
+ */
+add_action('wp_ajax_aisb_save_ai_settings', 'aisb_ajax_save_ai_settings');
+
+function aisb_ajax_save_ai_settings() {
+    // Check nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'aisb_ai_settings')) {
+        wp_send_json_error(__('Security check failed.', 'ai-section-builder'));
+    }
+    
+    // Check permissions
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(__('You do not have permission to save settings.', 'ai-section-builder'));
+    }
+    
+    // Get and sanitize input
+    $provider = isset($_POST['provider']) ? sanitize_text_field($_POST['provider']) : '';
+    $api_key = isset($_POST['api_key']) ? sanitize_text_field($_POST['api_key']) : '';
+    $model = isset($_POST['model']) ? sanitize_text_field($_POST['model']) : '';
+    $keep_existing_key = isset($_POST['keep_existing_key']) ? intval($_POST['keep_existing_key']) : 0;
+    
+    // Get existing settings
+    $settings = get_option('aisb_ai_settings', array());
+    
+    // Check if provider changed
+    $provider_changed = isset($settings['provider']) && $settings['provider'] !== $provider;
+    
+    // Update settings
+    $settings['provider'] = $provider;
+    $settings['model'] = $model;
+    
+    // Handle API key updates
+    if (!empty($api_key)) {
+        // New API key provided
+        $settings['api_key'] = aisb_encrypt_api_key($api_key);
+        // Keep verified status since user had to test before saving
+    } elseif ($keep_existing_key && !$provider_changed && isset($settings['api_key'])) {
+        // Keep existing key (no change needed)
+    } else if ($provider_changed) {
+        // Provider changed, reset verification
+        $settings['verified'] = false;
+        $settings['last_verified'] = 0;
+    }
+    
+    // Save settings
+    update_option('aisb_ai_settings', $settings);
+    
+    // Prepare response
+    $response_data = array(
+        'message' => __('Settings saved successfully.', 'ai-section-builder'),
+        'verified' => $settings['verified']
+    );
+    
+    // Add masked key for display if key was updated
+    if (!empty($api_key) && strlen($api_key) > 4) {
+        $response_data['masked_key'] = str_repeat('•', strlen($api_key) - 4) . substr($api_key, -4);
+    }
+    
+    wp_send_json_success($response_data);
+}
+
+/**
+ * AJAX handler for testing AI connection
+ */
+add_action('wp_ajax_aisb_test_ai_connection', 'aisb_ajax_test_ai_connection');
+
+function aisb_ajax_test_ai_connection() {
+    // Check nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'aisb_ai_settings')) {
+        wp_send_json_error(__('Security check failed.', 'ai-section-builder'));
+    }
+    
+    // Check permissions
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(__('You do not have permission to test connection.', 'ai-section-builder'));
+    }
+    
+    // Get input
+    $provider = isset($_POST['provider']) ? sanitize_text_field($_POST['provider']) : '';
+    $api_key = isset($_POST['api_key']) ? sanitize_text_field($_POST['api_key']) : '';
+    $model = isset($_POST['model']) ? sanitize_text_field($_POST['model']) : '';
+    
+    if (empty($provider) || empty($api_key)) {
+        wp_send_json_error(__('Provider and API key are required.', 'ai-section-builder'));
+    }
+    
+    // Test the connection based on provider
+    $test_result = false;
+    $error_message = '';
+    
+    if ($provider === 'openai') {
+        // Test OpenAI connection
+        $test_result = aisb_test_openai_connection($api_key, $model);
+    } elseif ($provider === 'anthropic') {
+        // Test Anthropic connection
+        $test_result = aisb_test_anthropic_connection($api_key, $model);
+    } else {
+        wp_send_json_error(__('Invalid provider selected.', 'ai-section-builder'));
+    }
+    
+    if ($test_result['success']) {
+        // Update verification status in database
+        $settings = get_option('aisb_ai_settings', array());
+        $settings['verified'] = true;
+        $settings['last_verified'] = current_time('timestamp');
+        update_option('aisb_ai_settings', $settings);
+        
+        wp_send_json_success(array(
+            'message' => $test_result['message']
+        ));
+    } else {
+        wp_send_json_error($test_result['message']);
+    }
+}
+
+/**
+ * Test OpenAI API connection
+ */
+function aisb_test_openai_connection($api_key, $model = '') {
+    $url = 'https://api.openai.com/v1/models';
+    
+    $response = wp_remote_get($url, array(
+        'headers' => array(
+            'Authorization' => 'Bearer ' . $api_key,
+            'Content-Type' => 'application/json'
+        ),
+        'timeout' => 10
+    ));
+    
+    if (is_wp_error($response)) {
+        return array(
+            'success' => false,
+            'message' => sprintf(__('Connection error: %s', 'ai-section-builder'), $response->get_error_message())
+        );
+    }
+    
+    $status_code = wp_remote_retrieve_response_code($response);
+    
+    if ($status_code === 200) {
+        return array(
+            'success' => true,
+            'message' => __('Successfully connected to OpenAI API.', 'ai-section-builder')
+        );
+    } elseif ($status_code === 401) {
+        return array(
+            'success' => false,
+            'message' => __('Invalid API key. Please check your OpenAI API key.', 'ai-section-builder')
+        );
+    } else {
+        return array(
+            'success' => false,
+            'message' => sprintf(__('API returned error code: %d', 'ai-section-builder'), $status_code)
+        );
+    }
+}
+
+/**
+ * Test Anthropic API connection
+ */
+function aisb_test_anthropic_connection($api_key, $model = '') {
+    // Use a simple API call to test the connection
+    $url = 'https://api.anthropic.com/v1/messages';
+    
+    // Create a minimal test message
+    $body = array(
+        'model' => $model ?: 'claude-3-haiku-20240307',
+        'max_tokens' => 10,
+        'messages' => array(
+            array(
+                'role' => 'user',
+                'content' => 'Hi'
+            )
+        )
+    );
+    
+    $response = wp_remote_post($url, array(
+        'headers' => array(
+            'x-api-key' => $api_key,
+            'anthropic-version' => '2023-06-01',
+            'Content-Type' => 'application/json'
+        ),
+        'body' => json_encode($body),
+        'timeout' => 10
+    ));
+    
+    if (is_wp_error($response)) {
+        return array(
+            'success' => false,
+            'message' => sprintf(__('Connection error: %s', 'ai-section-builder'), $response->get_error_message())
+        );
+    }
+    
+    $status_code = wp_remote_retrieve_response_code($response);
+    
+    if ($status_code === 200) {
+        return array(
+            'success' => true,
+            'message' => __('Successfully connected to Anthropic API.', 'ai-section-builder')
+        );
+    } elseif ($status_code === 401) {
+        return array(
+            'success' => false,
+            'message' => __('Invalid API key. Please check your Anthropic API key.', 'ai-section-builder')
+        );
+    } elseif ($status_code === 400) {
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+        $error_message = isset($data['error']['message']) ? $data['error']['message'] : __('Invalid request.', 'ai-section-builder');
+        return array(
+            'success' => false,
+            'message' => sprintf(__('API Error: %s', 'ai-section-builder'), $error_message)
+        );
+    } else {
+        return array(
+            'success' => false,
+            'message' => sprintf(__('API returned error code: %d', 'ai-section-builder'), $status_code)
+        );
+    }
 }
 
 /**
