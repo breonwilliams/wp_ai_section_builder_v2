@@ -1,0 +1,414 @@
+/**
+ * Document Upload Styles
+ * 
+ * Minimal styles for document upload functionality
+ * 
+ * @package AI_Section_Builder
+ * @since 2.0.0
+ */
+
+/* Upload Progress Indicator */
+.aisb-upload-progress {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 12px;
+    padding: 6px 12px;
+    background: #f6f7f7;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #2c3338;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.aisb-upload-progress .spinner {
+    float: none;
+    margin: 0;
+    width: 16px;
+    height: 16px;
+}
+
+.aisb-progress-text {
+    line-height: 1;
+}
+
+/* Upload Notifications */
+.aisb-upload-notice {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 100001;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 4px;
+    border: 1px solid;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    max-width: 400px;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Success notification - green with good contrast */
+.aisb-upload-notice--success {
+    background: #d4f4dd;
+    color: #0a5d2c;
+    border-color: #00a32a;
+}
+
+/* Error notification - red with good contrast */
+.aisb-upload-notice--error {
+    background: #fcebea;
+    color: #8a1a1b;
+    border-color: #d63638;
+}
+
+.aisb-upload-notice .dashicons {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+}
+
+.aisb-upload-notice--success .dashicons-yes {
+    color: #00a32a;
+}
+
+.aisb-upload-notice--error .dashicons-warning {
+    color: #d63638;
+}
+
+.aisb-notice-dismiss {
+    margin-left: auto;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.aisb-notice-dismiss:hover {
+    opacity: 1;
+}
+
+.aisb-notice-dismiss .dashicons {
+    color: #50575e;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Upload Button Specific */
+#aisb-upload-document {
+    margin-right: 8px;
+}
+
+#aisb-upload-document .dashicons {
+    margin-right: 4px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+    .aisb-upload-notice {
+        right: 10px;
+        max-width: calc(100% - 20px);
+    }
+    
+    .aisb-upload-progress {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+}
+
+/* Extraction Results Display (Phase 3) */
+.aisb-extraction-results {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100000;
+    width: 90%;
+    max-width: 600px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.aisb-extraction-results h3 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e1e1e;
+}
+
+.aisb-extraction-stats {
+    display: flex;
+    gap: 20px;
+    padding: 10px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 3px;
+    margin-bottom: 15px;
+}
+
+.aisb-extraction-stats span {
+    font-size: 14px;
+    color: #2c3338;
+}
+
+.aisb-extraction-preview {
+    margin-bottom: 15px;
+}
+
+.aisb-extraction-preview h4 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #50575e;
+}
+
+.aisb-extraction-preview p {
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #e5e5e5;
+    border-radius: 3px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #50575e;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.aisb-phase-info {
+    padding: 10px;
+    background: #e7f5ff;
+    border: 1px solid #bee3f8;
+    border-radius: 3px;
+    margin-bottom: 15px;
+}
+
+.aisb-phase-info em {
+    font-size: 13px;
+    color: #2563eb;
+}
+
+.aisb-close-results {
+    padding: 6px 12px;
+    background: #2271b1;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.aisb-close-results:hover {
+    background: #135e96;
+}
+
+/* AI Results Display (Phase 4) */
+.aisb-ai-results {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100000;
+    width: 90%;
+    max-width: 700px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
+    padding: 24px;
+    animation: fadeInDown 0.3s ease-out;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.aisb-ai-results h3 {
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e1e1e;
+    border-bottom: 2px solid #2271b1;
+    padding-bottom: 8px;
+}
+
+.aisb-ai-summary {
+    padding: 12px;
+    background: #f0f6fc;
+    border: 1px solid #bee3f8;
+    border-radius: 3px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #2c3338;
+}
+
+.aisb-ai-stats {
+    display: flex;
+    gap: 24px;
+    padding: 10px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 3px;
+    margin-bottom: 16px;
+}
+
+.aisb-ai-stats span {
+    font-size: 14px;
+    color: #2c3338;
+}
+
+.aisb-sections-preview {
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 3px;
+}
+
+.aisb-sections-preview h4 {
+    margin: 0 0 12px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #50575e;
+}
+
+.aisb-sections-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.aisb-sections-list li {
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 3px;
+    font-size: 13px;
+    color: #50575e;
+}
+
+.aisb-sections-list strong {
+    color: #2271b1;
+    font-weight: 600;
+}
+
+.aisb-ai-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #dcdcde;
+}
+
+.aisb-add-sections {
+    padding: 8px 16px;
+    background: #00a32a;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.aisb-add-sections:hover {
+    background: #008a20;
+}
+
+.aisb-ai-results .aisb-close-results {
+    padding: 8px 16px;
+    background: #50575e;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.aisb-ai-results .aisb-close-results:hover {
+    background: #3c434a;
+}
+
+/* Dark mode support (if editor has dark mode) */
+.aisb-editor-dark-mode .aisb-upload-progress {
+    background: rgba(30, 30, 30, 0.95);
+    border-color: #444;
+    color: #ccc;
+}
+
+.aisb-editor-dark-mode .aisb-upload-notice {
+    background: #1e1e1e;
+    color: #ccc;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.aisb-editor-dark-mode .aisb-notice-dismiss .dashicons {
+    color: #999;
+}
+
+.aisb-editor-dark-mode .aisb-ai-results {
+    background: #1e1e1e;
+    border-color: #444;
+    color: #ccc;
+}
+
+.aisb-editor-dark-mode .aisb-ai-results h3 {
+    color: #fff;
+    border-bottom-color: #60a5fa;
+}
+
+.aisb-editor-dark-mode .aisb-ai-summary {
+    background: #374151;
+    border-color: #4b5563;
+    color: #d1d5db;
+}
+
+.aisb-editor-dark-mode .aisb-sections-preview {
+    background: #374151;
+    border-color: #4b5563;
+}
+
+.aisb-editor-dark-mode .aisb-sections-list li {
+    background: #1f2937;
+    border-color: #4b5563;
+    color: #d1d5db;
+}
+
+.aisb-editor-dark-mode .aisb-sections-list strong {
+    color: #60a5fa;
+}

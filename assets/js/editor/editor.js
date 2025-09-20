@@ -349,7 +349,17 @@
         var existingSections = $('#aisb-existing-sections').val();
         if (existingSections) {
             try {
-                editorState.sections = JSON.parse(existingSections);
+                var rawSections = JSON.parse(existingSections);
+                
+                // Normalize sections data for consistent handling
+                if (window.AISBDataNormalizer) {
+                    editorState.sections = window.AISBDataNormalizer.normalizeSections(rawSections);
+                    console.log('Editor: Normalized', editorState.sections.length, 'sections from database');
+                } else {
+                    editorState.sections = rawSections;
+                    console.warn('Editor: DataNormalizer not available, using raw sections');
+                }
+                
                 renderSections();
             } catch(e) {
                 console.error('Error parsing sections:', e);
@@ -457,6 +467,11 @@
         // Save button
         $('#aisb-save-sections').on('click', function() {
             saveSections();
+        });
+        
+        // Clear all sections button
+        $('#aisb-clear-all-sections').on('click', function() {
+            clearAllSections();
         });
         
         // Back to library button
@@ -684,7 +699,23 @@
         
         // Migrate buttons to global_blocks
         if (content.buttons && !content.global_blocks) {
-            migrated.global_blocks = content.buttons.map(function(btn) {
+            // Parse buttons if it's a JSON string
+            var buttons = content.buttons;
+            if (typeof buttons === 'string') {
+                try {
+                    buttons = JSON.parse(buttons);
+                } catch (e) {
+                    console.error('Failed to parse buttons:', e);
+                    buttons = [];
+                }
+            }
+            
+            // Ensure buttons is an array
+            if (!Array.isArray(buttons)) {
+                buttons = [];
+            }
+            
+            migrated.global_blocks = buttons.map(function(btn) {
                 return $.extend({ type: 'button' }, btn);
             });
             delete migrated.buttons;
@@ -2306,6 +2337,16 @@
      * Render Checklist Items
      */
     function renderChecklistItems(items) {
+        // Parse items if it's a JSON string
+        if (typeof items === 'string') {
+            try {
+                items = JSON.parse(items);
+            } catch (e) {
+                console.error('Failed to parse checklist items:', e);
+                items = [];
+            }
+        }
+        
         debugLog('renderChecklistItems called', {
             items: items,
             isArray: Array.isArray(items),
@@ -2344,6 +2385,16 @@
      * Render Feature Cards
      */
     function renderFeatureCards(cards) {
+        // Parse cards if it's a JSON string
+        if (typeof cards === 'string') {
+            try {
+                cards = JSON.parse(cards);
+            } catch (e) {
+                console.error('Failed to parse feature cards:', e);
+                cards = [];
+            }
+        }
+        
         if (!cards || !Array.isArray(cards) || cards.length === 0) {
             // Return empty - no placeholder cards
             return '';
@@ -2391,6 +2442,16 @@
      * Render stat items for Stats section
      */
     function renderStatItems(stats) {
+        // Parse stats if it's a JSON string
+        if (typeof stats === 'string') {
+            try {
+                stats = JSON.parse(stats);
+            } catch (e) {
+                console.error('Failed to parse stats:', e);
+                stats = [];
+            }
+        }
+        
         if (!stats || !Array.isArray(stats) || stats.length === 0) {
             // Return placeholder stats to show what the section will look like
             return `
@@ -2440,6 +2501,16 @@
      * Render testimonial items for Testimonials section
      */
     function renderTestimonialItems(testimonials) {
+        // Parse testimonials if it's a JSON string
+        if (typeof testimonials === 'string') {
+            try {
+                testimonials = JSON.parse(testimonials);
+            } catch (e) {
+                console.error('Failed to parse testimonials:', e);
+                testimonials = [];
+            }
+        }
+        
         if (!testimonials || !Array.isArray(testimonials) || testimonials.length === 0) {
             // Return placeholder message
             return `
@@ -2686,10 +2757,10 @@
             return; // Container not found
         }
         
-        // Get items from content or empty array
-        var items = content.faq_items || [];
+        // Get items from content - handle both 'questions' (from AI) and 'faq_items' (legacy)
+        var items = content.questions || content.faq_items || [];
         
-        // Initialize repeater field
+        // Initialize repeater field (keep internal fieldName as faq_items for consistency)
         var itemsRepeater = $container.aisbRepeaterField({
             fieldName: 'faq_items',
             items: items,
@@ -2739,10 +2810,13 @@
                     sectionType: editorState.currentSection !== null ? editorState.sections[editorState.currentSection].type : null
                 });
                 
-                // Update the content
+                // Update the content - save as 'questions' for AI compatibility
                 if (editorState.currentSection !== null) {
+                    // Save as both 'questions' (for AI/frontend) and 'faq_items' (for legacy)
+                    editorState.sections[editorState.currentSection].content.questions = items;
                     editorState.sections[editorState.currentSection].content.faq_items = items;
                     debugLog('Updated section content with FAQ items', {
+                        questions: items,
                         sectionContent: editorState.sections[editorState.currentSection].content
                     });
                     updatePreview();
@@ -3814,14 +3888,23 @@
             content[field.name] = field.value;
         });
         
+        // Get the current section first
+        var currentSection = editorState.sections[editorState.currentSection];
+        
+        // Debug: Check hero heading specifically
+        if (currentSection && currentSection.type === 'hero') {
+            debugLog('Hero Heading Check', {
+                formHeading: content.heading,
+                currentHeading: currentSection.content ? currentSection.content.heading : 'no content',
+                formDataRaw: formData.filter(f => f.name === 'heading')
+            });
+        }
+        
         // Debug: Check if items are in form data
         debugLog('updatePreview - Checking for items in form data', {
             hasItemsInFormData: formData.some(field => field.name === 'items'),
             formDataKeys: formData.map(field => field.name)
         });
-        
-        // Get the current section first
-        var currentSection = editorState.sections[editorState.currentSection];
         
         // Get TinyMCE content directly if editors exist
         // This ensures we get the HTML content, not the raw textarea value
@@ -3923,9 +4006,17 @@
                 });
             }
             
-            // Preserve FAQ items managed by repeater
-            if (currentSection.content.faq_items) {
+            // Preserve FAQ items managed by repeater (handle both field names)
+            if (currentSection.content.questions) {
+                content.questions = currentSection.content.questions;
+                content.faq_items = currentSection.content.questions; // Keep both for compatibility
+                debugLog('Preserving FAQ questions in updatePreview', {
+                    questions: currentSection.content.questions,
+                    itemCount: currentSection.content.questions.length
+                });
+            } else if (currentSection.content.faq_items) {
                 content.faq_items = currentSection.content.faq_items;
+                content.questions = currentSection.content.faq_items; // Keep both for compatibility
                 debugLog('Preserving FAQ items in updatePreview', {
                     faq_items: currentSection.content.faq_items,
                     itemCount: currentSection.content.faq_items.length
@@ -4030,6 +4121,9 @@
                 var sectionHtml = renderSection(section, index);
                 $canvas.append(sectionHtml);
             });
+            
+            // Trigger event for accordion and other frontend scripts
+            $(document).trigger('aisb:preview:updated');
         }
         
         // Update section list in right panel
@@ -4061,6 +4155,9 @@
                 var sectionHtml = renderSection(section, index);
                 $canvas.append(sectionHtml);
             });
+            
+            // Trigger event for accordion and other frontend scripts
+            $(document).trigger('aisb:preview:updated');
         }
     }
     
@@ -4346,8 +4443,18 @@
      */
     function renderGlobalBlocks(blocks, sectionType = 'hero') {
         console.log('=== renderGlobalBlocks DEBUG ===');
-        console.log('1. Blocks received:', JSON.parse(JSON.stringify(blocks)));
+        console.log('1. Blocks received:', blocks);
         console.log('2. Section type:', sectionType);
+        
+        // Parse blocks if it's a JSON string
+        if (typeof blocks === 'string') {
+            try {
+                blocks = JSON.parse(blocks);
+            } catch (e) {
+                console.error('Failed to parse global_blocks:', e);
+                blocks = [];
+            }
+        }
         
         if (!blocks || !blocks.length) {
             console.log('3. No blocks to render, returning empty');
@@ -4357,7 +4464,7 @@
         var html = '';
         var buttons = blocks.filter(function(block) { return block.type === 'button'; });
         
-        console.log('4. Buttons filtered:', JSON.parse(JSON.stringify(buttons)));
+        console.log('4. Buttons filtered:', buttons);
         
         // Render buttons if any
         if (buttons.length) {
@@ -4608,11 +4715,16 @@
     function renderFaqSection(section, index) {
         var content = section.content || section;
         
+        // Handle both 'questions' (from AI) and 'faq_items' (legacy) field names
+        var faqItems = content.questions || content.faq_items || [];
+        
         debugLog('renderFaqSection called', {
             section: section,
             content: content,
+            questions: content.questions,
             faq_items: content.faq_items,
-            itemsLength: content.faq_items ? content.faq_items.length : 0
+            finalItems: faqItems,
+            itemsLength: faqItems.length
         });
         
         // Build class list based on variants
@@ -4625,9 +4737,9 @@
         
         // Render FAQ items with accordion structure
         var itemsHtml = '';
-        if (content.faq_items && content.faq_items.length > 0) {
+        if (faqItems && faqItems.length > 0) {
             itemsHtml = '<div class="aisb-faq__items">';
-            content.faq_items.forEach(function(item, itemIndex) {
+            faqItems.forEach(function(item, itemIndex) {
                 if (item.question || item.answer) {
                     itemsHtml += '<div class="aisb-faq__item" data-faq-index="' + itemIndex + '">';
                     if (item.question) {
@@ -5045,6 +5157,73 @@
     }
     
     /**
+     * Clear all sections from the page
+     */
+    function clearAllSections() {
+        // Confirm with user
+        if (!confirm('Are you sure you want to remove all sections from this page? This will clear any corrupted sections as well.')) {
+            return;
+        }
+        
+        var postId = $('#aisb-post-id').val();
+        var nonce = $('#aisb_editor_nonce').val();
+        var $button = $('#aisb-clear-all-sections');
+        
+        // Disable button and show progress
+        var originalText = $button.text();
+        $button.prop('disabled', true).html('<span class="dashicons dashicons-update-alt spin"></span> Clearing...');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'aisb_clear_all_sections',
+                post_id: postId,
+                nonce: nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Clear editor state
+                    editorState.sections = [];
+                    editorState.isDirty = false;
+                    editorState.currentSection = null;
+                    
+                    // Clear the preview
+                    $('#aisb-sections-preview').html(
+                        '<div class="aisb-editor-empty-state">' +
+                        '<span class="dashicons dashicons-layout"></span>' +
+                        '<h2>Start Building Your Page</h2>' +
+                        '<p>Click a section type to add it to your page</p>' +
+                        '</div>'
+                    );
+                    
+                    // Clear the structure panel
+                    $('#aisb-section-list').empty();
+                    $('.aisb-structure-empty').show();
+                    
+                    // Now save the empty state to persist the changes
+                    saveSectionsToServer().then(function() {
+                        showNotification('All sections cleared and saved successfully', 'success');
+                    }).catch(function(error) {
+                        showNotification('Sections cleared but failed to save: ' + error, 'warning');
+                    });
+                    
+                    // Reset button
+                    $button.prop('disabled', false).text(originalText);
+                } else {
+                    showNotification('Failed to clear sections: ' + (response.data || 'Unknown error'), 'error');
+                    $button.prop('disabled', false).text(originalText);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Clear sections error:', error);
+                showNotification('Failed to clear sections. Please try again.', 'error');
+                $button.prop('disabled', false).text(originalText);
+            }
+        });
+    }
+    
+    /**
      * Save sections to server (core functionality)
      */
     function saveSectionsToServer() {
@@ -5066,6 +5245,18 @@
                     post_id: postId,
                     sections: JSON.stringify(editorState.sections),
                     nonce: nonce
+                },
+                beforeSend: function() {
+                    // Debug: Log what we're saving for hero sections
+                    editorState.sections.forEach(function(section, index) {
+                        if (section.type === 'hero' || section.type === 'hero-form') {
+                            console.log('Save Debug - ' + section.type + ' section ' + index + ':', {
+                                heading: section.content ? section.content.heading : 'NO CONTENT',
+                                fullContent: section.content,
+                                fullSection: section
+                            });
+                        }
+                    });
                 },
                 timeout: 30000, // 30 second timeout
                 success: function(response) {
@@ -5499,6 +5690,69 @@
             
             // Initialize autocomplete on any existing URL fields
             setTimeout(initializeUrlAutocomplete, 500);
+            
+            // Expose editor API for document upload integration
+            window.aisbEditor = {
+                /**
+                 * Add a section to the editor
+                 */
+                addSection: function(section) {
+                    if (!section || !section.type) {
+                        console.error('Invalid section format');
+                        return false;
+                    }
+                    
+                    // Add to editor state
+                    editorState.sections.push(section);
+                    editorState.isDirty = true;
+                    
+                    // Render sections
+                    renderSections();
+                    updateSectionList();
+                    updateSaveStatus('unsaved');
+                    
+                    return true;
+                },
+                
+                /**
+                 * Update section list display
+                 */
+                updateSectionList: function() {
+                    updateSectionList();
+                },
+                
+                /**
+                 * Mark editor as having unsaved changes
+                 */
+                markDirty: function() {
+                    editorState.isDirty = true;
+                    updateSaveStatus('unsaved');
+                },
+                
+                /**
+                 * Get current sections
+                 */
+                getSections: function() {
+                    return editorState.sections;
+                },
+                
+                /**
+                 * Clear all sections (with confirmation)
+                 */
+                clearSections: function(skipConfirmation) {
+                    if (!skipConfirmation && !confirm('Are you sure you want to remove all sections?')) {
+                        return false;
+                    }
+                    
+                    editorState.sections = [];
+                    editorState.isDirty = true;
+                    renderSections();
+                    updateSectionList();
+                    updateSaveStatus('unsaved');
+                    
+                    return true;
+                }
+            };
             
             debugLog('Editor initialization complete');
         }

@@ -52,7 +52,7 @@ class AI_Ajax {
         $provider = isset($_POST['provider']) ? sanitize_text_field($_POST['provider']) : '';
         $api_key = isset($_POST['api_key']) ? sanitize_text_field($_POST['api_key']) : '';
         $model = isset($_POST['model']) ? sanitize_text_field($_POST['model']) : '';
-        $keep_existing = isset($_POST['keep_existing_key']) && $_POST['keep_existing_key'] === 'yes';
+        $keep_existing = isset($_POST['keep_existing_key']) && $_POST['keep_existing_key'] === '1';
         
         // Get current settings
         $current_settings = AI_Connector::get_settings();
@@ -73,14 +73,22 @@ class AI_Ajax {
         $provider_changed = isset($current_settings['provider']) && 
                           $current_settings['provider'] !== $provider;
         
-        // Update settings
+        // Update settings with provider-specific fields
         $settings = array(
             'provider' => $provider,
-            'api_key' => $encrypted_key,
-            'model' => $model,
+            'api_key' => $encrypted_key, // Keep generic for backward compatibility
             'verified' => $provider_changed ? false : (isset($current_settings['verified']) ? $current_settings['verified'] : false),
             'last_verified' => $provider_changed ? 0 : (isset($current_settings['last_verified']) ? $current_settings['last_verified'] : 0)
         );
+        
+        // Add provider-specific fields
+        if ($provider === 'openai') {
+            $settings['openai_api_key'] = $encrypted_key;
+            $settings['openai_model'] = $model;
+        } else if ($provider === 'anthropic') {
+            $settings['anthropic_api_key'] = $encrypted_key;
+            $settings['anthropic_model'] = $model;
+        }
         
         // Save settings
         $saved = AI_Connector::save_settings($settings);
@@ -139,6 +147,19 @@ class AI_Ajax {
             $settings = AI_Connector::get_settings();
             $settings['verified'] = true;
             $settings['last_verified'] = time();
+            
+            // Ensure provider-specific API key is saved
+            $settings['provider'] = $provider;
+            $settings['api_key'] = AI_Connector::encrypt_api_key($api_key); // Keep generic too
+            
+            if ($provider === 'openai') {
+                $settings['openai_api_key'] = AI_Connector::encrypt_api_key($api_key);
+                $settings['openai_model'] = $model;
+            } else if ($provider === 'anthropic') {
+                $settings['anthropic_api_key'] = AI_Connector::encrypt_api_key($api_key);
+                $settings['anthropic_model'] = $model;
+            }
+            
             AI_Connector::save_settings($settings);
             
             wp_send_json_success(array(

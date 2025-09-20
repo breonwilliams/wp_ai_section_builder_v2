@@ -400,14 +400,20 @@ class AI_Settings {
                 $spinner.addClass('is-active');
                 $message.hide();
                 
+                // Determine if we should keep existing key
+                var apiKeyField = $('#aisb_api_key');
+                var apiKeyValue = apiKeyField.val();
+                var hasSavedKey = apiKeyField.data('has-saved-key') === 'true' || apiKeyField.data('has-saved-key') === true;
+                var keepExisting = (apiKeyValue === '' && hasSavedKey) ? '1' : '0';
+                
                 $.ajax({
                     url: ajaxurl,
                     type: 'POST',
                     data: {
                         action: 'aisb_save_ai_settings',
                         provider: $('input[name="aisb_provider"]:checked').val(),
-                        api_key: $('#aisb_api_key').val(),
-                        keep_existing_key: $('#aisb_keep_existing_key').val(),
+                        api_key: apiKeyValue,
+                        keep_existing_key: keepExisting,
                         model: $('#aisb_model').val(),
                         nonce: $('#aisb_ai_settings_nonce').val()
                     },
@@ -427,9 +433,16 @@ class AI_Settings {
                                 );
                             }
                             
+                            // Update the field state after successful save
+                            if (apiKeyValue) {
+                                // New key was saved
+                                $('#aisb_api_key').val('').data('has-saved-key', 'true');
+                                $('#aisb_keep_existing_key').val('1');
+                            }
+                            
                             // Clear API key field and update placeholder
                             if (response.data.masked_key) {
-                                $('#aisb_api_key').val('').attr('placeholder', response.data.masked_key);
+                                $('#aisb_api_key').attr('placeholder', response.data.masked_key);
                             }
                         } else {
                             $message.removeClass('notice-success').addClass('notice-error notice')

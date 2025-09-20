@@ -56,6 +56,12 @@ class Testimonials_Section extends Section_Base {
         
         // Get global blocks (buttons for now)
         $global_blocks = isset($content['global_blocks']) ? $content['global_blocks'] : array();
+        if (is_string($global_blocks)) {
+            $global_blocks = json_decode($global_blocks, true);
+        }
+        if (!is_array($global_blocks)) {
+            $global_blocks = array();
+        }
         
         // Build section classes based on variants - matching Features structure
         $section_classes = array(
@@ -123,7 +129,13 @@ class Testimonials_Section extends Section_Base {
                 <!-- Testimonials grid -->
                 <?php 
                 // Get testimonials array
-                $testimonials = isset($content['testimonials']) && is_array($content['testimonials']) ? $content['testimonials'] : array();
+                $testimonials = isset($content['testimonials']) ? $content['testimonials'] : array();
+                if (is_string($testimonials)) {
+                    $testimonials = json_decode($testimonials, true);
+                }
+                if (!is_array($testimonials)) {
+                    $testimonials = array();
+                }
                 
                 if (!empty($testimonials)): ?>
                     <div class="aisb-testimonials__grid">

@@ -52,10 +52,20 @@ if (defined('WP_DEBUG') && WP_DEBUG) {
                     <span class="aisb-btn-label"><?php _e('Hide Panels', 'ai-section-builder'); ?></span>
                 </button>
             </div>
+            <button class="aisb-editor-btn aisb-editor-btn-ghost" id="aisb-upload-document">
+                <span class="dashicons dashicons-media-text"></span>
+                <?php _e('Upload Document', 'ai-section-builder'); ?>
+            </button>
+            <button class="aisb-editor-btn aisb-editor-btn-danger" id="aisb-clear-all-sections" title="<?php _e('Remove all sections from this page', 'ai-section-builder'); ?>">
+                <span class="dashicons dashicons-trash"></span>
+                <?php _e('Clear All', 'ai-section-builder'); ?>
+            </button>
             <button class="aisb-editor-btn aisb-editor-btn-primary" id="aisb-save-sections">
                 <span class="dashicons dashicons-saved"></span>
                 <?php _e('Save', 'ai-section-builder'); ?>
             </button>
+            <!-- Hidden file input for document upload -->
+            <input type="file" id="aisb-document-file" accept=".docx,.doc,.txt" style="display: none;" data-post-id="<?php echo esc_attr($post_id); ?>" />
         </div>
     </div>
     

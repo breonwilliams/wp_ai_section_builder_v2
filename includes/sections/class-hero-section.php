@@ -48,6 +48,12 @@ class Hero_Section extends Section_Base {
         $eyebrow_heading = esc_html($content['eyebrow_heading'] ?? '');
         $heading = esc_html($content['heading'] ?? '');
         $content_text = wp_kses_post($content['content'] ?? '');
+        
+        // Debug: Log what we're getting for heading
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("AISB Hero - Heading value: '$heading'");
+            error_log("AISB Hero - Raw heading from content: " . ($content['heading'] ?? 'NOT SET'));
+        }
         $outro_content = wp_kses_post($content['outro_content'] ?? '');
         $featured_image = esc_url($content['featured_image'] ?? '');
         $media_type = sanitize_text_field($content['media_type'] ?? 'none');
@@ -93,6 +99,14 @@ class Hero_Section extends Section_Base {
                         
                         <?php 
                         // Render global blocks (buttons for now)
+                        // Handle both array and JSON string formats
+                        if (is_string($global_blocks)) {
+                            $global_blocks = json_decode($global_blocks, true);
+                        }
+                        if (!is_array($global_blocks)) {
+                            $global_blocks = array();
+                        }
+                        
                         $buttons = array_filter($global_blocks, function($block) {
                             return isset($block['type']) && $block['type'] === 'button';
                         });

@@ -61,6 +61,12 @@ class Hero_Form_Section extends Section_Base {
         
         // Get global blocks (buttons for now)
         $global_blocks = isset($content['global_blocks']) ? $content['global_blocks'] : array();
+        if (is_string($global_blocks)) {
+            $global_blocks = json_decode($global_blocks, true);
+        }
+        if (!is_array($global_blocks)) {
+            $global_blocks = array();
+        }
         
         // Build section classes based on variants
         $section_classes = array(

@@ -19,7 +19,23 @@
         this.defaultItem = options.defaultItem || {};
         this.maxItems = options.maxItems || 10;
         this.minItems = options.minItems || 0;
-        this.items = options.items || [];
+        
+        // CRITICAL: Ensure items is always an array (handle JSON strings from AI)
+        var items = options.items || [];
+        if (typeof items === 'string') {
+            try {
+                items = JSON.parse(items);
+            } catch (e) {
+                console.warn('AISBRepeaterField: Invalid JSON string for items, using empty array:', e);
+                items = [];
+            }
+        }
+        if (!Array.isArray(items)) {
+            console.warn('AISBRepeaterField: items is not an array, converting to array:', items);
+            items = [];
+        }
+        this.items = items;
+        
         this.onUpdate = options.onUpdate || function() {};
         this.itemLabel = options.itemLabel || 'Item';
         this.addButtonText = options.addButtonText || 'Add Item';
@@ -281,7 +297,21 @@
          * Set items data
          */
         setData: function(items) {
-            this.items = items || [];
+            // CRITICAL: Ensure items is always an array (handle JSON strings from AI)
+            items = items || [];
+            if (typeof items === 'string') {
+                try {
+                    items = JSON.parse(items);
+                } catch (e) {
+                    console.warn('AISBRepeaterField: Invalid JSON string for setData, using empty array:', e);
+                    items = [];
+                }
+            }
+            if (!Array.isArray(items)) {
+                console.warn('AISBRepeaterField: setData items is not an array, converting to array:', items);
+                items = [];
+            }
+            this.items = items;
             this.render();
         },
         

@@ -51,9 +51,37 @@ class FAQ_Section extends Section_Base {
         
         // Get global blocks (buttons)
         $global_blocks = isset($content['global_blocks']) ? $content['global_blocks'] : array();
+        if (is_string($global_blocks)) {
+            $global_blocks = json_decode($global_blocks, true);
+        }
+        if (!is_array($global_blocks)) {
+            $global_blocks = array();
+        }
         
-        // Get FAQ items (will be empty in Phase 1)
-        $faq_items = isset($content['faq_items']) ? $content['faq_items'] : array();
+        // Get FAQ items (will be empty in Phase 1) 
+        // Note: The field is actually 'questions' not 'faq_items' based on the document-upload.js
+        $faq_items = isset($content['questions']) ? $content['questions'] : (isset($content['faq_items']) ? $content['faq_items'] : array());
+        
+        // Debug: Log FAQ data
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("AISB FAQ - Raw questions field: " . print_r(($content['questions'] ?? 'NOT SET'), true));
+            error_log("AISB FAQ - Before decode: " . gettype($faq_items) . " - " . (is_string($faq_items) ? substr($faq_items, 0, 100) : 'not string'));
+        }
+        
+        if (is_string($faq_items)) {
+            $faq_items = json_decode($faq_items, true);
+        }
+        if (!is_array($faq_items)) {
+            $faq_items = array();
+        }
+        
+        // Debug: Log after decode
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("AISB FAQ - After decode, items count: " . count($faq_items));
+            if (!empty($faq_items)) {
+                error_log("AISB FAQ - First item: " . print_r($faq_items[0] ?? 'empty', true));
+            }
+        }
         
         // Build section classes
         $section_classes = array(

@@ -57,6 +57,12 @@ class Stats_Section extends Section_Base {
         
         // Get global blocks (buttons for now)
         $global_blocks = isset($content['global_blocks']) ? $content['global_blocks'] : array();
+        if (is_string($global_blocks)) {
+            $global_blocks = json_decode($global_blocks, true);
+        }
+        if (!is_array($global_blocks)) {
+            $global_blocks = array();
+        }
         
         // Build section classes based on variants - matching Features structure
         $section_classes = array(
@@ -125,7 +131,13 @@ class Stats_Section extends Section_Base {
                 <div class="aisb-stats__grid">
                     <?php 
                     // Get stats items array
-                    $stats = isset($content['stats']) && is_array($content['stats']) ? $content['stats'] : array();
+                    $stats = isset($content['stats']) ? $content['stats'] : array();
+                    if (is_string($stats)) {
+                        $stats = json_decode($stats, true);
+                    }
+                    if (!is_array($stats)) {
+                        $stats = array();
+                    }
                     
                     if (!empty($stats)):
                         foreach ($stats as $stat):

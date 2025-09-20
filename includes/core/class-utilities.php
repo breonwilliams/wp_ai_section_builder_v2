@@ -127,6 +127,16 @@ class Utilities {
             $sections = [];
         }
         
+        // Debug: Log sections loading for hero sections
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            foreach ($sections as $index => $section) {
+                if (isset($section['type']) && ($section['type'] === 'hero' || $section['type'] === 'hero-form')) {
+                    error_log('AISB Frontend Load - ' . $section['type'] . ' section ' . $index . ' heading: ' . 
+                        (isset($section['content']['heading']) ? $section['content']['heading'] : 'NO HEADING'));
+                }
+            }
+        }
+        
         // Cache for 1 hour
         if ($use_cache) {
             set_transient('aisb_sections_' . $post_id, $sections, HOUR_IN_SECONDS);

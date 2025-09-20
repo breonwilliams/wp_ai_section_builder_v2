@@ -29,7 +29,7 @@ if (defined('AISB_INITIALIZED')) {
 define('AISB_INITIALIZED', true);
 
 // Plugin constants - using PHP native functions to avoid WordPress dependency
-define('AISB_VERSION', '2.0.0');
+define('AISB_VERSION', '2.0.2');
 define('AISB_PLUGIN_FILE', __FILE__);
 
 // Use PHP's dirname instead of plugin_dir_path to avoid WordPress function dependency
@@ -145,6 +145,7 @@ add_action('init', function() {
         require_once AISB_PLUGIN_DIR . 'includes/ajax/class-ajax-handler.php';
         require_once AISB_PLUGIN_DIR . 'includes/ajax/class-editor-ajax.php';
         require_once AISB_PLUGIN_DIR . 'includes/ajax/class-ai-ajax.php';
+        require_once AISB_PLUGIN_DIR . 'includes/ajax/class-document-ajax.php';
         
         // Initialize admin components
         new \AISB\Admin\Admin_Menu();
@@ -153,6 +154,10 @@ add_action('init', function() {
         // Initialize AJAX handlers
         new \AISB\Ajax\Editor_Ajax();
         new \AISB\Ajax\AI_Ajax();
+        new \AISB\Ajax\Document_Ajax();
+        
+        // Load clear sections utility
+        require_once AISB_PLUGIN_DIR . 'includes/ajax/clear-sections.php';
     }
 });
 

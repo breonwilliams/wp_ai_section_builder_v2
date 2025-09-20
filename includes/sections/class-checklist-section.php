@@ -51,9 +51,21 @@ class Checklist_Section extends Section_Base {
         
         // Get global blocks (buttons)
         $global_blocks = isset($content['global_blocks']) ? $content['global_blocks'] : array();
+        if (is_string($global_blocks)) {
+            $global_blocks = json_decode($global_blocks, true);
+        }
+        if (!is_array($global_blocks)) {
+            $global_blocks = array();
+        }
         
         // Get items (will be empty in Phase 1)
         $items = isset($content['items']) ? $content['items'] : array();
+        if (is_string($items)) {
+            $items = json_decode($items, true);
+        }
+        if (!is_array($items)) {
+            $items = array();
+        }
         
         // Build section classes
         $section_classes = array(

@@ -125,6 +125,13 @@ class Features_Section extends Section_Base {
                 <!-- Feature cards grid -->
                 <?php 
                 $cards = isset($content['cards']) ? $content['cards'] : array();
+                // Handle JSON string format
+                if (is_string($cards)) {
+                    $cards = json_decode($cards, true);
+                }
+                if (!is_array($cards)) {
+                    $cards = array();
+                }
                 if (!empty($cards)): 
                 ?>
                     <div class="aisb-features__grid">
@@ -168,6 +175,14 @@ class Features_Section extends Section_Base {
                 
                 <?php 
                 // Render global blocks (buttons for now)
+                // Handle both array and JSON string formats
+                if (is_string($global_blocks)) {
+                    $global_blocks = json_decode($global_blocks, true);
+                }
+                if (!is_array($global_blocks)) {
+                    $global_blocks = array();
+                }
+                
                 $buttons = array_filter($global_blocks, function($block) {
                     return isset($block['type']) && $block['type'] === 'button';
                 });

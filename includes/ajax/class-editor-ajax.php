@@ -126,6 +126,14 @@ class Editor_Ajax {
         // Debug: Log what we're saving
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('AISB Saving Sections: ' . print_r($sections_array, true));
+            
+            // Special debug for hero sections
+            foreach ($sections_array as $index => $section) {
+                if (isset($section['type']) && ($section['type'] === 'hero' || $section['type'] === 'hero-form')) {
+                    error_log('AISB Save Debug - ' . $section['type'] . ' section ' . $index . ' heading: ' . 
+                        (isset($section['content']['heading']) ? $section['content']['heading'] : 'NO HEADING'));
+                }
+            }
         }
         
         // Save sections

@@ -202,6 +202,19 @@ class AI_Connector {
      * @return bool Success
      */
     public static function save_settings($settings) {
-        return update_option('aisb_ai_settings', $settings);
+        // update_option returns false if the value is unchanged, but that's not an error
+        // It only fails if there's an actual database error
+        $result = update_option('aisb_ai_settings', $settings);
+        
+        // If false, check if the option exists and matches what we're trying to save
+        if ($result === false) {
+            $current = get_option('aisb_ai_settings');
+            // If the current settings match what we're trying to save, that's success
+            if ($current === $settings) {
+                return true;
+            }
+        }
+        
+        return $result;
     }
 }

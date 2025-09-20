@@ -39,6 +39,7 @@ class Asset_Manager {
     public function __construct() {
         // Enqueue styles with high priority to ensure they load after theme styles
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_styles'), 99);
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_scripts'), 100);
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
     }
     
@@ -92,6 +93,40 @@ class Asset_Manager {
         // Load editor styles on editor page
         if ($hook === 'admin_page_aisb-editor') {
             $this->enqueue_editor_styles();
+        }
+    }
+    
+    /**
+     * Enqueue frontend scripts
+     */
+    public function enqueue_frontend_scripts() {
+        // Only enqueue if we have active sections
+        if (!aisb_has_sections()) {
+            return;
+        }
+        
+        // Get corrected plugin URL
+        $plugin_url = function_exists('aisb_plugin_url') ? aisb_plugin_url() : AISB_PLUGIN_URL;
+        
+        // Check if we have FAQ sections on the page
+        $post_id = get_the_ID();
+        if ($post_id) {
+            $sections = get_post_meta($post_id, '_aisb_sections', true);
+            if (is_array($sections)) {
+                foreach ($sections as $section) {
+                    if (isset($section['type']) && $section['type'] === 'faq') {
+                        // Enqueue accordion script for FAQ sections
+                        wp_enqueue_script(
+                            'aisb-accordion',
+                            $plugin_url . 'assets/js/frontend/accordion.js',
+                            array('jquery'),
+                            AISB_VERSION,
+                            true
+                        );
+                        break; // Only need to enqueue once
+                    }
+                }
+            }
         }
     }
     
@@ -174,6 +209,14 @@ class Asset_Manager {
             AISB_VERSION
         );
         
+        // Load document upload styles
+        wp_enqueue_style(
+            'aisb-document-upload-styles',
+            $plugin_url . 'assets/css/editor/document-upload.css',
+            [],
+            AISB_VERSION
+        );
+        
         // CRITICAL: Enqueue WordPress Editor (TinyMCE) for WYSIWYG functionality
         wp_enqueue_editor();
         
@@ -205,11 +248,29 @@ class Asset_Manager {
             'after'
         );
         
+        // Enqueue data normalizer (CRITICAL for consistent data handling)
+        wp_enqueue_script(
+            'aisb-data-normalizer',
+            $plugin_url . 'assets/js/editor/data-normalizer.js',
+            ['jquery'],
+            AISB_VERSION,
+            true
+        );
+        
         // Enqueue repeater field JavaScript (CRITICAL for repeatable blocks)
         wp_enqueue_script(
             'aisb-repeater-field',
             $plugin_url . 'assets/js/editor/repeater-field.js',
-            ['jquery', 'sortablejs-cdn'],
+            ['jquery', 'sortablejs-cdn', 'aisb-data-normalizer'],
+            AISB_VERSION,
+            true
+        );
+        
+        // Enqueue accordion script for editor preview
+        wp_enqueue_script(
+            'aisb-accordion',
+            $plugin_url . 'assets/js/frontend/accordion.js',
+            array('jquery'),
             AISB_VERSION,
             true
         );
@@ -223,8 +284,17 @@ class Asset_Manager {
             wp_enqueue_script(
                 'aisb-editor-script',
                 $editor_js_url,
-                ['jquery', 'sortablejs-cdn', 'aisb-repeater-field', 'wp-tinymce'],
+                ['jquery', 'sortablejs-cdn', 'aisb-data-normalizer', 'aisb-repeater-field', 'wp-tinymce'],
                 AISB_VERSION . '-' . time(),
+                true
+            );
+            
+            // Load document upload script
+            wp_enqueue_script(
+                'aisb-document-upload',
+                $plugin_url . 'assets/js/editor/document-upload.js',
+                ['jquery', 'aisb-data-normalizer'],
+                AISB_VERSION,
                 true
             );
             
