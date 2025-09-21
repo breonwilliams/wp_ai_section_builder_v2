@@ -35,25 +35,25 @@ class Hero_Section extends Section_Base {
         $content = isset($this->section['content']) ? $this->section['content'] : $this->section;
         
         // Migrate old field names to new structure (using global function for now)
+        // This MUST be called BEFORE any other fallback logic
         if (function_exists('aisb_migrate_field_names')) {
             $content = aisb_migrate_field_names($content);
         }
         
-        // Debug: Log what we're getting (only in debug mode)
-        if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
-            error_log('AISB Hero Section Content: ' . print_r($content, true));
+        // Additional fallback: Check if heading is at root level
+        if (empty($content['heading']) && isset($this->section['heading'])) {
+            $content['heading'] = $this->section['heading'];
+        }
+        
+        // Final fallback: Check for 'headline' (in case migration didn't work)
+        if (empty($content['heading']) && isset($content['headline'])) {
+            $content['heading'] = $content['headline'];
         }
         
         // Extract standardized fields
         $eyebrow_heading = esc_html($content['eyebrow_heading'] ?? '');
         $heading = esc_html($content['heading'] ?? '');
         $content_text = wp_kses_post($content['content'] ?? '');
-        
-        // Debug: Log what we're getting for heading
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log("AISB Hero - Heading value: '$heading'");
-            error_log("AISB Hero - Raw heading from content: " . ($content['heading'] ?? 'NOT SET'));
-        }
         $outro_content = wp_kses_post($content['outro_content'] ?? '');
         $featured_image = esc_url($content['featured_image'] ?? '');
         $media_type = sanitize_text_field($content['media_type'] ?? 'none');

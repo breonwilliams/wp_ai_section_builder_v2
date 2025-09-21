@@ -3891,13 +3891,22 @@
         // Get the current section first
         var currentSection = editorState.sections[editorState.currentSection];
         
-        // Debug: Check hero heading specifically
-        if (currentSection && currentSection.type === 'hero') {
-            debugLog('Hero Heading Check', {
-                formHeading: content.heading,
-                currentHeading: currentSection.content ? currentSection.content.heading : 'no content',
-                formDataRaw: formData.filter(f => f.name === 'heading')
-            });
+        // COMPREHENSIVE DEBUG: Log for ALL section types
+        console.log('=== UPDATE PREVIEW DEBUG ===');
+        console.log('1. Current section type:', currentSection ? currentSection.type : 'NO SECTION');
+        console.log('2. Form heading field:', content.heading || 'NO HEADING IN FORM');
+        console.log('3. All form fields:', Object.keys(content));
+        console.log('4. Section index:', editorState.currentSection);
+        
+        // Debug: Check hero/hero-form heading specifically
+        if (currentSection && (currentSection.type === 'hero' || currentSection.type === 'hero-form')) {
+            console.log('=== HERO SECTION DEBUG ===');
+            console.log('Section type:', currentSection.type);
+            console.log('Form heading value:', content.heading);
+            console.log('Current section heading:', currentSection.content ? currentSection.content.heading : 'NO CONTENT');
+            console.log('Heading input element value:', $('#hero-heading').val() || $('#hero-form-heading').val() || 'NOT FOUND');
+            console.log('Form data with heading:', formData.filter(f => f.name === 'heading'));
+            console.log('=== END HERO DEBUG ===');
         }
         
         // Debug: Check if items are in form data
@@ -4510,6 +4519,14 @@
     function renderHeroSection(section, index) {
         var content = migrateOldFieldNames(section.content || section);
         
+        // DEBUG: Log hero rendering data
+        console.log('=== RENDER HERO SECTION ===');
+        console.log('Section index:', index);
+        console.log('Section type:', section.type);
+        console.log('Heading value:', content.heading);
+        console.log('Full content:', content);
+        console.log('=== END RENDER HERO ===');
+        
         // Build class list based on variants
         var sectionClasses = [
             'aisb-section',
@@ -4524,6 +4541,10 @@
                     <div class="aisb-hero__container">
                         <div class="aisb-hero__grid">
                             <div class="aisb-hero__content">
+                                <!-- DEBUG: Show heading value -->
+                                <div style="background: yellow; color: black; padding: 5px; margin-bottom: 10px; font-size: 11px;">
+                                    DEBUG - Heading: "${content.heading || 'EMPTY'}"
+                                </div>
                                 ${content.eyebrow_heading ? `<div class="aisb-hero__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
                                 <h1 class="aisb-hero__heading">${escapeHtml(content.heading || 'Your Headline Here')}</h1>
                                 <div class="aisb-hero__body">${content.content || '<p>Your compelling message goes here</p>'}</div>
@@ -4550,6 +4571,8 @@
         
         console.log('3. Content after migration:', JSON.parse(JSON.stringify(content)));
         console.log('4. Global blocks being rendered:', JSON.parse(JSON.stringify(content.global_blocks)));
+        console.log('5. HERO-FORM HEADING VALUE:', content.heading);
+        console.log('6. HERO-FORM HEADING EXISTS:', !!content.heading);
         
         // Build class list based on variants
         var sectionClasses = [
@@ -4568,6 +4591,10 @@
                     <div class="aisb-hero-form__container">
                         <div class="aisb-hero-form__grid">
                             <div class="aisb-hero-form__content">
+                                <!-- DEBUG: Show heading value -->
+                                <div style="background: yellow; color: black; padding: 5px; margin-bottom: 10px; font-size: 11px;">
+                                    DEBUG - Hero-Form Heading: "${content.heading || 'EMPTY'}"
+                                </div>
                                 ${content.eyebrow_heading ? `<div class="aisb-hero-form__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
                                 <h1 class="aisb-hero-form__heading">${escapeHtml(content.heading || 'Your Headline Here')}</h1>
                                 <div class="aisb-hero-form__body">${content.content || '<p>Your compelling message goes here</p>'}</div>

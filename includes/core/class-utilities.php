@@ -42,12 +42,13 @@ class Utilities {
         }
         
         // Map old field names to new
+        // FIXED: This maps FROM old names TO new names
         $field_map = [
-            'heading' => 'headline',
-            'subheading' => 'subheadline',
-            'button_text' => 'cta_text',
-            'button_url' => 'cta_url',
-            'background' => 'bg_color'
+            'headline' => 'heading',          // Convert old 'headline' to new 'heading'
+            'subheadline' => 'subheading',    // Convert old 'subheadline' to new 'subheading'
+            'cta_text' => 'button_text',      // Convert old 'cta_text' to new 'button_text'
+            'cta_url' => 'button_url',        // Convert old 'cta_url' to new 'button_url'
+            'bg_color' => 'background'        // Convert old 'bg_color' to new 'background'
         ];
         
         foreach ($field_map as $old => $new) {

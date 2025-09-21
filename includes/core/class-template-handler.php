@@ -146,11 +146,20 @@ $sections = aisb_get_sections($post_id);
             padding: 0 !important;
         }
         
-        /* Hide theme page title */
-        .aisb-canvas .entry-title,
-        .aisb-canvas .page-title,
-        .aisb-canvas h1.entry-title {
+        /* Hide ONLY theme page title - NOT our hero headings */
+        .aisb-canvas > .entry-title,
+        .aisb-canvas > .page-title,
+        .aisb-canvas header.entry-header h1.entry-title,
+        .aisb-canvas article > h1.entry-title {
             display: none !important;
+        }
+        
+        /* Ensure our hero headings are always visible */
+        .aisb-hero__heading,
+        .aisb-hero-form__heading {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         
         /* Ensure proper width without overflow */
