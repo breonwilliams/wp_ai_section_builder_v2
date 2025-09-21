@@ -27,9 +27,6 @@ class Document_Ajax {
      */
     public function __construct() {
         $this->register_ajax_handlers();
-        
-        // Debug: Log that the handler was registered
-        error_log('AISB_DEBUG: Document_Ajax constructor called, handlers registered');
     }
     
     /**
@@ -38,9 +35,6 @@ class Document_Ajax {
     private function register_ajax_handlers() {
         add_action('wp_ajax_aisb_upload_document', array($this, 'handle_document_upload'));
         add_action('wp_ajax_nopriv_aisb_upload_document', array($this, 'handle_document_upload_nopriv'));
-        
-        // Debug: Verify actions were added
-        error_log('AISB_DEBUG: AJAX actions registered for aisb_upload_document');
     }
     
     /**

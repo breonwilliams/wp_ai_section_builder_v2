@@ -92,8 +92,7 @@ class Editor_Ajax {
         // Clear cache for this post
         wp_cache_delete('aisb_enabled_' . $post_id, 'aisb');
         
-        // Log for debugging
-        error_log("AISB: Deactivated via AJAX for post $post_id - sections preserved");
+        // Sections preserved during deactivation
         
         wp_send_json_success([
             'message' => 'Builder deactivated. Your sections have been preserved and will be available if you reactivate.',

@@ -354,17 +354,21 @@
                 // Normalize sections data for consistent handling
                 if (window.AISBDataNormalizer) {
                     editorState.sections = window.AISBDataNormalizer.normalizeSections(rawSections);
-                    console.log('Editor: Normalized', editorState.sections.length, 'sections from database');
+                    // Sections normalized from database
                 } else {
                     editorState.sections = rawSections;
                     console.warn('Editor: DataNormalizer not available, using raw sections');
                 }
-                
-                renderSections();
             } catch(e) {
                 console.error('Error parsing sections:', e);
             }
+        } else {
+            // No existing sections, initialize as empty array
+            editorState.sections = [];
         }
+        
+        // Always render to ensure empty state shows when there are no sections
+        renderSections();
     }
     
     /**
@@ -2277,10 +2281,7 @@
      * Global block button template (component template)
      */
     function globalBlockButtonTemplate(button, index) {
-        console.log('=== globalBlockButtonTemplate CALLED ===');
-        console.log('1. Button data:', JSON.parse(JSON.stringify(button)));
-        console.log('2. Index:', index);
-        console.log('3. Button text:', button.text);
+        // Render button template
         
         var styles = [
             { value: 'primary', label: 'Primary' },
@@ -2294,7 +2295,7 @@
         }).join('');
         
         var buttonText = button.text || '';
-        console.log('4. Button text to display in input:', buttonText);
+        // Button text prepared
         
         return `
             <div class="aisb-repeater-fields">
@@ -2865,7 +2866,7 @@
         }
         
         if (!$textarea.length) {
-            console.log('FAQ answer textarea not found for index:', index);
+            // FAQ answer textarea not found for index
             return;
         }
         
@@ -2893,7 +2894,7 @@
                         force_p_newlines: true,
                         height: 120,
                         init_instance_callback: function(editor) {
-                            console.log('FAQ answer editor initialized for index:', index);
+                            // FAQ answer editor initialized
                         },
                         setup: function(editor) {
                             editor.on('change keyup', function() {
@@ -4113,13 +4114,23 @@
         var $emptyState = $('.aisb-editor-empty-state');
         
         if (editorState.sections.length === 0) {
-            // Show empty state
-            if ($emptyState.length) {
+            // Show canvas with empty state
+            $canvas.show();
+            
+            // If empty state doesn't exist, create it
+            if ($emptyState.length === 0) {
+                var emptyStateHtml = '<div class="aisb-editor-empty-state">' +
+                    '<span class="dashicons dashicons-layout"></span>' +
+                    '<h2>Start Building Your Page</h2>' +
+                    '<p>Click a section type to add it to your page</p>' +
+                    '</div>';
+                $canvas.html(emptyStateHtml);
+            } else {
+                // Show existing empty state
                 $emptyState.show();
             }
-            $canvas.hide();
         } else {
-            // Hide empty state and show canvas
+            // Hide empty state and render sections
             if ($emptyState.length) {
                 $emptyState.hide();
             }
@@ -4147,13 +4158,23 @@
         var $emptyState = $('.aisb-editor-empty-state');
         
         if (editorState.sections.length === 0) {
-            // Show empty state
-            if ($emptyState.length) {
+            // Show canvas with empty state
+            $canvas.show();
+            
+            // If empty state doesn't exist, create it
+            if ($emptyState.length === 0) {
+                var emptyStateHtml = '<div class="aisb-editor-empty-state">' +
+                    '<span class="dashicons dashicons-layout"></span>' +
+                    '<h2>Start Building Your Page</h2>' +
+                    '<p>Click a section type to add it to your page</p>' +
+                    '</div>';
+                $canvas.html(emptyStateHtml);
+            } else {
+                // Show existing empty state
                 $emptyState.show();
             }
-            $canvas.hide();
         } else {
-            // Hide empty state and show canvas
+            // Hide empty state and render sections
             if ($emptyState.length) {
                 $emptyState.hide();
             }
@@ -4451,9 +4472,7 @@
      * Render global blocks (buttons, cards, etc.)
      */
     function renderGlobalBlocks(blocks, sectionType = 'hero') {
-        console.log('=== renderGlobalBlocks DEBUG ===');
-        console.log('1. Blocks received:', blocks);
-        console.log('2. Section type:', sectionType);
+        // Render global blocks for section
         
         // Parse blocks if it's a JSON string
         if (typeof blocks === 'string') {
@@ -4466,21 +4485,19 @@
         }
         
         if (!blocks || !blocks.length) {
-            console.log('3. No blocks to render, returning empty');
+            // No blocks to render
             return '';
         }
         
         var html = '';
         var buttons = blocks.filter(function(block) { return block.type === 'button'; });
         
-        console.log('4. Buttons filtered:', buttons);
+        // Filter buttons from blocks
         
         // Render buttons if any
         if (buttons.length) {
             var buttonHtml = buttons.map(function(button, idx) {
-                console.log(`5. Button ${idx} text:`, button.text);
                 if (!button.text) {
-                    console.log(`6. Button ${idx} has no text, skipping`);
                     return '';
                 }
                 var styleClass = 'aisb-btn-' + (button.style || 'primary');
@@ -4489,7 +4506,7 @@
                 return `<button class="aisb-btn ${styleClass}" type="button">${escapeHtml(button.text)}</button>`;
             }).join('');
             
-            console.log('7. Button HTML generated:', buttonHtml);
+            // Button HTML generated
             
             if (buttonHtml) {
                 // Use correct container class based on section type
@@ -4504,8 +4521,7 @@
             }
         }
         
-        console.log('8. Final HTML:', html);
-        console.log('=== END renderGlobalBlocks DEBUG ===');
+        // Return rendered HTML
         
         // Future: Add rendering for other block types (cards, lists, etc.)
         
@@ -4541,10 +4557,6 @@
                     <div class="aisb-hero__container">
                         <div class="aisb-hero__grid">
                             <div class="aisb-hero__content">
-                                <!-- DEBUG: Show heading value -->
-                                <div style="background: yellow; color: black; padding: 5px; margin-bottom: 10px; font-size: 11px;">
-                                    DEBUG - Heading: "${content.heading || 'EMPTY'}"
-                                </div>
                                 ${content.eyebrow_heading ? `<div class="aisb-hero__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
                                 <h1 class="aisb-hero__heading">${escapeHtml(content.heading || 'Your Headline Here')}</h1>
                                 <div class="aisb-hero__body">${content.content || '<p>Your compelling message goes here</p>'}</div>
@@ -4591,10 +4603,6 @@
                     <div class="aisb-hero-form__container">
                         <div class="aisb-hero-form__grid">
                             <div class="aisb-hero-form__content">
-                                <!-- DEBUG: Show heading value -->
-                                <div style="background: yellow; color: black; padding: 5px; margin-bottom: 10px; font-size: 11px;">
-                                    DEBUG - Hero-Form Heading: "${content.heading || 'EMPTY'}"
-                                </div>
                                 ${content.eyebrow_heading ? `<div class="aisb-hero-form__eyebrow">${escapeHtml(content.eyebrow_heading)}</div>` : ''}
                                 <h1 class="aisb-hero-form__heading">${escapeHtml(content.heading || 'Your Headline Here')}</h1>
                                 <div class="aisb-hero-form__body">${content.content || '<p>Your compelling message goes here</p>'}</div>
@@ -5214,6 +5222,9 @@
                     editorState.sections = [];
                     editorState.isDirty = false;
                     editorState.currentSection = null;
+                    
+                    // Return to library mode since no sections exist
+                    showLibraryMode();
                     
                     // Clear the preview
                     $('#aisb-sections-preview').html(

@@ -41,16 +41,13 @@ class Template_Handler {
         
         $post_id = get_the_ID();
         
-        error_log("AISB: Template override check for post $post_id");
-        error_log("AISB: _aisb_enabled = " . get_post_meta($post_id, '_aisb_enabled', true));
-        error_log("AISB: _aisb_sections = " . print_r(get_post_meta($post_id, '_aisb_sections', true), true));
+        // Check if AISB is enabled for this post
         
         // Check for builder conflicts
         $conflict_check = aisb_check_conflicts($post_id);
         
         // If there are conflicts, don't override template
         if ($conflict_check['has_conflicts']) {
-            error_log("AISB: Conflicts detected, not overriding template");
             // Set flag for admin notice
             set_transient('aisb_conflict_notice_' . $post_id, $conflict_check['conflicting_builders'], 300);
             return $template;
@@ -58,11 +55,8 @@ class Template_Handler {
         
         // Only override if AISB is the active builder
         if (!aisb_is_enabled($post_id)) {
-            error_log("AISB: AISB not enabled, not overriding template");
             return $template;
         }
-        
-        error_log("AISB: Overriding template for post $post_id");
         // Load our custom template
         return $this->get_canvas_template();
     }
